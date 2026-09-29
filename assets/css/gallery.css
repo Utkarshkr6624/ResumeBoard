@@ -1,0 +1,1289 @@
+/* Resumeboard — static reference pages: the ATS guide and the template gallery.
+ *
+ * Two audiences, one stylesheet:
+ *   .gp-*  page chrome for the static HTML pages under /ats and /templates
+ *   .rp-*  the resume specimens shown on the template pages
+ *
+ * The specimens are drawn, not photographed: there is no build step, so every
+ * "screenshot" here is the real CSS at real proportions.
+ *
+ * The specimen sheet is deliberately NOT themed. It represents ink on paper,
+ * so it keeps a fixed paper/ink palette in both colour schemes. Only the page
+ * around it follows --rb-* tokens.
+ *
+ * The .gp-* chrome is the /ats + /templates half of the site shell. The same
+ * values live in home.css, examples.css and site.css — 1200px measure, 56px
+ * bar, 26px brand tile, 64px section rhythm — because each page links exactly
+ * one of those sheets and nothing can factor them out. Keep the four in step.
+ */
+
+:root {
+  --rbx-page: 1200px;
+  --rbx-gutter: var(--rb-space-6);
+  --rbx-head-h: 3.5rem;
+  --rbx-mark: 26px;
+  --rbx-h1: 2.25rem;
+  --rbx-section: var(--rb-space-16);
+  --rbx-top: var(--rb-space-16);
+
+  /* Small text the reader has to read. See the note in home.css. */
+  --rbx-label: var(--rb-text-secondary);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) { --rbx-label: var(--rb-text-muted); }
+}
+html[data-theme="dark"] { --rbx-label: var(--rb-text-muted); }
+
+/* ============================================================ page chrome */
+
+.gp-skiplink {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -120%);
+  z-index: var(--rb-z-toast);
+  padding: var(--rb-space-2) var(--rb-space-4);
+  background: var(--rb-accent-600);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--rb-radius-md) var(--rb-radius-md);
+  transition: transform var(--rb-dur-base) var(--rb-ease-out);
+}
+.gp-skiplink:focus { transform: translate(-50%, 0); }
+
+.gp-top {
+  position: sticky;
+  top: 0;
+  z-index: var(--rb-z-header);
+  background: color-mix(in srgb, var(--rb-bg-elevated) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--rb-border);
+}
+.gp-top__in {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-6);
+  min-height: var(--rbx-head-h);
+  padding: 0 var(--rbx-gutter);
+  max-width: var(--rbx-page);
+  margin: 0 auto;
+}
+.gp-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  font-weight: 650;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  color: var(--rb-text);
+  text-decoration: none;
+  flex: none;
+}
+/* Same tile as the brand marks on every other page: 26px, 6px radius,
+   accent fill, white glyph. The stroke is re-stated because padding scales
+   the 24-unit viewBox down to 18px. */
+.gp-brand__mark {
+  width: var(--rbx-mark);
+  height: var(--rbx-mark);
+  padding: 4px;
+  flex: none;
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-accent-600);
+  color: #fff;
+  stroke-width: 2.2;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out);
+}
+.gp-brand:hover .gp-brand__mark { background: var(--rb-accent-700); }
+.gp-nav {
+  display: flex; gap: var(--rb-space-1); margin-left: auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.gp-nav::-webkit-scrollbar { display: none; }
+.gp-nav a {
+  padding: 6px var(--rb-space-3);
+  border-radius: var(--rb-radius-sm);
+  font-size: var(--rb-text-base);
+  font-weight: 500;
+  color: var(--rb-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.gp-nav a:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+.gp-nav a[aria-current="page"] { color: var(--rb-text); background: var(--rb-bg-hover); font-weight: 600; }
+
+.gp-wrap { max-width: var(--rbx-page); margin: 0 auto; padding: 0 var(--rbx-gutter); }
+.gp-wrap--narrow { max-width: 880px; }
+/* One top offset for every page in this family, whether it opens on a
+   breadcrumb, a hero or straight into the prose. */
+.gp-main > .gp-wrap { padding-top: var(--rbx-top); }
+.gp-main { display: block; }
+.gp-main:focus { outline: none; }
+
+/* ============================================================== typography */
+
+.gp-hero { padding: var(--rb-space-6) 0 var(--rb-space-10); }
+.gp-kicker {
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-3);
+}
+.gp-h1 {
+  font-size: var(--rbx-h1);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 680;
+  max-width: 22ch;
+}
+.gp-h2 {
+  font-size: var(--rb-text-2xl);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 660;
+  margin: var(--rbx-section) 0 var(--rb-space-3);
+  max-width: 30ch;
+  scroll-margin-top: calc(var(--rbx-head-h) + var(--rb-space-4));
+}
+.gp-h3 {
+  font-size: var(--rb-text-lg);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  font-weight: 640;
+  margin: var(--rb-space-10) 0 var(--rb-space-2);
+  scroll-margin-top: calc(var(--rbx-head-h) + var(--rb-space-4));
+}
+.gp-h4 {
+  font-size: var(--rb-text-md);
+  font-weight: 640;
+  margin: var(--rb-space-5) 0 var(--rb-space-1);
+}
+.gp-lead {
+  font-size: var(--rb-text-lg);
+  line-height: 1.55;
+  color: var(--rb-text-secondary);
+  max-width: 62ch;
+  margin-top: var(--rb-space-4);
+}
+.gp-p { margin-top: var(--rb-space-4); max-width: 68ch; color: var(--rb-text-secondary); }
+.gp-p strong, .gp-verdict strong, .gp-note strong { color: var(--rb-text); font-weight: 620; }
+.gp-p a, .gp-note a { color: var(--rb-text-accent); }
+.gp-small { font-size: var(--rb-text-sm); color: var(--rbx-label); max-width: 72ch; }
+.gp-mono { font-family: var(--rb-font-mono); font-size: var(--rb-text-xs); }
+.gp-langlist { max-width: 72ch; line-height: 2.1; word-spacing: 0.3em; }
+
+.gp-prose { padding-bottom: var(--rb-space-16); }
+.gp-mt-4 { margin-top: var(--rb-space-4); }
+.gp-mt-5 { margin-top: var(--rb-space-5); }
+.gp-mt-6 { margin-top: var(--rb-space-6); }
+.gp-prose ul, .gp-prose ol { margin-top: var(--rb-space-3); max-width: 68ch; }
+.gp-prose ul { list-style: disc; padding-left: var(--rb-space-5); }
+.gp-prose ol { list-style: decimal; padding-left: var(--rb-space-6); }
+.gp-prose li { margin-top: var(--rb-space-2); color: var(--rb-text-secondary); }
+.gp-prose li::marker { color: var(--rb-text-faint); }
+.gp-prose li > ul, .gp-prose li > ol { margin-top: var(--rb-space-1); }
+
+.gp-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-2);
+  font-size: var(--rb-text-sm);
+  color: var(--rbx-label);
+  padding-top: 0;
+}
+.gp-crumbs a { color: var(--rbx-label); text-decoration: none; }
+.gp-crumbs a:hover { color: var(--rb-text); text-decoration: underline; }
+.gp-crumbs .gp-crumbs__sep { color: var(--rb-text-faint); }
+
+/* ================================================================== cards */
+
+.gp-grid { display: grid; gap: var(--rb-space-5); }
+.gp-grid--2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.gp-grid--3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.gp-grid--4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+.gp-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-2);
+  padding: var(--rb-space-5);
+  background: var(--rb-bg-elevated);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  box-shadow: var(--rb-shadow-xs);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--rb-dur-fast) var(--rb-ease-out),
+              box-shadow var(--rb-dur-fast) var(--rb-ease-out),
+              transform var(--rb-dur-fast) var(--rb-ease-out);
+}
+a.gp-card:hover {
+  border-color: var(--rb-border-strong);
+  box-shadow: var(--rb-shadow-md);
+  transform: translateY(-1px);
+}
+.gp-card__title { font-size: var(--rb-text-md); font-weight: 640; letter-spacing: -0.01em; }
+.gp-card__meta { font-size: var(--rb-text-sm); color: var(--rbx-label); }
+.gp-card__note { font-size: var(--rb-text-sm); color: var(--rb-text-secondary); margin-top: var(--rb-space-1); }
+.gp-card--link { position: relative; padding-right: var(--rb-space-12); }
+.gp-card--link::after {
+  content: "\2192";
+  position: absolute;
+  right: var(--rb-space-5);
+  top: var(--rb-space-5);
+  color: var(--rb-text-faint);
+  transition: transform var(--rb-dur-fast) var(--rb-ease-out), color var(--rb-dur-fast) var(--rb-ease-out);
+}
+a.gp-card--link:hover::after { transform: translateX(3px); color: var(--rb-text-accent); }
+.gp-card--shot { padding: var(--rb-space-4); gap: var(--rb-space-4); }
+
+/* The .rb-badge in base.css is the site-wide pill. .gp-tag is the same
+   primitive under a different name, so it is sized to match rather than
+   carrying a border the other families do not have. */
+.gp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+  align-self: flex-start;
+  padding: 1px var(--rb-space-2);
+  border-radius: var(--rb-radius-full);
+  background: var(--rb-bg-sunken);
+  font-size: var(--rb-text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--rb-text-secondary);
+  white-space: nowrap;
+}
+.gp-tag--pass { background: var(--rb-green-50); border-color: transparent; color: var(--rb-green-700); }
+.gp-tag--warn { background: var(--rb-amber-50); border-color: transparent; color: var(--rb-amber-700); }
+.gp-tag--fail { background: var(--rb-red-50); border-color: transparent; color: var(--rb-red-700); }
+.gp-tag--info { background: var(--rb-blue-50); border-color: transparent; color: var(--rb-blue-700); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .gp-tag--pass { background: rgba(4,120,87,.20); color: #6ee7b7; }
+  html:not([data-theme="light"]) .gp-tag--warn { background: rgba(181,71,8,.22); color: #fcd34d; }
+  html:not([data-theme="light"]) .gp-tag--fail { background: rgba(217,45,32,.20); color: #fca5a5; }
+  html:not([data-theme="light"]) .gp-tag--info { background: rgba(2,106,162,.22); color: #7dd3fc; }
+}
+html[data-theme="dark"] .gp-tag--pass { background: rgba(4,120,87,.20); color: #6ee7b7; }
+html[data-theme="dark"] .gp-tag--warn { background: rgba(181,71,8,.22); color: #fcd34d; }
+html[data-theme="dark"] .gp-tag--fail { background: rgba(217,45,32,.20); color: #fca5a5; }
+html[data-theme="dark"] .gp-tag--info { background: rgba(2,106,162,.22); color: #7dd3fc; }
+
+/* ======================================================= good / bad lists */
+
+.gp-verdicts { display: grid; gap: var(--rb-space-5); grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+.gp-verdict {
+  padding: var(--rb-space-5);
+  border-radius: var(--rb-radius-lg);
+  border: 1px solid var(--rb-border);
+  border-top-width: 2px;
+  background: var(--rb-bg-elevated);
+}
+.gp-verdict__title {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: var(--rb-space-3);
+}
+.gp-verdict__title::before { content: ""; width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.gp-verdict--good { border-top-color: var(--rb-green-600); }
+.gp-verdict--good .gp-verdict__title { color: var(--rb-green-700); }
+.gp-verdict--good .gp-verdict__title::before { background: var(--rb-green-600); }
+.gp-verdict--bad { border-top-color: var(--rb-red-500); }
+.gp-verdict--bad .gp-verdict__title { color: var(--rb-red-700); }
+.gp-verdict--bad .gp-verdict__title::before { background: var(--rb-red-500); }
+/* The -700 steps are dark enough to disappear on the dark surface, so the
+   titles take the same light-on-dark pair the .gp-tag variants use. */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .gp-verdict--good .gp-verdict__title { color: #6ee7b7; }
+  html:not([data-theme="light"]) .gp-verdict--bad .gp-verdict__title { color: #fca5a5; }
+}
+html[data-theme="dark"] .gp-verdict--good .gp-verdict__title { color: #6ee7b7; }
+html[data-theme="dark"] .gp-verdict--bad .gp-verdict__title { color: #fca5a5; }
+.gp-verdict ul { list-style: none; }
+.gp-verdict ul > li {
+  position: relative;
+  padding-left: var(--rb-space-4);
+  margin-top: var(--rb-space-2);
+  font-size: var(--rb-text-sm);
+  color: var(--rb-text-secondary);
+}
+.gp-verdict ul > li::before { position: absolute; left: 0; top: 0; font-weight: 700; }
+.gp-verdict--good ul > li::before { content: "+"; color: var(--rb-green-600); }
+.gp-verdict--bad ul > li::before { content: "\2212"; color: var(--rb-red-500); }
+
+/* ================================================================ callout */
+
+.gp-note {
+  display: flex;
+  gap: var(--rb-space-3);
+  padding: var(--rb-space-4) var(--rb-space-5);
+  border-radius: var(--rb-radius-md);
+  border: 1px solid var(--rb-border);
+  border-left: 3px solid var(--rb-text-faint);
+  background: var(--rb-bg-elevated);
+  margin: var(--rb-space-5) 0;
+}
+.gp-note__body { min-width: 0; }
+.gp-note__title { font-size: var(--rb-text-sm); font-weight: 650; margin-bottom: var(--rb-space-1); }
+.gp-note__text { font-size: var(--rb-text-sm); color: var(--rb-text-secondary); }
+.gp-note__text > * + * { margin-top: var(--rb-space-2); }
+.gp-note--info { border-left-color: var(--rb-blue-600); }
+.gp-note--warn { border-left-color: var(--rb-amber-600); }
+.gp-note--stop { border-left-color: var(--rb-red-500); }
+.gp-note--ok { border-left-color: var(--rb-green-600); }
+
+/* ============================================================ data tables */
+
+.gp-table-scroll { overflow-x: auto; margin: var(--rb-space-5) 0; }
+.gp-table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: var(--rb-text-sm); }
+.gp-table caption {
+  text-align: left;
+  font-size: var(--rb-text-sm);
+  font-weight: 650;
+  color: var(--rb-text);
+  padding-bottom: var(--rb-space-2);
+}
+.gp-table th, .gp-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: var(--rb-space-3) var(--rb-space-4);
+  border-bottom: 1px solid var(--rb-border-subtle);
+}
+.gp-table thead th {
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+  border-bottom: 1px solid var(--rb-border);
+  white-space: nowrap;
+}
+.gp-table tbody th { font-weight: 620; color: var(--rb-text); width: 25%; }
+.gp-table td { color: var(--rb-text-secondary); }
+.gp-table td a { color: var(--rb-text-accent); }
+
+/* ============================================================== citations */
+
+.gp-src { margin: var(--rb-space-6) 0 0; padding: 0 0 0 var(--rb-space-4); border-left: 2px solid var(--rb-border); font-size: var(--rb-text-sm); list-style: none; }
+.gp-src > li { margin-top: var(--rb-space-3); color: var(--rbx-label); }
+.gp-src a { color: var(--rb-text-accent); word-break: break-word; }
+.gp-src-label {
+  display: block;
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-1);
+}
+
+.gp-quote {
+  margin: var(--rb-space-5) 0;
+  padding: var(--rb-space-2) 0 var(--rb-space-2) var(--rb-space-5);
+  border-left: 3px solid var(--rb-accent-300);
+  font-size: var(--rb-text-md);
+  line-height: 1.55;
+  color: var(--rb-text);
+}
+.gp-quote p + p { margin-top: var(--rb-space-2); }
+.gp-quote cite { display: block; margin-top: var(--rb-space-3); font-size: var(--rb-text-sm); font-style: normal; color: var(--rbx-label); }
+.gp-quote cite a { color: var(--rb-text-accent); }
+
+.gp-hash {
+  display: inline-block;
+  padding: 1px var(--rb-space-2);
+  border-radius: var(--rb-radius-xs);
+  background: var(--rb-bg-sunken);
+  border: 1px solid var(--rb-border);
+  font-family: var(--rb-font-mono);
+  font-size: var(--rb-text-2xs);
+  color: var(--rb-text);
+  white-space: nowrap;
+}
+
+details.gp-details {
+  margin: var(--rb-space-5) 0;
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-md);
+  background: var(--rb-bg-elevated);
+}
+details.gp-details > summary {
+  cursor: pointer;
+  padding: var(--rb-space-3) var(--rb-space-4);
+  font-size: var(--rb-text-sm);
+  font-weight: 620;
+  list-style: none;
+}
+details.gp-details > summary::-webkit-details-marker { display: none; }
+details.gp-details > summary::before { content: "+ "; color: var(--rbx-label); font-weight: 700; }
+details.gp-details[open] > summary::before { content: "\2212  "; }
+details.gp-details > .gp-details__body { padding: 0 var(--rb-space-4) var(--rb-space-4); font-size: var(--rb-text-sm); color: var(--rb-text-secondary); }
+details.gp-details > .gp-details__body > * + * { margin-top: var(--rb-space-3); }
+.gp-details__body ul { list-style: none; }
+.gp-details__body ul > li { margin-top: var(--rb-space-1); padding-left: var(--rb-space-4); position: relative; }
+.gp-details__body ul > li::before { content: "\2013"; position: absolute; left: 0; color: var(--rb-text-faint); }
+
+/* ==================================================================== CTA */
+
+.gp-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rb-space-4) var(--rb-space-6);
+  margin-top: var(--rb-space-12);
+  padding: var(--rb-space-8);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-xl);
+  background: var(--rb-bg-elevated);
+  box-shadow: var(--rb-shadow-sm);
+}
+.gp-cta--primary { background: var(--rb-bg-inset); }
+.gp-cta__body { flex: 1 1 320px; min-width: 0; }
+.gp-cta__title { font-size: var(--rb-text-xl); font-weight: 660; letter-spacing: -0.02em; }
+.gp-cta__text { font-size: var(--rb-text-sm); color: var(--rb-text-secondary); margin-top: var(--rb-space-2); max-width: 54ch; }
+.gp-cta__actions { display: flex; flex-wrap: wrap; gap: var(--rb-space-3); }
+
+/* Sized to the .rb-btn in base.css so a button reads the same weight on the
+   landing page, the guides and here. */
+.gp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  height: 32px;
+  padding: 0 var(--rb-space-4);
+  border-radius: var(--rb-radius-sm);
+  border: 1px solid transparent;
+  font-size: var(--rb-text-base);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out), border-color var(--rb-dur-fast) var(--rb-ease-out), color var(--rb-dur-fast) var(--rb-ease-out);
+}
+.gp-btn--primary { background: var(--rb-accent-600); color: #fff; }
+.gp-btn--primary:hover { background: var(--rb-accent-700); color: #fff; }
+.gp-btn--secondary { background: var(--rb-bg-elevated); border-color: var(--rb-border-strong); color: var(--rb-text); box-shadow: var(--rb-shadow-xs); }
+.gp-btn--secondary:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+
+/* ================================================================= footer */
+/* Same band, measure, heading scale and link scale as the footer in
+   home.css, examples.css and site.css. */
+
+.gp-foot {
+  margin-top: var(--rb-space-16);
+  border-top: 1px solid var(--rb-border);
+  background: var(--rb-bg-sunken);
+  padding: var(--rb-space-12) 0 var(--rb-space-8);
+  color: var(--rb-text-muted);
+  font-size: var(--rb-text-sm);
+}
+.gp-foot__grid { display: grid; gap: var(--rb-space-8) var(--rb-space-6); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gp-foot h2 {
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-2);
+}
+.gp-foot ul > li { margin-top: var(--rb-space-1); }
+.gp-foot a { color: var(--rb-text-secondary); text-decoration: none; }
+.gp-foot a:hover { color: var(--rb-text); text-decoration: underline; }
+.gp-foot__legal { margin-top: var(--rb-space-8); padding-top: var(--rb-space-5); border-top: 1px solid var(--rb-border-subtle); font-size: var(--rb-text-xs); color: var(--rbx-label); max-width: 80ch; }
+/* A link inside a sentence has to be distinguishable without colour: in dark
+   mode the link ink (#a8b1c0) and the body ink it sits in (#7d8798) are both
+   correct against the background and 1.68:1 against each other, so the
+   underline is the only cue that survives. */
+.gp-foot__legal a { text-decoration: underline; text-underline-offset: 0.15em; }
+@media (max-width: 44rem) {
+  .gp-foot__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 30rem) {
+  .gp-foot__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* =========================================================================
+   RESUME SPECIMEN
+   .rp-shot is the query container; .rp-frame is one page, Letter or A4.
+
+   The values below are the ones the builder writes onto #rb-doc from
+   assets/js/render/templates.js — the same registry, the same arithmetic.
+   Body size in particular is not the preset's baseSizePt: it is that value
+   corrected by the face's optical size, exactly as RB.templates.sizePt does,
+   because two faces at the same point size are not the same size on paper.
+
+   A specimen is a static page, not a screen capture. It is exact about
+   geometry, type scale, page size and rules, and it is silent about the
+   editing affordances the live document has around the same content.
+
+   Paper and ink are fixed, not themed. A resume is ink on paper and the
+   export does not invert with the app theme, so a white sheet stays white in
+   dark mode. Only the page around it follows --rb-* tokens.
+   ========================================================================= */
+
+.rp-shot { container-type: inline-size; margin: 0; width: 100%; }
+.rp-shot__cap {
+  margin-top: var(--rb-space-3);
+  font-size: var(--rb-text-xs);
+  color: var(--rbx-label);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-1) var(--rb-space-3);
+}
+
+.rp-frame {
+  /* Magnitudes, written inline on every specimen by the page generator from
+     the registry: page size in inches, margin in inches, body size in points,
+     and the two gaps and the rule weight exactly as the preset declares them.
+     The values here are the classic preset's, and only so the sheet is not
+     unshaped if the inline block is ever lost. */
+  --rp-page-w-in: 8.5;
+  --rp-page-h-in: 11;
+  --rp-margin-in: 0.6;
+  --rp-size-pt: 10.5;
+  --rp-gap-pt: 14;
+  --rp-entry-pt: 7;
+  --rp-rule-pt: 0.6;        /* ruleWeight, already multiplied by the 0.6pt hairline */
+
+  --rp-paper: #ffffff;
+  --rp-ink: #151a23;
+  --rp-mute: #4d5666;
+  --rp-faint: #8d97a8;
+  --rp-hair: #d7dbe3;
+  --rp-hair-w: 1px;
+  --rp-edge: #d7dbe3;
+
+  /* The accent, the face and the bullet come from the same --rb-doc-* the
+     builder paints onto #rb-doc, so a preview cannot drift from the document
+     it is a preview of. */
+  --rp-accent: var(--rb-doc-accent, #232936);
+  --rp-face: var(--rb-doc-font, var(--rb-font-sans));
+
+  /* A point is 1/72 of an inch and an inch is 1/--rp-page-w-in of the sheet,
+     so this is one point at the current sheet width. Every length above
+     therefore lands on paper at its real value at any preview size. */
+  --rp-pt: calc(100cqw / (72 * var(--rp-page-w-in)));
+  --rp-u: calc(var(--rp-size-pt) * var(--rp-pt));       /* one body em */
+  --rp-pad: calc(var(--rp-margin-in) * 72 * var(--rp-pt));
+  --rp-rule: calc(max(var(--rp-rule-pt), 0.6) * var(--rp-pt));
+  --rp-indent: calc(var(--rp-u) * 1.05);
+
+  position: relative;
+  display: block;
+  width: 100%;
+  /* Read off the sheet size, so A4 is as tall as A4 and not as tall as Letter. */
+  aspect-ratio: var(--rp-page-w-in) / var(--rp-page-h-in);
+  overflow: hidden;
+  padding: var(--rp-pad);
+  background: var(--rp-paper);
+  color: var(--rp-ink);
+  border: 1px solid var(--rp-edge);
+  border-radius: var(--rb-radius-sm);
+  box-shadow: var(--rb-shadow-doc);
+  text-align: left;
+  font-family: var(--rp-face);
+  font-size: 15px;                          /* no container query units */
+  font-size: var(--rp-u);                   /* 10.5pt on a Letter sheet */
+  line-height: var(--rb-doc-leading, 1.32);
+  -webkit-hyphens: none;
+  hyphens: none;
+}
+/* No blanket colour on list items. .rp-frame already sets the ink, and a rule
+   here would beat every inherited colour a band or a sidebar needs — a filled
+   header band sets its contact line to reverse-out ink on the ul, and an li
+   with its own colour would ignore it and print near-black on a dark ground. */
+
+/* -- header --------------------------------------------------------------- */
+
+.rp-name {
+  margin: 0;
+  font-size: calc(var(--rp-u) * 1.95);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: calc(var(--rb-doc-tracking, 0em) - 0.018em);
+  color: var(--rp-accent);
+  text-wrap: balance;
+}
+.rp-label {
+  margin-top: 0.3em;
+  font-size: calc(var(--rp-u) * 1.12);
+  line-height: 1.25;
+  color: var(--rp-mute);
+  letter-spacing: var(--rp-track-mid);
+  text-wrap: balance;
+}
+.rp-contact {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15em 0.8em;
+  margin-top: 0.55em;
+  font-size: calc(var(--rp-u) * 0.9);
+  line-height: 1.4;
+  color: var(--rp-mute);
+}
+.rp-contact li { white-space: nowrap; }
+.rp-contact .rp-sep { color: var(--rp-faint); }
+
+/* The photo slot. Empty, hairline-framed and never louder than the name —
+   an empty box is what the builder draws until you add a picture, and a
+   preview that quietly included a face would be a picture of a person who
+   does not exist. */
+.rp-photo {
+  display: none;
+  width: 6.4em;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid var(--rp-faint);
+  border-radius: 0.15em;
+  font-size: 0.5em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  /* --rp-faint is a hairline colour and this is text, 4.3px of it, at 2.95:1
+     on the preview's white. The label is decorative but it is still read by a
+     magnifier, so it takes the muted ink, which clears 7:1. */
+  color: var(--rp-mute);
+}
+.rp-head--photo { display: flex; align-items: flex-start; gap: 1.1em; }
+.rp-head--photo .rp-id { flex: 1 1 auto; min-width: 0; }
+.rp-frame[data-photo="on"] .rp-photo { display: flex; flex: none; }
+/* In two columns the photo belongs to the rail, and the rail is the measure. */
+.rp-frame[data-cols="2"] .rp-photo { width: 100%; margin-bottom: var(--rp-gap); }
+.rp-frame[data-print-safe="true"] .rp-photo { border-color: var(--rp-mute); }
+
+/* -- sections ------------------------------------------------------------- */
+
+.rp-sec { margin-top: var(--rp-gap); }
+.rp-sec:first-child { margin-top: 0; }
+.rp-p { margin: 0; color: var(--rp-ink); }
+
+/* -- entries -------------------------------------------------------------- */
+
+.rp-entry + .rp-entry { margin-top: var(--rp-entry-gap); }
+.rp-ehead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: var(--rp-col-gap);
+  row-gap: 0;
+  min-width: 0;
+}
+/* The organisation is the entry's title line; the job title is the qualifier
+   under it. The document does it this way and so does a preview. */
+.rp-org {
+  margin: 0;
+  font-size: calc(var(--rp-u) * 1.04);
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--rp-ink);
+}
+.rp-dates {
+  flex: none;
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+  font-size: calc(var(--rp-u) * 0.9);
+  color: var(--rp-mute);
+  font-variant-numeric: tabular-nums;
+}
+.rp-sub {
+  margin: calc(var(--rp-u) * 0.12) 0 0;
+  font-size: calc(var(--rp-u) * 0.9);
+  line-height: 1.35;
+  color: var(--rp-mute);
+}
+.rp-bul li { position: relative; }
+
+.rp-skills { display: block; margin: 0; }
+.rp-skill { display: flex; gap: 0.5em; margin-top: 0.35em; }
+.rp-skill dt { flex: none; min-width: 6.4em; font-weight: 650; color: var(--rp-ink); }
+.rp-skill dd { margin: 0; color: var(--rp-ink); }
+
+/* -- two-column shell ----------------------------------------------------- */
+
+.rp-side { min-width: 0; }
+.rp-main { min-width: 0; }
+
+/* =========================================================================
+   TEMPLATE DIFFERENCES, AND WHERE THEY COME FROM
+   There is no per-template rule in this file, and adding one would be the bug.
+
+   Every specimen carries the same --rb-doc-* custom properties that
+   RB.templates.paint() writes onto #rb-doc, the same [data-heading],
+   [data-bullet], [data-cols], [data-page-size], [data-photo] and
+   [data-print-safe] attributes the renderer sets, and the seven magnitudes
+   the sheet needs in order to scale itself (page size, margin, body size,
+   section gap, entry gap, rule weight). All of it is read from
+   assets/js/render/templates.js. Everything below is keyed on those values,
+   so a template added to the registry arrives with its geometry already
+   correct and this file does not change.
+
+   The floor on the two vertical gaps is templates.css's floor, restated:
+   an entry gap asked for at less than half the body size would otherwise
+   come out narrower than the bullets inside the entry, and the reader would
+   lose track of where one job ends.
+   ========================================================================= */
+
+.rp-frame {
+  --rp-entry-gap: max(calc(var(--rp-entry-pt) * var(--rp-pt)), calc(var(--rp-u) * 0.5));
+  --rp-gap: max(calc(var(--rp-gap-pt) * var(--rp-pt)), calc(var(--rp-entry-gap) * 1.7));
+  --rp-bullet-gap: calc(var(--rp-u) * 0.16);
+  --rp-track-caps: calc(var(--rb-doc-tracking, 0em) + 0.1em);
+  --rp-track-mid: calc(var(--rb-doc-tracking, 0em) + 0.045em);
+  --rp-col-gap: calc(var(--rp-u) * 1.5);
+  --rp-side-min: calc(180 * var(--rp-pt));
+}
+
+/* The measure is an em cap, so it holds through every point size the reader
+   can pick, and a generous margin clamps it and a tight one does not. Two
+   columns take the whole sheet instead: halving it again would leave a
+   sidebar too narrow to hold a word. */
+.rp-body { max-width: var(--rb-doc-measure, 38em); margin-inline: auto; }
+.rp-frame[data-cols="2"] .rp-body { max-width: none; }
+
+/* -- section headings: three treatments, one standing-alone line ----------- */
+
+.rp-h {
+  margin: 0 0 calc(var(--rp-u) * 0.5);
+  padding-bottom: calc(var(--rp-u) * 0.32);
+  border-bottom: var(--rp-rule) solid var(--rp-accent);
+  font-size: calc(var(--rp-u) * 1.20);
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--rp-accent);
+  text-transform: uppercase;
+  letter-spacing: var(--rp-track-caps);
+}
+.rp-frame[data-heading="title"] .rp-h {
+  font-size: calc(var(--rp-u) * 1.368);
+  margin-bottom: calc(var(--rp-u) * 0.42);
+  padding-bottom: 0;
+  border-bottom: 0;
+  text-transform: capitalize;
+  letter-spacing: var(--rp-track-mid);
+}
+.rp-frame[data-heading="rule"] .rp-h {
+  font-size: calc(var(--rp-u) * 1.248);
+  border-bottom: calc(var(--rp-rule) * 1.8) solid var(--rp-accent);
+  text-transform: capitalize;
+  letter-spacing: var(--rp-track-mid);
+}
+
+/* -- bullets: the same hanging marker the document draws -------------------
+   The indent is on the ITEM, not the list, so the marker can sit in the
+   hanging position the text returns to after a wrap. */
+
+.rp-bul,
+.rp-cites,
+.rp-plain {
+  margin: calc(var(--rp-u) * 0.34) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.rp-cites, .rp-plain { margin-top: 0; }
+.rp-bul li,
+.rp-cites li,
+.rp-plain li { position: relative; padding-left: var(--rp-indent); }
+.rp-bul li + li,
+.rp-cites li + li,
+.rp-plain li + li { margin-top: var(--rp-bullet-gap); }
+.rp-bul li::before {
+  content: var(--rb-doc-bullet);
+  position: absolute;
+  left: 0;
+  top: 0.08em;
+  width: calc(var(--rp-indent) - 0.5em);
+  text-align: left;
+  color: var(--rp-accent);
+}
+/* bulletGlyph "none" means exactly that: the claims run flush as plain lines
+   and the spacing has to do the work the marker was doing. */
+.rp-frame[data-bullet="none"] {
+  --rp-indent: 0;
+  --rp-bullet-gap: calc(var(--rp-u) * 0.5);
+}
+
+
+/* -- the two-column shell ------------------------------------------------- */
+
+.rp-cols { display: none; }
+.rp-frame[data-cols="2"] .rp-cols {
+  display: grid;
+  grid-template-columns: max(var(--rb-doc-sidebar-width, 32%), var(--rp-side-min)) minmax(0, 1fr);
+  column-gap: var(--rp-col-gap);
+  align-items: stretch;
+}
+.rp-frame[data-cols="2"] .rp-side {
+  padding-right: calc(var(--rp-col-gap) * 0.75);
+  border-right: var(--rp-hair-w) solid var(--rp-hair);
+}
+.rp-frame[data-cols="2"] .rp-skill { display: block; }
+.rp-frame[data-cols="2"] .rp-skill dt { min-width: 0; margin-bottom: 0.1em; }
+.rp-frame[data-cols="2"] .rp-side > .rp-sec:first-child { margin-top: 0; }
+
+/* -- print-safe: no hue, and hairlines thick enough for a toner drum ------ */
+
+.rp-frame[data-print-safe="true"] {
+  --rp-accent: #000000;
+  --rp-ink: #000000;
+  --rp-mute: #1a1a1a;
+  --rp-faint: #4a4a4a;
+  --rp-hair: #000000;
+  --rp-rule: calc(max(var(--rp-rule-pt), 0.9) * var(--rp-pt));
+}
+
+/* =========================================================================
+   14. ARRANGEMENT
+   The mirror of §14 in templates.css, and it works the same way: one generic
+   rule per axis, keyed on the shape the registry named and never on
+   [data-template]. The attributes come off the builder's own paint(), so a
+   preset that asks for a bar down the side of every section gets a bar, and
+   adding an axis to the registry adds a shape rather than a template.
+
+   Two shapes are width-gated in the document — the card grid and the margin
+   column — because at 360px they are a column of one word per line. The gates
+   here are on the sheet rather than the window, so a thumbnail stacks where a
+   full-size preview does not. That is the same decision, measured against the
+   thing actually being drawn.
+   ========================================================================= */
+
+.rp-frame {
+  /* Lengths a shape needs but a shape name cannot carry, in the units the
+     builder wrote them. Em columns stay in ems: the specimen's own font size
+     is one body em, so 9em is nine characters of body type. */
+  --rp-frame-pad: calc(var(--rp-frame-pad-pt, 6) * var(--rp-pt));
+  --rp-band-pad: calc(var(--rp-band-pad-pt, 11) * var(--rp-pt));
+  --rp-bar-w: calc(var(--rp-bar-w-pt, 3) * var(--rp-pt));
+  --rp-rail-col: calc(var(--rp-rail-col-em, 9) * 1em);
+  --rp-date-col: calc(var(--rp-date-col-em, 9.5) * 1em);
+  --rp-card-gap: calc(var(--rp-card-gap-pt, 8) * var(--rp-pt));
+  --rp-rail-pad: calc(var(--rp-rail-pad-em, 1.2) * 1em);
+
+  /* Derived from the accent, never hardcoded, exactly as the document does it:
+     change the accent in Design and every band, tint and bar follows. */
+  --rp-band-fill: color-mix(in srgb, var(--rp-accent) 76%, #0b0e14);
+  --rp-tint: color-mix(in srgb, var(--rp-accent) 8%, var(--rp-paper));
+  --rp-on-band: var(--rp-paper);
+  --rp-on-band-soft: color-mix(in srgb, var(--rp-paper) 78%, var(--rp-band-fill));
+  --rp-faint-line: color-mix(in srgb, var(--rp-faint) 42%, var(--rp-paper));
+  --rp-faint-fill: color-mix(in srgb, var(--rp-faint) 7%, var(--rp-paper));
+}
+
+/* -- 14a. the rules around the header -------------------------------------- */
+
+/* The header's three tiers and three gaps are the document's: the name crowds
+   its headline, the headline breathes before the contact line, and the contact
+   line gets the most room before the rule. A single uniform gap flattens the
+   block into a list of unrelated strings. */
+.rp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: var(--rp-col-gap);
+  row-gap: 0;
+  padding-bottom: calc(var(--rp-u) * 0.95);
+  margin-bottom: var(--rp-gap);
+  border-bottom: calc(var(--rp-rule) * 1.8) solid var(--rp-accent);
+}
+.rp-head .rp-id { flex: 1 1 auto; min-width: 0; }
+.rp-frame[data-struct-head-rules="none"] .rp-head { border-bottom: 0; padding-bottom: 0; }
+.rp-frame[data-struct-head-rules="double"] .rp-head { border-bottom: calc(var(--rp-rule) * 3) double var(--rp-accent); }
+.rp-frame[data-struct-head-rules="heavy"] .rp-head { border-bottom: calc(var(--rp-rule) * 2.6) solid var(--rp-accent); }
+
+/* A band across the header. The negative margin is the page margin, so the
+   band runs the full width of the sheet while its text still lines up with
+   the measure — which is the whole reason it is a band and not a box. */
+.rp-frame[data-struct-head-band="fill"] .rp-head,
+.rp-frame[data-struct-head-band="tint"] .rp-head {
+  margin-inline: calc(-1 * var(--rp-pad));
+  padding: var(--rp-band-pad) var(--rp-pad);
+  max-width: none;
+  border-bottom: 0;
+}
+.rp-frame[data-struct-head-band="tint"] .rp-head { background: var(--rp-tint); }
+.rp-frame[data-struct-head-band="fill"] .rp-head { background: var(--rp-band-fill); color: var(--rp-on-band); }
+/* On a filled band the name's colour IS the band, so it has to be handed the
+   band's ink explicitly rather than inheriting the accent. */
+.rp-frame[data-struct-head-band="fill"] .rp-name { color: var(--rp-on-band); }
+.rp-frame[data-struct-head-band="fill"] .rp-label,
+.rp-frame[data-struct-head-band="fill"] .rp-contact { color: var(--rp-on-band-soft); }
+.rp-frame[data-struct-head-band="fill"] .rp-photo { color: var(--rp-on-band-soft); }
+.rp-frame[data-struct-head-band="fill"] .rp-sep { color: inherit; }
+
+/* -- 14b. header arrangements --------------------------------------------- */
+
+.rp-frame[data-struct-head="center"] .rp-head {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.rp-frame[data-struct-head="center"] .rp-contact { justify-content: center; }
+.rp-frame[data-struct-head="center"] .rp-name,
+.rp-frame[data-struct-head="center"] .rp-label { text-align: center; text-wrap: balance; }
+.rp-frame[data-struct-head="center"] .rp-photo { order: -1; align-self: center; margin-bottom: calc(var(--rp-u) * 0.6); }
+
+/* Triptych: the identity block cut into three bands, the rules landing
+   between them. `display: contents` is what makes the name and the headline
+   grid items in their own right. */
+.rp-frame[data-struct-head="triptych"] .rp-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--rp-col-gap);
+  row-gap: 0;
+  align-items: start;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.rp-frame[data-struct-head="triptych"] .rp-id { display: contents; }
+.rp-frame[data-struct-head="triptych"] .rp-name { grid-column: 1; grid-row: 1; }
+.rp-frame[data-struct-head="triptych"] .rp-label {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: 0.2em;
+  padding-top: 0.32em;
+  border-top: var(--rp-rule) solid var(--rp-accent);
+}
+.rp-frame[data-struct-head="triptych"] .rp-photo { grid-column: 2; grid-row: 1 / span 2; align-self: start; }
+.rp-frame[data-struct-head="triptych"] .rp-contact {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  align-self: stretch;
+  margin-top: 0;
+  padding: 0.42em 0 0.5em;
+  border-top: var(--rp-rule) solid var(--rp-accent);
+  border-bottom: var(--rp-rule) solid var(--rp-accent);
+}
+
+/* -- 14c. section shapes --------------------------------------------------- */
+
+.rp-frame[data-struct-sec="bar"] .rp-sec { padding-left: var(--rp-bar-w); }
+.rp-frame[data-struct-sec="bar"] .rp-h {
+  border-bottom: 0;
+  margin-left: calc(-1 * var(--rp-bar-w));
+  padding-bottom: 0;
+  margin-bottom: calc(var(--rp-u) * 0.42);
+  box-shadow: inset var(--rp-bar-w) 0 0 0 var(--rp-accent);
+}
+
+.rp-frame[data-struct-sec="box"] .rp-sec,
+.rp-frame[data-struct-sec="tint"] .rp-sec {
+  padding: var(--rp-frame-pad);
+  border-radius: calc(var(--rp-pt) * 2);
+}
+.rp-frame[data-struct-sec="box"] .rp-sec {
+  border: var(--rp-rule) solid var(--rp-faint-line);
+  background: var(--rp-faint-fill);
+}
+.rp-frame[data-struct-sec="tint"] .rp-sec {
+  border-left: calc(var(--rp-hair-w) * 2.2) solid var(--rp-accent);
+  background: var(--rp-tint);
+}
+.rp-frame[data-struct-sec="box"] .rp-sec:first-child,
+.rp-frame[data-struct-sec="tint"] .rp-sec:first-child { margin-top: 0; }
+
+/* Numbered sections. The counter is drawn, not typed, so it never reaches the
+   text layer. The heading keeps its own line and its own rule. */
+.rp-frame[data-struct-number="decimal"] .rp-body { counter-reset: rp-sec; }
+.rp-frame[data-struct-number="decimal"] .rp-h { counter-increment: rp-sec; }
+.rp-frame[data-struct-number="decimal"] .rp-h::before {
+  content: counter(rp-sec, decimal-leading-zero);
+  display: inline-block;
+  min-width: 1.9em;
+  margin-right: 0.1em;
+  color: var(--rp-faint);
+  font-weight: 400;
+  font-size: 0.8em;
+  vertical-align: 0.15em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* -- 14d. entry shapes ----------------------------------------------------- */
+
+/* A hairline between jobs and nothing else. The gap moves into the padding so
+   a divider can never collapse the space a reader needs to see where one job
+   ends — the entry-gap floor still applies to it. */
+.rp-frame[data-struct-entry="hair"] .rp-sec > .rp-entry + .rp-entry {
+  margin-top: 0;
+  padding-top: var(--rp-entry-gap);
+  border-top: var(--rp-hair-w) solid var(--rp-faint-line);
+}
+
+.rp-frame[data-struct-entry="box"] .rp-sec > .rp-entry {
+  padding: var(--rp-frame-pad);
+  border: var(--rp-rule) solid var(--rp-faint-line);
+  border-radius: calc(var(--rp-pt) * 2);
+  background: var(--rp-faint-fill);
+}
+
+/* A timeline: a hairline down the section and a node at every job. Neither is
+   a character, so neither reaches the text layer. */
+.rp-frame[data-struct-entry="rail"] .rp-sec:has(> .rp-entry) {
+  position: relative;
+  padding-left: var(--rp-rail-pad);
+  border-left: var(--rp-hair-w) solid var(--rp-faint-line);
+}
+.rp-frame[data-struct-entry="rail"] .rp-sec > .rp-entry { position: relative; }
+.rp-frame[data-struct-entry="rail"] .rp-sec > .rp-entry .rp-ehead::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--rp-rail-pad) - var(--rp-u) * 0.21);
+  top: 0.4em;
+  width: calc(var(--rp-u) * 0.42);
+  height: calc(var(--rp-u) * 0.42);
+  border-radius: 50%;
+  background: var(--rp-accent);
+}
+
+/* A hanging date gutter. Grid placement, so the DOM order — title, then dates
+   — is untouched and a parser still reads the title before the range. */
+@container (min-width: 620px) {
+  .rp-frame[data-struct-entry="dates"] .rp-ehead {
+    display: grid;
+    grid-template-columns: var(--rp-date-col) minmax(0, 1fr);
+    column-gap: var(--rp-col-gap);
+    align-items: baseline;
+  }
+  .rp-frame[data-struct-entry="dates"] .rp-dates { grid-column: 1; grid-row: 1; text-align: left; }
+  .rp-frame[data-struct-entry="dates"] .rp-org { grid-column: 2; grid-row: 1; }
+  .rp-frame[data-struct-entry="dates"] .rp-entry > :not(.rp-ehead) {
+    margin-left: calc(var(--rp-date-col) + var(--rp-col-gap));
+  }
+}
+
+/* A docket: the range stamped on the line above the title. column-reverse puts
+   the dates first on the page without moving them in the document. */
+.rp-frame[data-struct-entry="stamp"] .rp-ehead {
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  row-gap: 0.1em;
+}
+.rp-frame[data-struct-entry="stamp"] .rp-dates {
+  margin: 0;
+  text-align: left;
+  letter-spacing: var(--rp-track-caps);
+  text-transform: uppercase;
+  font-size: calc(var(--rp-u) * 0.84);
+}
+
+/* -- 14e. the card grid ---------------------------------------------------- */
+
+@container (min-width: 620px) {
+  .rp-frame[data-struct-cards="on"] .rp-sec {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--rp-card-gap);
+    row-gap: var(--rp-card-gap);
+    align-items: stretch;
+  }
+  .rp-frame[data-struct-cards="on"] .rp-h { grid-column: 1 / -1; margin-bottom: 0; }
+  /* The inter-entry margin is a grid row's job here: left in place it would
+     push the second column down a row and break the pairing. */
+  .rp-frame[data-struct-cards="on"] .rp-sec > .rp-entry { margin-top: 0; }
+}
+
+/* -- 14f. the body: a margin column for the section headings --------------- */
+
+@container (min-width: 620px) {
+  .rp-frame[data-struct-body="marginalia"] .rp-sec {
+    display: grid;
+    grid-template-columns: var(--rp-rail-col) minmax(0, 1fr);
+    column-gap: var(--rp-col-gap);
+    align-items: start;
+  }
+  .rp-frame[data-struct-body="marginalia"] .rp-h {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    padding-bottom: 0;
+  }
+  .rp-frame[data-struct-body="marginalia"] .rp-sec > *:not(.rp-h) { grid-column: 2; }
+}
+
+/* -- 14g. where the rail sits --------------------------------------------- */
+
+@container (min-width: 620px) {
+  .rp-frame[data-struct-side="bottom"][data-cols="2"] .rp-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+}
+
+/* -- 14h. the ledger: a rule under everything ----------------------------- */
+
+.rp-frame[data-struct-ledger="lines"] .rp-h { border-bottom-width: var(--rp-hair-w); letter-spacing: var(--rp-track-caps); }
+.rp-frame[data-struct-ledger="lines"] .rp-ehead {
+  padding-bottom: calc(var(--rp-u) * 0.22);
+  border-bottom: var(--rp-hair-w) solid var(--rp-faint-line);
+}
+.rp-frame[data-struct-ledger="lines"] .rp-bul li,
+.rp-frame[data-struct-ledger="lines"] .rp-cites li,
+.rp-frame[data-struct-ledger="lines"] .rp-plain li,
+.rp-frame[data-struct-ledger="lines"] .rp-skill {
+  border-top: var(--rp-hair-w) solid var(--rp-faint-line);
+  padding-top: calc(var(--rp-u) * 0.14);
+}
+.rp-frame[data-struct-ledger="lines"] .rp-bul { margin-top: calc(var(--rp-u) * 0.4); }
+.rp-frame[data-struct-ledger="lines"] .rp-bul li + li { margin-top: calc(var(--rp-u) * 0.2); }
+
+/* A print-safe page is monochrome, so a tint and a fill both have to go: the
+   border or the rule is left carrying the boundary, exactly as §12 of the
+   document stylesheet does it. */
+.rp-frame[data-print-safe="true"] .rp-sec { background: none; }
+.rp-frame[data-print-safe="true"][data-struct-sec="tint"] .rp-sec { border-left-width: var(--rp-rule); }
+.rp-frame[data-print-safe="true"][data-struct-sec="box"] .rp-sec { border-color: var(--rp-faint); }
+.rp-frame[data-print-safe="true"] .rp-head { background: none; }
+.rp-frame[data-print-safe="true"][data-struct-head-band="fill"] .rp-name,
+.rp-frame[data-print-safe="true"][data-struct-head-band="fill"] .rp-label,
+.rp-frame[data-print-safe="true"][data-struct-head-band="fill"] .rp-contact { color: var(--rp-ink); }
+
+/* =========================================================================
+   TEMPLATE GALLERY
+   /templates/index.html shows all eight specimens at card size. A detail page
+   shows one at full page width, so a point on the screen is a point on paper.
+   ========================================================================= */
+
+/* The template pages used to run to 1320px while every other page ran to
+   1200, so the left edge jumped 60px when you moved between them. They now
+   use the site measure like the rest. */
+.gp-wrap--wide { max-width: var(--rbx-page); }
+
+/* -- detail page: prose beside the sheet ---------------------------------- */
+
+.tpl-split {
+  display: grid;
+  gap: var(--rb-space-4);
+  align-items: start;
+  grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+}
+.tpl-split__prose, .tpl-split__shot { min-width: 0; }
+
+/* A neutral surface behind the sheet, so a white page in dark mode reads as
+   paper on a desk instead of a hole in the layout. */
+.tpl-desk {
+  padding: var(--rb-space-3);
+  background: var(--rb-bg-inset);
+  border: 1px solid var(--rb-border-subtle);
+  border-radius: var(--rb-radius-lg);
+}
+/* The sheet is 8.5in and the query container is what a point is measured
+   against, so the container is pinned to 8.5in too. Letting it stretch and
+   capping the frame instead renders every point 3% small, which quietly makes
+   "a point on the screen is a point on paper" untrue. */
+.tpl-split__shot .rp-shot--full { width: 8.5in; max-width: 100%; }
+.rp-shot--full > .rp-frame { max-width: 816px; margin-inline: auto; }
+.tpl-scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+
+/* -- the numbers, read off the template registry -------------------------- */
+
+.tpl-spec { margin: var(--rb-space-5) 0 0; }
+.tpl-spec > div {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: var(--rb-space-2) var(--rb-space-4);
+  padding: var(--rb-space-2) 0;
+  border-bottom: 1px solid var(--rb-border-subtle);
+  font-size: var(--rb-text-sm);
+}
+/* --rb-text-muted is 4.49:1 on the spec panel's own background at this size,
+ * a hundredth under the 4.5:1 floor, so the terms take the secondary ink. */
+.tpl-spec dt { color: var(--rb-text-secondary); }
+.tpl-spec dd { margin: 0; color: var(--rb-text); font-variant-numeric: tabular-nums; }
+.tpl-spec > div:first-child { border-top: 1px solid var(--rb-border-subtle); }
+
+/* -- gallery cards -------------------------------------------------------- */
+
+.tpl-grid { display: grid; gap: var(--rb-space-8); }
+.tpl-card { padding: var(--rb-space-5); }
+.tpl-card .rp-frame { max-width: 560px; margin-inline: auto; }
+/* The heading is first in the DOM so a screen reader meets it before the
+   specimen; the sheet is put back on top visually, where it belongs. */
+.tpl-card__shot { order: -1; }
+.tpl-card__head { display: flex; align-items: baseline; gap: var(--rb-space-3); }
+.tpl-card__num {
+  font-family: var(--rb-font-mono);
+  font-size: var(--rb-text-xs);
+  color: var(--rbx-label);
+  flex: none;
+}
+.tpl-card__title { font-size: var(--rb-text-xl); font-weight: 660; letter-spacing: -0.02em; }
+.tpl-card__line { font-size: var(--rb-text-sm); color: var(--rb-text-secondary); max-width: 52ch; }
+.tpl-card__tags { display: flex; flex-wrap: wrap; gap: var(--rb-space-2); margin-top: auto; padding-top: var(--rb-space-2); }
+
+/* -- previous / next ------------------------------------------------------ */
+
+.tpl-next {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-3) var(--rb-space-6);
+  margin-top: var(--rb-space-10);
+  padding-top: var(--rb-space-5);
+  border-top: 1px solid var(--rb-border-subtle);
+  font-size: var(--rb-text-sm);
+}
+.tpl-next span { color: var(--rbx-label); }
+.tpl-next a { color: var(--rb-text-accent); text-decoration: none; }
+.tpl-next a:hover { text-decoration: underline; }
+
+/* ============================================================== responsive */
+
+@media (min-width: 1080px) {
+  .tpl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1040px) {
+  .tpl-split { grid-template-columns: minmax(0, 1fr); }
+  .tpl-desk { padding: var(--rb-space-4); }
+}
+@media (max-width: 720px) {
+  .tpl-grid { gap: var(--rb-space-6); }
+  .tpl-desk { padding: var(--rb-space-3); }
+  /* Below this the sheet is a thumbnail nobody can judge, so keep the page
+     proportions and let the desk scroll sideways instead. */
+  .tpl-scroll { margin-inline: calc(var(--rb-space-5) * -1); padding-inline: var(--rb-space-5); }
+  .tpl-scroll > .rp-shot { width: 520px; }
+  .tpl-spec > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+@media print {
+  .tpl-desk { background: none; border-color: #999; }
+  .tpl-next, .tpl-split__prose { break-inside: avoid; }
+}
+
+/* ================================================================== print */
+
+@media print {
+  .gp-top, .gp-cta, .gp-foot, .gp-skiplink, .gp-crumbs { display: none !important; }
+  body { background: #fff; color: #000; }
+  .gp-wrap { max-width: none; padding: 0; }
+  .gp-hero, .gp-prose { padding: 0; }
+  .gp-p, .gp-small, .gp-table td, .gp-verdict ul > li, .gp-note__text { color: #000; }
+  .gp-table th, .gp-table td { border-color: #999; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; word-break: break-all; }
+  .gp-card, .gp-verdict, .gp-note { break-inside: avoid; box-shadow: none; }
+  .rp-frame { box-shadow: none; border-color: #999; }
+}
+
+/* ============================================================== responsive */
+
+@media (max-width: 720px) {
+  .gp-top__in { gap: var(--rb-space-3); padding: 0 var(--rb-space-4); }
+  .gp-nav a { padding: var(--rb-space-1) var(--rb-space-2); }
+  .gp-hero { padding: var(--rb-space-8) 0 var(--rb-space-6); }
+  .gp-cta { padding: var(--rb-space-5); }
+  .gp-btn { width: 100%; justify-content: center; }
+  .gp-cta__actions { width: 100%; }
+  .gp-h2 { margin-top: var(--rb-space-10); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.gp-card:hover, a.gp-card--link:hover::after { transform: none; }
+}

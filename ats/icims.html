@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iCIMS resume parsing: what the vendor publishes</title>
+<meta name="description" content="iCIMS publishes an explainer of what CV parsing is, not a specification. Here is what it documents, what it configures per customer, and what that means.">
+<link rel="canonical" href="https://resumeboard.app/ats/icims.html">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="iCIMS resume parsing: what the vendor publishes">
+<meta property="og:description" content="iCIMS publishes an explainer of what CV parsing is, not a specification. Here is what it documents, what it configures per customer, and what that means.">
+<meta property="og:url" content="https://resumeboard.app/ats/icims.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard - a resume builder that keeps your work on your machine">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="iCIMS resume parsing: what the vendor publishes">
+<meta name="twitter:description" content="iCIMS publishes an explainer of what CV parsing is, not a specification. Here is what it documents, what it configures per customer, and what that means.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/ats/icims.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/ats/icims.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#4743e0">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/gallery.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "iCIMS resume parsing: what iCIMS actually publishes",
+  "description": "iCIMS publishes an explainer of what CV parsing is, not a specification. Here is the honest page: what iCIMS documents, what it configures per customer, and what that means for you.",
+  "url": "https://resumeboard.app/ats/icims.html",
+  "inLanguage": "en",
+  "isPartOf": { "@type": "WebSite", "name": "Resumeboard", "url": "https://resumeboard.app/" },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Resumeboard", "item": "https://resumeboard.app/" },
+      { "@type": "ListItem", "position": 2, "name": "ATS guide", "item": "https://resumeboard.app/ats/" },
+      { "@type": "ListItem", "position": 3, "name": "iCIMS", "item": "https://resumeboard.app/ats/icims.html" }
+    ]
+  }
+}
+</script>
+<script src="../assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="../assets/css/motion.css">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-192.png">
+<link rel="manifest" href="../manifest.webmanifest">
+</head>
+<body>
+<a class="gp-skiplink" href="#main">Skip to content</a>
+
+<header class="gp-top">
+  <div class="gp-top__in">
+    <a class="gp-brand" href="../index.html">
+      <svg class="gp-brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" stroke-linejoin="round"/>
+        <path d="M14 2v5h5" stroke-linejoin="round"/>
+        <path d="M8 13h8M8 17h5" stroke-linecap="round"/>
+      </svg>
+      Resumeboard
+    </a>
+    <nav class="gp-nav" aria-label="Main">
+      <span class="rb-sz-host" data-site-size></span>
+      <a href="../editor.html#start">Builder</a>
+      <a href="../templates/index.html">Templates</a>
+      <a href="index.html" aria-current="page">ATS guide</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="gp-main" id="main" tabindex="-1">
+  <div class="gp-wrap">
+
+    <nav class="gp-crumbs" aria-label="Breadcrumb">
+      <a href="../index.html">Resumeboard</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <a href="index.html">ATS guide</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <span aria-current="page">iCIMS</span>
+    </nav>
+
+    <div class="gp-prose">
+      <h1 class="gp-h1">iCIMS resume parsing: an explainer, not a specification</h1>
+      <p class="gp-lead">This is the shortest and least satisfying of these pages, and it is short on purpose. iCIMS publishes a clear explanation of what parsing is for. It does not publish how its parser behaves, and pretending otherwise would be the least useful thing this guide could do.</p>
+
+      <div class="gp-note gp-note--stop">
+        <div class="gp-note__body">
+          <p class="gp-note__title">There is no iCIMS parser specification to read</p>
+          <p class="gp-note__text">If you have found a page claiming to list "iCIMS parser rules", treat it with suspicion. What you are almost certainly reading is either the general explainer below, a description of a different product on the same vendor's site, or someone's own observations presented as documentation. This page tells you which is which.</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">What iCIMS actually publishes</h2>
+      <p>iCIMS's own explanation of the feature defines the job it does and gives the reason it exists:</p>
+      <blockquote class="gp-quote">
+        <p>"CV or resume parsing is the technology that extracts data, usually from a Word or PDF document, and converts it in a structured way, often self-completing a form. It automatically identifies important, relevant terms in a CV such as a candidate's contact details, language level, years of experience, etc."</p>
+        <p>"It's simpler: the candidate drag &amp; drops or submits his or her CV and CV parsing does the rest of the job. It's faster: the candidate saves time and applies in one click."</p>
+        <cite>iCIMS, <a href="https://www.icims.com/blog/what-is-cv-resume-parsing/">What is CV/Resume parsing?</a></cite>
+      </blockquote>
+      <p>Two things in that text are worth pulling out. First, <strong>Word or PDF</strong> is the documented input. Second, the stated goal is the candidate's convenience &mdash; fewer clicks, no retyping &mdash; not the employer's. The article frames parsing as a form-filling feature, which is a fairer description of iCIMS than "screening engine".</p>
+      <p>Note also what it is <em>not</em> claiming: there is no mention of ranking, scoring, matching to a requisition, or rejecting candidates. On iCIMS, parsing is an intake convenience. Any evaluation of your resume happens after a human has read the form.</p>
+
+      <h2 class="gp-h2">The part that makes iCIMS different from the other five</h2>
+      <p>iCIMS does not document parser behaviour, and it does not have to, because the behaviour is set by the customer rather than by the product. What varies from one iCIMS career site to the next is:</p>
+      <ul>
+        <li data-reveal><strong>Which fields exist in the application form.</strong> A government contractor's iCIMS form has clearance, citizenship and security-investigation fields. A retailer's has store number and availability. The parser has a different job on each.</li>
+        <li data-reveal><strong>Which fields are prefilled and which are not.</strong> Recruiters configure this per job.</li>
+        <li data-reveal><strong>Whether a candidate can correct a prefilled value</strong> before submitting, and how easy it is to find the field.</li>
+        <li data-reveal><strong>Whether the employer has parsing switched on at all</strong> for a given career site.</li>
+      </ul>
+      <p>This is the same structural problem as <a href="taleo.html">Oracle Taleo</a>, with a different cause: Taleo's parsing is a partner service, iCIMS's is a configured feature. In both cases the honest conclusion is that there is no single "iCIMS format" to optimise for, because there is no single iCIMS behaviour.</p>
+
+      <h2 class="gp-h2">The published facts, for what they are worth</h2>
+      <div class="gp-table-scroll">
+        <table class="gp-table">
+          <caption>The extent of iCIMS's published documentation</caption>
+          <thead>
+            <tr>
+              <th scope="col">Question</th>
+              <th scope="col">What iCIMS publishes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">What does parsing do?</th>
+              <td>Extracts data from a Word or PDF document and converts it into structured form data, "often self-completing a form".</td>
+            </tr>
+            <tr>
+              <th scope="row">What does it identify?</th>
+              <td>"Contact details, language level, years of experience, etc." The "etc." is doing a lot of work, and is the whole of the specification.</td>
+            </tr>
+            <tr>
+              <th scope="row">What are the accepted file types?</th>
+              <td>"Usually from a Word or PDF document." No exhaustive list, no size limit.</td>
+            </tr>
+            <tr>
+              <th scope="row">Which fields get filled?</th>
+              <td>Not published. Determined by the employer's configuration.</td>
+            </tr>
+            <tr>
+              <th scope="row">Which layouts fail?</th>
+              <td>Not published.</td>
+            </tr>
+            <tr>
+              <th scope="row">How is the candidate scored?</th>
+              <td>Not in the parsing documentation. iCIMS markets separate, named assessment features; none of them is resume parsing.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="gp-h2">Where iCIMS pages come from</h2>
+      <p>iCIMS maintains two public documentation surfaces and it is worth knowing which one you are reading, because they differ enormously in specificity.</p>
+      <div class="gp-grid gp-grid--2 gp-mt-5">
+        <div class="gp-card">
+          <p class="gp-card__title">icims.com marketing and blog</p>
+          <p class="gp-card__meta">What this page quotes.</p>
+          <p class="gp-card__note">Explains the feature, its purpose and its benefits. Accurate about the product's intent, silent on parser mechanics. Treat it as a product explainer.</p>
+          <p><a class="gp-card__meta" href="https://www.icims.com/blog/what-is-cv-resume-parsing/">www.icims.com/blog/what-is-cv-resume-parsing/</a></p>
+        </div>
+        <div class="gp-card">
+          <p class="gp-card__title">community.icims.com knowledge base</p>
+          <p class="gp-card__meta">Written for iCIMS administrators, not candidates.</p>
+          <p class="gp-card__note">Release notes, how-to articles and configuration guides. This is where the real behaviour lives, because parsing in iCIMS is a thing an administrator configures. It is also written for customers, so the details are gated behind a login and the vocabulary assumes you already run the product.</p>
+          <p><a class="gp-card__meta" href="https://community.icims.com/s/knowledge-search-documentation">community.icims.com/s/knowledge-search-documentation</a></p>
+        </div>
+      </div>
+      <p>Neither surface is a parsing specification for a job applicant. That is not an oversight to be fixed by a better search; it is a consequence of the feature being customer-configured.</p>
+
+      <h2 class="gp-h2">What to do when there is no spec to design against</h2>
+      <p>This is the situation the other five pages do not put you in, so the advice here is deliberately general. It is the union of what the four vendors that <em>do</em> publish have in common, which is the closest available proxy:</p>
+      <ol>
+        <li data-reveal>Export a text-based PDF or a DOCX. iCIMS names both, and they are the two formats the other vendors document most precisely.</li>
+        <li data-reveal>One column. Greenhouse names columned layouts as a failure mode and Workday's guidelines say to avoid column formats. There is no evidence iCIMS is different, and every reason to think the same text-extraction problem applies.</li>
+        <li data-reveal>No tables, text boxes, images or logos. Same reasoning.</li>
+        <li data-reveal>Standard upper-case section headings, so that whatever fields the employer's form maps to, your content is where they expect it.</li>
+        <li data-reveal>Name at the top, in initial capitals, with your email and phone on the lines immediately below. "Contact details" is one of the three things iCIMS says it identifies, so make them impossible to miss.</li>
+        <li data-reveal>Spell out employers and job titles, and write your years of experience in numerals with context ("8 years", "since 2018"), since iCIMS explicitly names "years of experience" as something it identifies.</li>
+        <li data-reveal>Review every field on the iCIMS form before you submit, especially any that arrived pre-filled. On a configurable form, a wrong pre-fill is invisible unless you look.</li>
+      </ol>
+      <p>The <a href="../templates/print-safe.html">print-safe template</a> satisfies all seven and adds no decoration for a parser to trip over. The <a href="../templates/compact.html">compact template</a> also satisfies them and is worth a look if you are applying to a large employer with a long, form-heavy iCIMS process and want the resume to be as short as possible.</p>
+
+      <h2 class="gp-h2">A word on the folk claims</h2>
+      <p>You will see online that iCIMS scores resumes, that it rejects on keywords, or that it has a known list of parse failures. None of that is in anything iCIMS publishes. iCIMS's own description of parsing is an intake feature that saves candidates typing. If you want to reason about iCIMS, reason from the form in front of you: that is the part of the process that is real, configured, and in your control.</p>
+
+      <ul class="gp-src">
+        <li data-reveal>
+          <span class="gp-src-label">iCIMS sources</span>
+          <a href="https://www.icims.com/blog/what-is-cv-resume-parsing/">What is CV/Resume parsing?</a> &mdash; iCIMS's own definition of the feature, quoted in full above<br>
+          <a href="https://community.icims.com/s/knowledge-search-documentation">iCIMS Community knowledge base</a> &mdash; the administrator-facing documentation surface
+        </li>
+        <li data-reveal>
+          <span class="gp-src-label">Cross-references on this site</span>
+          <a href="greenhouse.html">Greenhouse</a> for the published failure-mode list &middot;
+          <a href="workday.html">Workday</a> for the published formatting guidelines &middot;
+          <a href="taleo.html">Oracle Taleo</a> for the other customer-configured system
+        </li>
+      </ul>
+    </div>
+
+    <div class="gp-cta gp-cta--primary">
+      <div class="gp-cta__body">
+        <p class="gp-cta__title">Check your resume against the rules that are actually published</p>
+        <p class="gp-cta__text">Because iCIMS publishes none of its own, Resumeboard's iCIMS check applies the Greenhouse and Workday rules &mdash; the closest thing to a documented floor, and the layout every other vendor on this site steers toward.</p>
+        <p class="gp-small gp-mt-4">Opens the builder. The check is under <span class="gp-hash">Check</span>, on the <span class="gp-hash">ATS</span> tab.</p>
+      </div>
+      <div class="gp-cta__actions">
+        <a class="gp-btn gp-btn--primary" href="../editor.html#start">Open the iCIMS check</a>
+        <a class="gp-btn gp-btn--secondary" href="../templates/print-safe.html">See the print-safe template</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="gp-foot">
+  <div class="gp-wrap">
+    <div class="gp-foot__grid">
+      <div>
+        <h2>Builder</h2>
+        <ul>
+          <li data-reveal><a href="../editor.html#start">Open Resumeboard</a></li>
+          <li data-reveal><a href="../editor.html#start">ATS check</a></li>
+          <li data-reveal><a href="../templates/index.html">Template gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>ATS guide</h2>
+        <ul>
+          <li data-reveal><a href="greenhouse.html">Greenhouse</a></li>
+          <li data-reveal><a href="workday.html">Workday</a></li>
+          <li data-reveal><a href="taleo.html">Oracle Taleo</a></li>
+          <li data-reveal><a href="lever.html">Lever</a></li>
+          <li data-reveal><a href="icims.html">iCIMS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Templates</h2>
+        <ul>
+          <li data-reveal><a href="../templates/print-safe.html">Print-safe</a></li>
+          <li data-reveal><a href="../templates/compact.html">Compact</a></li>
+          <li data-reveal><a href="../templates/classic.html">Classic</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="gp-foot__legal"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> · <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a> · Resumeboard is a static site with no analytics and no backend. Quotes are taken from the iCIMS page linked above; iCIMS changes its documentation, so check the source before relying on a detail. Resumeboard is not affiliated with iCIMS.</p>
+  </div>
+<p class="rb-foot__contact"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> <span aria-hidden="true">&middot;</span> <a href="../contact.html">Contact</a></p>
+</footer>
+
+<script src="../assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="../assets/js/motion.js?v=d639f64b7f"></script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+/* Resumeboard — motion
+ *
+ * Two jobs, and only two:
+ *   1. Let content arrive calmly instead of snapping into place.
+ *   2. Make an accordion feel like it has a hinge.
+ *
+ * Every rule here is transform/opacity only, so nothing here can cause layout
+ * shift, and every rule is inside a reduced-motion guard. Elements are visible
+ * by default; `js-motion` on <html> is the only thing that hides them, and it
+ * is set synchronously before paint, so a no-JS reader and a reader who
+ * prefers reduced motion both get a finished page.
+ */
+
+html.js-motion [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition:
+    opacity var(--rb-move-dur) var(--rb-move-ease),
+    transform var(--rb-move-dur) var(--rb-move-ease);
+  transition-delay: var(--rb-move-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+html.js-motion [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* A short hold before the move begins: content lands rather than lands-then-
+ * corrects, which is what reads as "going up and down". */
+:root {
+  --rb-move-dur: 460ms;
+  --rb-move-ease: cubic-bezier(0.22, 0.68, 0.24, 1);
+  --rb-move-delay: 0ms;
+}
+
+/* Stagger, by position in the group. Purely additive: the cap keeps a long
+ * list from accumulating a second of delay before the last item moves. */
+html.js-motion [data-reveal-stagger] > [data-reveal]:nth-child(1) { --rb-move-delay: 0ms; }
+html.js-motion [data-reveal-stagger] > [data-reveal]:nth-child(2) { --rb-move-delay: 55ms; }
+html.js-motion [data-reveal-stagger] > [data-reveal]:nth-child(3) { --rb-move-delay: 110ms; }
+html.js-motion [data-reveal-stagger] > [data-reveal]:nth-child(4) { --rb-move-delay: 165ms; }
+html.js-motion [data-reveal-stagger] > [data-reveal]:nth-child(5) { --rb-move-delay: 220ms; }
+html.js-motion [data-reveal-stagger] > [data-reveal]:nth-child(n + 6) { --rb-move-delay: 260ms; }
+
+/* ---------- Accordion ---------- */
+
+.rb-faq,
+details.rb-faq,
+.toc--inline,
+details.toc--inline {
+  overflow: hidden;
+}
+
+html.js-motion details > .rb-faq__body,
+html.js-motion details > .rb-faq__panel {
+  overflow: hidden;
+}
+
+html:not(.js-motion) details > *:not(summary) { display: revert; }
+
+/* Native <details> cannot be height-animated, so the panel is measured and
+ * driven explicitly. Without JS it is simply open or shut. */
+html.js-motion details[rb-motion] > .rb-faq__panel {
+  height: 0;
+  opacity: 0;
+  transition:
+    height var(--rb-move-dur) var(--rb-move-ease),
+    opacity var(--rb-move-dur) ease;
+}
+html.js-motion details[rb-motion][open] > .rb-faq__panel {
+  height: auto;
+  opacity: 1;
+}
+
+/* ---------- Anchor targets ---------- */
+
+/* A jump to an anchor should not land under the sticky masthead, and the
+ * landing should not be a smooth-scroll across a long document. */
+:target { scroll-margin-top: calc(var(--site-head-h, 64px) + 16px); }
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  html.js-motion [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  html.js-motion details[rb-motion] > .rb-faq__panel {
+    height: auto !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+  html.js-motion details:not([open])[rb-motion] > .rb-faq__panel {
+    height: 0 !important;
+    opacity: 0 !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Site-wide text size ----------
+ * A root multiplier the marketing type ramp already reads, so every page moves
+ * together and nothing reflows into a different layout at 130%. */
+:root { --rb-site-scale: 1; }
+
+html[data-site-scale] body { font-size: calc(1rem * var(--rb-site-scale)); }
+html[data-site-scale="1.00"] body { font-size: 1rem; }
+
+/* The scale is carried on the root, so the rem-based type ramp follows it. */
+html { font-size: calc(100% * var(--rb-site-scale)); }
+
+.rb-sz {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--rb-border, rgba(120,120,130,.28));
+  border-radius: 9px;
+  background: var(--rb-bg-elevated, transparent);
+}
+.rb-sz__btn {
+  display: grid; place-items: center;
+  width: 26px; height: 24px;
+  border: 0; border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font-weight: 700; line-height: 1;
+  cursor: pointer;
+}
+.rb-sz__btn:hover:not(:disabled) { background: rgba(120,120,130,.16); }
+.rb-sz__btn:disabled { opacity: .35; cursor: not-allowed; }
+.rb-sz__btn--sm { font-size: 11px; }
+.rb-sz__btn--lg { font-size: 15px; }
+.rb-sz__val {
+  min-width: 42px; height: 24px;
+  border: 0; border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.rb-sz__val:hover { background: rgba(120,120,130,.16); }
+
+/* ---------- Contact strip ----------
+ * A single quiet line with the author, on every page. */
+.rb-contact {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  padding: var(--rb-space-2) clamp(1rem, 4vw, 2.5rem);
+  border-top: 1px solid var(--rb-border, rgba(120,120,130,.22));
+  background: var(--rb-bg, transparent);
+  font-size: 12.5px;
+  color: var(--rb-text-muted, rgba(110,116,130,1));
+  flex-wrap: wrap;
+}
+.rb-contact__label { font-weight: 600; }
+.rb-contact a { color: inherit; }
+.rb-foot__contact { margin-top: var(--rb-space-4); font-size: 13px; color: var(--rb-text-muted, rgba(110,116,130,1)); }
+
+/* ---------- Contact strip ----------
+ * Sits at the foot of the document, below the footer. The label, the name and
+ * each link are separated by real spacing rather than run together, which is
+ * what happened when they were plain inline text. */
+.rb-contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding: var(--rb-space-5, 20px) clamp(1rem, 4vw, 2.5rem);
+  border-top: 1px solid var(--rb-border, rgba(120,120,130,.22));
+  background: var(--rb-bg, transparent);
+  font-size: 13px;
+  color: var(--rb-text-muted, rgba(110,116,130,1));
+  text-align: center;
+}
+.rb-contact__label::after { content: ":"; }
+.rb-contact__name { color: var(--rb-text, inherit); font-weight: 600; }
+.rb-contact a { color: var(--rb-accent-600, #4743e0); text-decoration: none; }
+.rb-contact a:hover { text-decoration: underline; }
+.rb-contact__dot { opacity: .5; }
+
+.rb-foot__contact { margin-top: var(--rb-space-4); font-size: 13px; color: var(--rb-text-muted, rgba(110,116,130,1)); }
+
+/* ---------- Site text size control ----------
+ * The control must never be squeezed by its container: it is a single row by
+ * definition, and an inline-flex inside a crowded nav collapses to a column. */
+.rb-sz-host {
+  display: inline-flex;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  align-items: center;
+}
+.rb-sz {
+  display: inline-flex !important;
+  flex: 0 0 auto;
+  flex-direction: row !important;
+  align-items: center;
+  white-space: nowrap;
+}
+.rb-sz > * { flex: 0 0 auto; }
+
+/* The control is intrinsically about 92px wide. A flex parent will happily
+ * shrink it below its content and let it wrap into a column of A / 100% / A,
+ * so its width is pinned to its content and wrapping is refused outright. */
+.rb-sz-host { min-width: max-content; max-width: max-content; }
+.rb-sz {
+  width: max-content;
+  min-width: max-content;
+  flex-wrap: nowrap !important;
+  flex-direction: row !important;
+}
+.rb-sz__btn { width: 26px; flex: 0 0 26px; }
+.rb-sz__val { width: 42px; flex: 0 0 42px; }
+
+/* ---------- Contact page ---------- */
+.rb-contact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--rb-space-4, 16px);
+  margin: var(--rb-space-8, 32px) 0;
+}
+.rb-contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--rb-space-5, 20px);
+  border: 1px solid var(--rb-border, rgba(120,120,130,.25));
+  border-radius: var(--rb-radius-lg, 12px);
+  background: var(--rb-bg-elevated, transparent);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+.rb-contact-card:hover {
+  border-color: var(--rb-accent-500, #4743e0);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -8px rgba(16,24,40,.25);
+}
+.rb-contact-card__label {
+  font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--rb-text-faint, rgba(110,116,130,1));
+}
+.rb-contact-card__value {
+  font-size: 15px; font-weight: 620; color: var(--rb-accent-600, #4743e0);
+  word-break: break-word;
+}
+.rb-contact-card__note { font-size: 13px; color: var(--rb-text-muted, rgba(110,116,130,1)); }

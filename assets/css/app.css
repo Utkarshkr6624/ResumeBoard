@@ -1,0 +1,1327 @@
+/* Resumeboard — app shell layout
+ * ============================================================================
+ * PLACEMENT ONLY. This file decides where things sit; the modules that build
+ * the surfaces decide what they look like inside.
+ *
+ * Ownership map (do not duplicate these — they are already written):
+ *   #rb-topbar internals   ui/chrome.js  injects its own <style> at runtime
+ *   #rb-rail internals      ui/rail.js    injects its own <style> at runtime
+ *   #rb-panel internals     ui/panel.js   sidebar + bottom sheet, both modes
+ *   #rb-doc, .rb-page-frame
+ *     sizing, ink, zoom     render/templates.css
+ *   @page, print reset      css/print.css
+ * Those modules inject their <style> after the document's stylesheets, so any
+ * override here must out-specify a bare `#id` — use `body #id`, never `#id`.
+ *
+ * What this file owns:
+ *   body block flow, topbar stickiness, #rb-shell height   #rb-shell column grid
+ *   #rb-rail surface + drawer, #rb-panel compat     the stage scroller
+ *   .rb-toolstrip, .rb-statusbar, .rb-zoom, .rb-marquee, .rb-scrim
+ *
+ * Markup contract for the surfaces with no module yet:
+ *   #rb-toolstrip  .rb-toolstrip  .rb-toolstrip__group  .rb-toolstrip__group--grow
+ *                  .rb-toolstrip__sep  .rb-toolstrip__title
+ *   #rb-statusbar  .rb-statusbar  .rb-statusbar__group  .rb-statusbar__group--end
+ *                  .rb-statusbar__item  (+ --ok/--warn/--error/--optional)
+ *                  .rb-statusbar__sep  .rb-zoom  .rb-zoom__btn  .rb-zoom__value
+ *   #rb-marquee    .rb-marquee  .rb-marquee__item
+ *   (drawer scrim, any host)  .rb-scrim
+ * Icon-only controls in these surfaces take aria-label + data-tip, plus the
+ * base.css `.rb-tip` class for the tooltip.
+ *
+ * Responsive state driven by the shell module:
+ *   body.rb-rail-open  → rail drawer visible (≤760px) and .rb-scrim revealed
+ * ============================================================================ */
+
+:root {
+  /* Shell-local metrics. Every other value resolves through tokens.css. */
+  --rb-statusbar-h: 30px;
+  --rb-marquee-h: 32px;
+  --rb-drawer-w: 264px;
+  --rb-ease-shell: var(--rb-ease-out);
+  /* The one dimension the shell has to size itself from, because the chrome
+   * above it is a sibling rather than a parent. The +1px is the topbar's
+   * bottom rule; ui/chrome.js owns the bar, this owns the box it reserves. */
+  --rb-chrome-h: calc(var(--rb-topbar-h) + 1px);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* The document scrolls and the shell occupies exactly one screen of it.
+ * index.html inlines the landing prose as a static body sibling, so the page
+ * is meant to be taller than the viewport. A 100dvh `overflow: hidden` grid
+ * could not hold both: the sibling auto-placed into an implicit row, its
+ * content took the whole 1fr track, and the editor collapsed to zero height
+ * with the landing text scrolled out of reach. */
+body {
+  display: block;
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+  background: var(--rb-bg);
+}
+
+/* The topbar rides the scroll rather than scrolling away, so an in-page link
+ * that jumps to a section leaves the app controls within reach. */
+#rb-topbar {
+  /* Fixed, not sticky. The app below is its own window, so sticky has no
+   * scroll container to stick to and the bar vanishes on any scroll. */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--rb-z-header);
+  min-height: var(--rb-chrome-h);
+}
+
+/* The overlay root is a full-viewport passthrough; ui/ui.js re-enables pointer
+ * events on the children it mounts, so an empty container never eats clicks. */
+#rb-overlay-root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--rb-z-modal);
+  pointer-events: none;
+}
+#rb-overlay-root > * { pointer-events: auto; }
+#rb-toasts { position: fixed; }
+
+/* The skip link targets #rb-main, which is tabindex="-1": a focus ring around
+ * the whole editing column is noise, and the ring on the focused control
+ * inside it still shows. */
+#rb-main:focus,
+#rb-main:focus-visible { outline: none; }
+
+/* ---------- Shell grid ---------- */
+
+.rb-shell {
+  position: relative;   /* containing block for the rail drawer and the scrim */
+  display: grid;
+  /* `auto`, not a fixed 232/380: ui/rail.js and ui/panel.js both size
+   * themselves (collapse, sheet) and the tracks must follow. */
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  height: calc(100dvh - var(--rb-chrome-h));
+  min-height: 0;
+  background: var(--rb-bg);
+}
+
+/* ---------- Rail surface ---------- */
+
+/* Surface only. rail.js owns head, rows, drag state, the collapse width and
+ * the add button. */
+body #rb-rail {
+  background: var(--rb-bg-elevated);
+  border-right: 1px solid var(--rb-border);
+}
+
+/* The expanded rail is sized by its content — 294px at the longest default
+ * section label, "PROFESSIONAL SUMMARY" — so the `auto` track is 0px wide at
+ * first paint and the whole editing column slides 294px right when the rail
+ * mounts. That was the largest single layout shift on the page. The floor is a
+ * min-width, not a fixed track, so a longer renamed label can still grow the
+ * rail; the collapsed width and the ≤760px drawer both opt out, and neither
+ * reads this rule.
+ *
+ * The ceiling is what stops a renamed label from eating the editor. Section
+ * headings are free text, and the `auto` track sizes to max-content: at
+ * "Professional Summary and Career Highlights" the rail measured 421px and its
+ * rows overflowed it by 28px, pushing the completion dot and the hide toggle
+ * clean off the right edge at 768, 1024 and 1440 alike. Capping the rail lets
+ * .rb-rail__label do what it already declares — ellipsise — instead. */
+@media (min-width: 761px) {
+  body #rb-rail:not([data-collapsed="true"]) {
+    min-width: 296px;
+    max-width: 320px;
+  }
+}
+
+/* Same story, other side: panel.js sets #rb-panel's width when it mounts, so
+ * the track is 0px until then and the page frame re-centres in the ~180ms
+ * before it does. Above the sheet breakpoint only — below it the panel is out
+ * of flow — and not while collapsed, where panel.js sets a 44px inline width
+ * that this floor would otherwise override. */
+@media (min-width: 900px) {
+  body #rb-panel:not([data-collapsed="true"]) { min-width: var(--rb-panel-w); }
+}
+
+/* Completion indicator. rail.js ships a 6px state dot; a ring reads as
+ * "how far along" at a glance, so partial draws as a ring and full as a disc. */
+body #rb-rail .rb-rail__dot {
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--rb-border-strong);
+  background: transparent;
+}
+body #rb-rail .rb-rail__dot[data-state="partial"] {
+  border-color: var(--rb-amber-600);
+  background: transparent;
+}
+body #rb-rail .rb-rail__dot[data-state="full"] {
+  border-color: var(--rb-green-600);
+  background: var(--rb-green-600);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) #rb-rail .rb-rail__dot[data-state="full"] {
+    border-color: var(--rb-green-200);
+    background: var(--rb-green-200);
+  }
+  html:not([data-theme="light"]) #rb-rail .rb-rail__dot[data-state="partial"] {
+    border-color: var(--rb-amber-200);
+  }
+}
+html[data-theme="dark"] #rb-rail .rb-rail__dot[data-state="full"] {
+  border-color: var(--rb-green-200);
+  background: var(--rb-green-200);
+}
+html[data-theme="dark"] #rb-rail .rb-rail__dot[data-state="partial"] {
+  border-color: var(--rb-amber-200);
+}
+
+/* ---------- Main column ---------- */
+
+body #rb-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--rb-bg-sunken);
+}
+
+/* ---------- Toolstrip ---------- */
+
+body #rb-toolstrip {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+  flex: none;
+  height: var(--rb-subbar-h);
+  padding: 0 var(--rb-space-3);
+  background: var(--rb-bg);
+  border-bottom: 1px solid var(--rb-border);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* The bar's own inline size, not the viewport's, decides whether the row of
+   * controls fits: the strip is 406px wide at 1024 (docked rail + narrow
+   * panel) and 1280px at 1920 on the same display. Only the label below reads
+   * the query. */
+  container: rb-toolstrip / inline-size;
+}
+body #rb-toolstrip::-webkit-scrollbar { height: 0; }
+.rb-toolstrip__group {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+  flex: none;
+}
+.rb-toolstrip__group--grow { flex: 1 1 auto; min-width: 0; }
+.rb-toolstrip__sep {
+  width: 1px;
+  height: 20px;
+  flex: none;
+  background: var(--rb-border);
+  margin: 0 var(--rb-space-2);
+}
+.rb-toolstrip__title {
+  font-size: var(--rb-text-sm);
+  font-weight: 600;
+  color: var(--rb-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Toolstrip: host slot, page count, zoom ----------
+ * app.html gives the bar a single empty host and nothing may be added to the
+ * markup afterwards, so the whole row is built into it. `display: contents`
+ * dissolves the wrapper so its children are laid out by #rb-toolstrip's own
+ * flex row — a real box here would break the gap and the right-hand pin. */
+.rb-toolstrip__slot {
+  display: contents;
+}
+.rb-toolstrip__title--ctl { margin-right: var(--rb-space-1); }
+
+/* The text-size control's appearance belongs to autofill.css, which is
+ * linked later and would win a tie anyway. Three adjacent controls have to
+ * read as one family though, so the focus ring is declared here for all
+ * three — autofill.css draws no focus state of its own, and this control is
+ * keyboard-operable, so the ring is not optional. */
+.rb-typectl__btn:focus-visible,
+.rb-typectl__value:focus-visible,
+.rb-zoom__btn:focus-visible,
+.rb-zoom__value:focus-visible,
+.rb-pagecount:focus-visible {
+  outline: 2px solid var(--rb-accent-500);
+  outline-offset: 1px;
+}
+
+/* Page count. The well matches the text-size control beside it (autofill.css
+ * is the reference: elevated surface, strong hairline, hairline shadow) so
+ * three controls in one 44px bar read as one family. A count of one is the
+ * goal, so anything over is the only state that takes a warning colour. */
+.rb-pagecount {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  flex: none;
+  height: 32px;
+  padding: 0 var(--rb-space-3);
+  border: 1px solid var(--rb-border-strong);
+  border-radius: var(--rb-radius-md);
+  background: var(--rb-bg-elevated);
+  box-shadow: var(--rb-shadow-xs);
+  font-size: var(--rb-text-xs);
+  font-weight: 600;
+  color: var(--rb-text-muted);
+  cursor: default;
+  white-space: nowrap;
+}
+.rb-pagecount__value { font-size: var(--rb-text-sm); font-weight: 700; color: var(--rb-text); }
+.rb-pagecount[data-state="over"] .rb-pagecount__value { color: var(--rb-amber-600); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-pagecount[data-state="over"] .rb-pagecount__value { color: var(--rb-amber-200); }
+}
+html[data-theme="dark"] .rb-pagecount[data-state="over"] .rb-pagecount__value { color: var(--rb-amber-200); }
+
+/* ---------- Stage ---------- */
+
+/* Scrolling mechanics only. templates.css owns the centring, the page
+ * padding and the narrow-viewport reflow, and it sets `display: flex` here —
+ * this block must not declare `display`, or the two would fight. */
+body #rb-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  background: var(--rb-bg-sunken);
+}
+body #rb-stage::-webkit-scrollbar { width: 10px; }
+body #rb-stage::-webkit-scrollbar-track { background: transparent; }
+body #rb-stage::-webkit-scrollbar-thumb {
+  background: var(--rb-border-strong);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: var(--rb-radius-full);
+}
+body #rb-stage::-webkit-scrollbar-thumb:hover {
+  background-color: var(--rb-text-faint);
+  background-clip: content-box;
+}
+
+/* ---------- Paper frame ---------- */
+
+/* templates.css owns width, min-height, paper white, the --rb-shadow-doc
+ * elevation and `zoom: var(--rb-doc-zoom, 1)`. What is left is the hairline
+ * that keeps a white sheet legible on a light stage, and the lift on hover. */
+body #rb-page-frame {
+  flex: none;
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-sm);
+  transition: box-shadow var(--rb-dur-base) var(--rb-ease-out);
+}
+body #rb-page-frame:hover { box-shadow: var(--rb-shadow-lg); }
+body #rb-page-frame[data-grabbing="true"] { cursor: grabbing; }
+body #rb-page-frame[data-grabbing="true"] * { user-select: none; }
+
+/* ---------- Document flow containers ----------
+ * templates.css keeps .rb-doc__side and .rb-doc__main at `display: contents`
+ * in single-column mode so the DOM is identical in both layouts. That is the
+ * right call for the template switch, but a contents box has no box: the
+ * paginator measures sections with offsetHeight, descends into a container
+ * only when that container has a height, and therefore walks straight past
+ * the whole body and reports every resume as one page.
+ *
+ * Giving the two columns ordinary block boxes is layout-neutral here — they
+ * carry no margin, padding or border, .rb-doc__body is already a block that
+ * stops margin collapsing at the same place, and the sidebar layout overrides
+ * both back to `display: block` anyway. It only restores a measurable box for
+ * the page counter. */
+body #rb-doc .rb-doc__side,
+body #rb-doc .rb-doc__main { display: block; }
+body #rb-doc[data-layout="sidebar"] .rb-doc__side,
+body #rb-doc[data-layout="sidebar"] .rb-doc__main { display: block; }
+
+/* ---------- Zoom control ---------- */
+
+/* The control writes --rb-doc-zoom on #rb-page-frame; templates.css consumes
+ * it. Nothing here may set `zoom` — that would override the document. Zoom is
+ * a viewing aid only, so it takes the same well as the two controls to its
+ * left and pins to the right edge of the bar. */
+.rb-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--rb-border-strong);
+  border-radius: var(--rb-radius-md);
+  background: var(--rb-bg-elevated);
+  box-shadow: var(--rb-shadow-xs);
+}
+.rb-zoom__btn {
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 var(--rb-space-1);
+  border-radius: var(--rb-radius-sm);
+  color: var(--rb-text-secondary);
+  font-size: var(--rb-text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out),
+              color var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-zoom__btn:hover:not(:disabled) { background: var(--rb-bg-hover); color: var(--rb-text); }
+.rb-zoom__btn:disabled { opacity: 0.35; }
+.rb-zoom__value {
+  display: grid;
+  place-items: center;
+  min-width: 46px;
+  height: 26px;
+  padding: 0 var(--rb-space-1);
+  border-radius: var(--rb-radius-sm);
+  color: var(--rb-text);
+  font-size: var(--rb-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out),
+              color var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-zoom__value:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+
+/* ---------- Status bar ---------- */
+
+body #rb-statusbar {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  flex: none;
+  height: var(--rb-statusbar-h);
+  padding: 0 var(--rb-space-3);
+  background: var(--rb-bg);
+  border-top: 1px solid var(--rb-border);
+  font-size: var(--rb-text-xs);
+  color: var(--rb-text-muted);
+  overflow: hidden;
+}
+.rb-statusbar__group {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  min-width: 0;
+}
+.rb-statusbar__group--end { margin-left: auto; }
+.rb-statusbar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rb-statusbar__sep {
+  width: 1px;
+  height: 14px;
+  flex: none;
+  background: var(--rb-border);
+}
+.rb-statusbar__item--ok { color: var(--rb-green-600); }
+.rb-statusbar__item--warn { color: var(--rb-amber-600); }
+.rb-statusbar__item--error { color: var(--rb-red-500); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-statusbar__item--ok { color: var(--rb-green-200); }
+  html:not([data-theme="light"]) .rb-statusbar__item--warn { color: var(--rb-amber-200); }
+}
+html[data-theme="dark"] .rb-statusbar__item--ok { color: var(--rb-green-200); }
+html[data-theme="dark"] .rb-statusbar__item--warn { color: var(--rb-amber-200); }
+
+/* ---------- Marquee ---------- */
+
+body #rb-marquee {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-4);
+  flex: none;
+  height: var(--rb-marquee-h);
+  padding: 0 var(--rb-space-4);
+  background: var(--rb-bg-elevated);
+  border-top: 1px solid var(--rb-border);
+  font-size: var(--rb-text-xs);
+  color: var(--rb-text-muted);
+  overflow-x: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+body #rb-marquee::-webkit-scrollbar { height: 0; }
+.rb-marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  flex: none;
+}
+.rb-marquee__item .rb-kbd { font-size: 9px; height: 16px; min-width: 16px; }
+body.rb-marquee-collapsed #rb-marquee { display: none; }
+
+/* ---------- Panel ----------
+ * panel.js owns #rb-panel's box, its sidebar/sheet modes and its width. These
+ * three are the compat surface editor.css documents (it says panels mount into
+ * a padded, already-scrolling .rb-panel__body). If panel.js's own view is the
+ * scroll container instead, these rules simply never match. */
+
+.rb-panel__grip {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  cursor: grab;
+  touch-action: none;
+}
+.rb-panel__grip::after {
+  content: '';
+  width: 36px;
+  height: 4px;
+  border-radius: var(--rb-radius-full);
+  background: var(--rb-border-strong);
+}
+.rb-panel__grip:active { cursor: grabbing; }
+
+.rb-panel__tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+  flex: none;
+  min-height: var(--rb-subbar-h);
+  padding: 0 var(--rb-space-2);
+  border-bottom: 1px solid var(--rb-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rb-panel__tabs::-webkit-scrollbar { height: 0; }
+
+.rb-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: var(--rb-space-4);
+}
+.rb-panel__body > * + * { margin-top: var(--rb-space-4); }
+
+/* ---------- Drawer scrim ---------- */
+
+/* A scrim has to darken in both themes, so it is a fixed ink wash rather than
+ * a surface token — a token would go pale in light mode. */
+.rb-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 16, 23, .42);
+  /* Above the panel sheet, which shares --rb-z-panel. The bottom sheet is
+   * fixed and painted in the root stacking context, so with equal depth the
+   * drawer would open over a panel that stayed bright and tappable. */
+  z-index: calc(var(--rb-z-panel) + 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--rb-dur-base) var(--rb-ease-out);
+}
+body.rb-rail-open .rb-scrim {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Responsive: ≤1100px — the panel yields width to the stage ---------- */
+
+/* panel.js owns the panel's slide-over sheet and switches to it below 900px.
+ * Overriding its positioning here would break the only state its collapse
+ * logic knows about, so between 900 and 1100 the panel simply narrows. It
+ * reads --rb-panel-w through an inline width, so re-declaring the token is
+ * enough — no !important, no fight. */
+@media (min-width: 900px) and (max-width: 1100px) {
+  :root { --rb-panel-w: 320px; }
+}
+
+/* ---------- Responsive: ≤760px — the rail becomes a drawer ---------- */
+
+/* 760 is ui/chrome.js's MOBILE_MAX: above it the topbar shows its desktop bar
+ * and a docked rail is right; below it the topbar has already become two rows
+ * and a 232px column would leave nothing for the document.
+ *
+ * Every block in this file that matches a width is scoped to `screen`. A sheet
+ * of paper is 794–816 CSS px wide, which is inside the phone queries below, so
+ * an unscoped one would reach the printed page. print.css resets the shell
+ * itself, but nothing there resets the document. */
+@media screen and (max-width: 760px) {
+  /* One bar, not two: chrome.js hides .rb-topbar__inner and shows
+   * .rb-topbar__mobile at the same breakpoint, so the subbar is the whole
+   * topbar here. Reserving both left a 52px empty band under the real one. */
+  :root { --rb-chrome-h: calc(var(--rb-subbar-h) + 1px); }
+
+  .rb-shell { grid-template-columns: minmax(0, 1fr); }
+
+  /* A docked rail is 264px because it sits beside a wide stage. As a drawer
+   * it has the screen to itself, and 264 truncates "PROFESSIONAL SUMMARY" to
+   * "PROFESSION…" once the grip and the visibility toggle take 88px of it. */
+  :root { --rb-drawer-w: 300px; }
+
+  body #rb-rail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(var(--rb-drawer-w), 84vw);
+    z-index: calc(var(--rb-z-panel) + 2);
+    box-shadow: var(--rb-shadow-xl);
+    transform: translateX(-101%);
+    visibility: hidden;
+    transition: transform var(--rb-dur-base) var(--rb-ease-shell),
+                visibility 0s linear var(--rb-dur-base);
+  }
+  body.rb-rail-open #rb-rail {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform var(--rb-dur-base) var(--rb-ease-shell),
+                visibility 0s;
+  }
+
+  /* A 300px drawer still cannot hold "PROFESSIONAL SUMMARY" on one line once
+   * the drag grip and the visibility toggle have taken 88px of it, and the row
+   * is 44px tall, which is exactly what two lines of it need. Wrapping is the
+   * right answer in a drawer: the list is vertical, a taller row costs nothing,
+   * and the section name is the one thing in the rail that has to be readable.
+   * The docked rail above this width keeps its single ellipsised line. */
+  body #rb-rail .rb-rail__label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+  /* …and the row has to be allowed to be taller than the one line it holds.
+   * ui/rail.js fixes .rb-rail__main at 32px for the docked rail and the drawer
+   * rules below raise it to a 44px touch target, so this is anchored one id
+   * deeper to win on specificity rather than on order — a fixed height here is
+   * what makes two wrapped labels overlap the row beneath them. */
+  body #rb-shell #rb-rail .rb-rail__main { height: auto; min-height: 44px; }
+
+  body #rb-toolstrip { padding: 0 var(--rb-space-2); }
+  body #rb-statusbar { padding: 0 var(--rb-space-2); }
+  body #rb-marquee { display: none; }
+  .rb-statusbar__item--optional { display: none; }
+
+  /* The rail drawer has to be dismissed, so the topbar carries the control.
+   * 44px is the floor for a touch target, and the bar it sits in was 44px —
+   * so the bar grows to 52 and every control in it can be 44 with air either
+   * side. --rb-subbar-h is shared with the toolstrip, so both grow together.
+   *
+   * These carry the #rb-topbar anchor rather than matching on class alone:
+   * a11y-fixes.css lands after this file and sets a 24px minimum on icon
+   * buttons through `body :is(...)`, and :is() takes the specificity of its
+   * most specific argument — so that rule outranks a bare two-class selector
+   * no matter which file it is in. */
+  :root { --rb-subbar-h: 52px; }
+
+  body #rb-topbar .rb-topbar__mobile .rb-btn,
+  body #rb-topbar .rb-topbar__mobile .rb-btn-group > .rb-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  body #rb-topbar .rb-topbar__mobile .rb-btn--icon,
+  body #rb-topbar .rb-topbar__mobile .rb-btn--sm {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+  /* The wordmark is the first thing to go: the mark beside it still carries the
+   * brand, and the resume name in the title field is what the user is looking
+   * at. Below 760 there is no room for both and a 44px drawer control.
+   * The class has to be the one the brand link actually carries — the old
+   * selector matched nothing, so the word stayed and squeezed the title to
+   * 18px wide while the bar overflowed the viewport. */
+  body #rb-topbar .rb-topbar__mobile .rb-brand__word { display: none; }
+  /* …and what is left of the brand is the mark, which on a phone is the only
+   * way back to the home page. Dropping the word must not drop the hit area
+   * with it: the link measures 28x28 without this, which is below the floor
+   * the rest of the bar is held to. */
+  body #rb-topbar .rb-topbar__mobile .rb-brand {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+  /* The spacer and the title field both grow, which splits the leftover
+   * width in half and leaves the title unusably narrow. The title wins. */
+  body #rb-topbar .rb-topbar__mobile .rb-spacer { flex: 0 0 0; }
+
+  /* Toolstrip controls carry the same floor. The bar is 52px, so 44 leaves
+   * 4px of air and nothing has to overflow its own well. */
+  .rb-typectl__btn,
+  .rb-typectl__value,
+  .rb-pagecount {
+    min-height: 44px;
+  }
+  .rb-typectl__btn {
+    min-width: 44px;
+  }
+
+  /* The title field is the only elastic thing left in the bar, so it has to
+   * be allowed to give up width rather than push the export control off the
+   * right edge. It is also a text field a thumb has to hit, so it takes the
+   * same 44px floor as the buttons around it, and 24px of width as the
+   * minimum a pointer target can be (SC 2.5.8). */
+  body #rb-topbar .rb-topbar__mobile .rb-topbar__titlefield { min-width: 24px; }
+  body #rb-topbar .rb-topbar__mobile .rb-topbar__title {
+    min-width: 24px;
+    min-height: 44px;
+  }
+
+  /* Dialogs are built by ui/ui.js, which mounts them in #rb-overlay-root
+   * outside every shell surface, so the sheet rules above never reach them.
+   * The card already caps at 84vh and its body already scrolls; what is left
+   * is the 26px close button and the 32px footer actions. */
+  .rb-modal-backdrop { padding: var(--rb-space-3); }
+  .rb-modal { max-height: min(88dvh, 720px); }
+  .rb-modal-foot {
+    flex-wrap: wrap;
+    row-gap: var(--rb-space-2);
+  }
+  body .rb-modal :is(button, a, input, select, textarea, [role="button"]):not([tabindex="-1"]) {
+    min-height: 44px;
+  }
+  body .rb-modal .rb-btn--icon,
+  body .rb-modal .rb-btn--sm.rb-btn--icon {
+    min-width: 44px;
+    width: 44px;
+  }
+  /* Two actions side by side at 44px each fit any phone, but a three-action
+   * confirm does not, and a wrapped row is better than a clipped one. */
+  .rb-modal-foot .rb-btn { flex: 1 1 auto; }
+  .rb-modal-foot .rb-spacer { flex-basis: 100%; height: 0; }
+
+  /* Popovers live in #rb-overlay-root, above the sheet and the drawer, so
+   * they need their own floor. a11y-fixes.css already lists these classes,
+   * but only behind the in-app "large targets" preference; below this width
+   * there is no mouse to be accurate with, so they take the floor anyway.
+   * The command palette is the same story and lives in the same root. */
+  body :is(.rb-pop__item, .rb-optcard, .rb-disclosure__summary, .rb-theme-opt, .rb-scale-picker__opt, .rb-cmd__opt) {
+    min-height: 44px;
+  }
+  body .rb-cmd :is(input, button):not([tabindex="-1"]) {
+    min-height: 44px;
+  }
+  body .rb-cmd .rb-btn--icon,
+  body .rb-cmd .rb-btn--sm.rb-btn--icon {
+    min-width: 44px;
+    width: 44px;
+  }
+
+  /* The drawer is a list of rows, and a thumb needs 44px of each. The rail
+   * module sizes all of these in points; here they are pixels. */
+  body #rb-rail .rb-rail__main { height: 44px; }
+  body #rb-rail .rb-rail__rename { height: 44px; }
+  body #rb-rail .rb-rail__grip {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  body #rb-rail .rb-rail__eye {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  body #rb-rail .rb-rail__add,
+  body #rb-rail .rb-rail__head .rb-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  body #rb-rail .rb-rail__head .rb-btn--icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+}
+
+/* ---------- Responsive: ≤900px — the panel is a sheet over the stage ----------
+ * panel.js switches #rb-panel to a fixed bottom sheet at the same width. A
+ * collapsed sheet still covers the bottom of the stage, so the stage has to
+ * reserve its height or the last line of the resume is unreachable. One
+ * token drives the sheet's own collapsed offset and this padding so the two
+ * cannot drift apart.
+ *
+ * The sheet's drag lip and the row that names the panel both collapse it, so
+ * a collapsed sheet only needs one of them. Dropping the lip when it is
+ * collapsed halves the permanent chrome — 44px of a 640px screen instead of
+ * 88 — and leaves the expanded sheet its handle, which is what a handle is
+ * for. */
+@media screen and (max-width: 899.98px) {
+  :root { --rb-sheet-peek-h: 44px; }
+
+  body #rb-panel[data-collapsed="true"] {
+    transform: translateY(calc(100% - var(--rb-sheet-peek-h)));
+  }
+  body #rb-panel[data-collapsed="true"] .rb-pane__grab { display: none; }
+  body #rb-panel[data-collapsed="true"] .rb-pane__head {
+    min-height: 44px;
+    padding-block: 0;
+  }
+  body #rb-panel .rb-pane__head { min-height: 44px; }
+  body #rb-panel .rb-pane__head > .rb-btn,
+  body #rb-panel .rb-pane__grab {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  body #rb-panel .rb-pane__head > .rb-btn { width: 44px; height: 44px; padding: 0; }
+  body #rb-panel .rb-pane__tab {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* The sheet is the only way to reach a labelled field on a phone, and it
+   * holds about 180 controls: 33px inputs, 26px small buttons and a 26px
+   * square on every entry row for Move / Hide / Duplicate / Delete. None of
+   * those is hittable with a thumb, and the sheet already scrolls, so the
+   * floor costs height rather than reach. min-* not height, so a control that
+   * needs to grow still can. The #rb-panel anchor outranks the 24px floor
+   * a11y-fixes.css sets through `body :is(...)`. */
+  body #rb-panel :is(button, a, input, select, textarea, summary, [role="button"]):not([tabindex="-1"]) {
+    min-height: 44px;
+  }
+  body #rb-panel .rb-btn--icon,
+  body #rb-panel .rb-btn--sm.rb-btn--icon {
+    min-width: 44px;
+  }
+  /* A tab strip is a flex row in a column panel, and `flex: 0 1 auto` lets the
+   * scrolling content below it squeeze the strip to nothing — the analysis
+   * panel's Linter / ATS / Job match row measured 8px tall in the sheet, with
+   * its labels sliced in half. A strip that cannot shrink is a strip. */
+  body #rb-panel .rb-tabs {
+    flex: none;
+  }
+
+  body #rb-stage {
+    /* The sheet's own height, plus a gap so the bottom edge of the last page
+     * is visible above the bar rather than running into it, plus whatever the
+     * device insets at the bottom of the screen. */
+    padding-bottom: calc(var(--rb-sheet-peek-h) + var(--rb-space-3) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* templates.css hard-sets `zoom: 1` on the frame at the same width, because
+   * the page is already exactly as wide as the column — there is nothing left
+   * to scale. The preview-zoom control therefore cannot do anything here, and
+   * at 44px targets it is 184px of a 360px toolstrip. Hiding inert controls
+   * beats showing three buttons that silently do nothing. */
+  .rb-zoom { display: none; }
+
+  /* The toolstrip's grow spacer is not focusable and carries aria-hidden, so
+   * moving it to the front changes where the controls sit without changing
+   * the order a keyboard or a screen reader walks them in. */
+  .rb-toolstrip__group--grow { order: -1; }
+
+  /* ---------- The contact line at phone width ----------
+   * templates.css gives up the 8.5in measure below 900px, so the contact list
+   * wraps. The renderer then hides the separator in front of any item that
+   * opened a line, and that edit is what re-wraps the line: the item that was
+   * pushed down pulls back up next to its predecessor, and the two arrive
+   * with nothing between them — "alex@example.com+1 415 555 0142".
+   *
+   * A run-together contact line is a correctness bug, not a cosmetic one, and
+   * it cannot be fixed by choosing a different hiding rule: any rule that
+   * removes a separator changes the measurement that chose it. So the mobile
+   * list stops wrapping instead. One fact per line, no separators, and the
+   * marker's job — telling two facts apart — is done by the line break
+   * instead. The desktop single line is untouched; this is scoped to the same
+   * 900px the reflow itself is scoped to. */
+  body #rb-doc .rb-doc__contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 1px;
+  }
+  body #rb-doc .rb-doc__contact-item {
+    display: block;
+    white-space: normal;
+  }
+  body #rb-doc .rb-doc__sep { display: none; }
+  /* A place is "San Francisco, CA" and reads as one fact, so it keeps the
+   * nowrap it has on paper even when the line above it is a different fact. */
+  body #rb-doc .rb-doc__place { white-space: nowrap; }
+}
+
+/* The toolstrip scrolls horizontally rather than wrapping, so when the row of
+ * controls is tighter than its own content the label is the only thing here
+ * that can go: the A · n% · A control beside it is self-explanatory. That
+ * happened at 1024, where the strip is 406px against 424px of content and the
+ * label was the single shrinkable item — it was squeezed to 8px and read
+ * "T.". A viewport breakpoint cannot catch that, because the strip's width
+ * depends on the rail and the panel as much as on the window, so the query is
+ * on the strip. */
+@container rb-toolstrip (max-width: 430px) {
+  .rb-toolstrip__title--ctl { display: none; }
+}
+
+/* The same strip, one step further: below about 400px even the label is gone
+ * and the row of controls is still wider than the strip. That is the band a
+ * docked rail (296) and a 320px panel leave open — 900 to 1010px of window —
+ * and what it cuts is the zoom control, which loses its value and both buttons
+ * to the panel's edge with nothing to mark that it scrolls. The bar already
+ * hides it below 900px for the same reason; this is the width-driven half of
+ * that decision, and it has to be a container query because the strip's width
+ * is set by the rail and the panel, not by the window. */
+@container rb-toolstrip (max-width: 399px) {
+  .rb-zoom { display: none; }
+}
+
+/* ---------- Touch floors where there is no mouse ----------
+ * 44px is a property of the pointer, not of the width. Everything above is
+ * width-driven because everything above is a layout decision: below 760 there
+ * is no room for a docked rail, below 900 none for a docked panel. None of
+ * that is true of a target size. An iPad in portrait is 768 — two pixels past
+ * the phone breakpoint and a full tablet — and it was getting the 32px desktop
+ * chrome: twelve controls in the topbar and the rail, none of them reachable
+ * with a thumb. In landscape it is 1024, the sheet never opens, and the panel's
+ * fifty-three controls were 24 to 36px. So the floor is declared against the
+ * pointer and the width queries keep only the layout.
+ *
+ * The id anchors are load-bearing. a11y-fixes.css lands after this file and
+ * floors every icon button at 24px through `body :is(...)`, and :is() takes
+ * the specificity of its most specific argument, so a bare class selector
+ * loses to it in any file.
+ *
+ * Scoped to `screen` for the same reason the width queries above are: a sheet
+ * of paper evaluates `(hover: none)` too, and a target size that only ever
+ * mattered to a thumb has no business in the printed output.
+ */
+@media screen and ((hover: none) or (pointer: coarse)) {
+  body #rb-topbar :is(.rb-topbar__inner, .rb-topbar__mobile) :is(button, input, .rb-topbar__navlink, .rb-brand) {
+    min-height: 44px;
+  }
+  body #rb-topbar :is(.rb-topbar__inner, .rb-topbar__mobile) :is(.rb-btn--icon, .rb-btn--sm) {
+    min-width: 44px;
+  }
+  body #rb-topbar .rb-topbar__titlefield,
+  body #rb-topbar .rb-topbar__title { min-height: 44px; }
+
+  /* 44px grips and toggles take 132px out of a 296px rail, which is more than
+   * "PROFESSIONAL SUMMARY" needs on one line. The drawer already answers this
+   * by wrapping the label; the docked rail has to answer it the same way, and a
+   * taller row in a scrolling list costs nothing. */
+  body #rb-shell #rb-rail .rb-rail__main { height: auto; min-height: 44px; }
+  body #rb-rail .rb-rail__label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+  body #rb-rail .rb-rail__grip,
+  body #rb-rail .rb-rail__eye { min-width: 44px; min-height: 44px; }
+  body #rb-rail :is(.rb-btn--icon, .rb-btn--sm.rb-btn--icon) { min-width: 44px; min-height: 44px; }
+  body #rb-rail .rb-rail__add,
+  body #rb-rail .rb-rail__head :is(button, .rb-btn) { min-width: 44px; min-height: 44px; }
+
+  /* autofill.css draws this control and is linked after app.css, so its 24px
+   * min-height on the readout outranks a plain class selector here. The
+   * element anchor is what puts the floor back. */
+  body .rb-typectl__btn,
+  body .rb-typectl__value,
+  body .rb-zoom__btn,
+  body .rb-zoom__value,
+  body .rb-pagecount { min-height: 44px; }
+  body .rb-typectl__btn,
+  body .rb-zoom__btn { min-width: 44px; }
+
+  /* The toolstrip is 44px tall by default and the 44px controls have to sit
+   * inside it. It grows with the topbar, which grows the same way. */
+  body #rb-toolstrip { height: 52px; }
+  :root { --rb-subbar-h: 52px; }
+
+  /* Widening the controls to 44px takes another 56px out of the strip, so the
+   * breakpoint above has to move with them — a control that needs more room
+   * cannot share the breakpoint of one that needs less. Measured against the
+   * real bar, the zoom control stops fitting at a 463px strip here. */
+  @container rb-toolstrip (max-width: 470px) {
+    .rb-zoom { display: none; }
+  }
+
+  /* Overlays. The ≤760 block above already floors these, but it is a width
+   * query, so an iPad in portrait got the same 26px close button a phone used
+   * to get. The dialog sizes stay width-driven — there is room for a
+   * three-action footer at 768 and no reason to wrap it — but a target size
+   * is a target size wherever it is. ui.js mounts all of this in
+   * #rb-overlay-root, outside every shell surface, so it has to be named. */
+  body :is(.rb-modal, .rb-cmd) :is(button, a, input, select, textarea, [role="button"], [role="menuitem"]):not([tabindex="-1"]) {
+    min-height: 44px;
+  }
+  body :is(.rb-modal, .rb-cmd) :is(.rb-btn--icon, .rb-btn--sm.rb-btn--icon) {
+    min-width: 44px;
+  }
+  body :is(.rb-pop__item, .rb-optcard, .rb-disclosure__summary, .rb-theme-opt, .rb-scale-picker__opt, .rb-cmd__opt) {
+    min-height: 44px;
+  }
+
+  /* The editing panel, for the same reason. The ≤900 block floors it when it
+   * is a sheet, which left the docked column — every width above 900, which is
+   * every tablet in landscape — with 53 controls between 24 and 36px: the four
+   * tabs, every labelled field, and the move/hide/duplicate/delete square on
+   * every entry row. The panel body already scrolls, so the floor costs height
+   * rather than reach. */
+  body #rb-panel :is(button, a, input, select, textarea, summary, [role="button"]):not([tabindex="-1"]) {
+    min-height: 44px;
+  }
+  body #rb-panel :is(.rb-btn--icon, .rb-btn--sm.rb-btn--icon) { min-width: 44px; }
+  body #rb-panel .rb-pane__head { min-height: 44px; }
+  body #rb-panel .rb-pane__head > .rb-btn { width: 44px; height: 44px; padding: 0; }
+  body #rb-panel .rb-pane__tab { width: 44px; height: 44px; }
+}
+
+@media screen and (max-width: 560px) {
+  .rb-pagecount { padding: 0 var(--rb-space-2); }
+  .rb-zoom__value { min-width: 40px; }
+}
+
+/* ---------- Reduced motion ---------- */
+
+/* base.css zeroes transitions globally; this additionally kills the
+ * paired visibility delay so nothing pops back in after the shortcut fires. */
+@media (prefers-reduced-motion: reduce) {
+  body #rb-rail { transition: none; }
+  body #rb-stage { scroll-behavior: auto; }
+}
+
+/* ---------- Print ----------
+ * Delegated in full to css/print.css, which hides the chrome by id, resets
+ * #rb-shell / #rb-main / #rb-stage to block flow, kills zoom, and owns @page.
+ * Nothing is declared here on purpose. */
+
+/* ---------- Template gallery ----------
+ * The cards in the Design panel. Each one holds a real page: the sheet inside
+ * it is laid out at 8.5in in real points with the template's own --rb-doc-*
+ * properties, then scaled to the card. That is why the paper width is a fixed
+ * 126px here and SHEET_W in ui/design.js is the same number — the scale factor
+ * is arithmetic, not a media query. Change one, change the other.
+ *
+ * The sheet is inert: not editable, not selectable, and hidden from assistive
+ * technology, because the document it reduces is already in the page. */
+.rb-t__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: var(--rb-space-2);
+}
+
+.rb-t__card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--rb-space-2);
+  padding: var(--rb-space-2);
+  text-align: left;
+  background: var(--rb-bg-elevated);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-md);
+  transition: border-color var(--rb-dur-fast) var(--rb-ease-out),
+              box-shadow var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-t__card:hover {
+  border-color: var(--rb-border-strong);
+  box-shadow: var(--rb-shadow-sm);
+}
+.rb-t__card[aria-pressed="true"] {
+  border-color: var(--rb-accent-500);
+  box-shadow: inset 0 0 0 1px var(--rb-accent-500);
+}
+.rb-t__card__name {
+  font-size: var(--rb-text-xs);
+  font-weight: 600;
+  color: var(--rb-text);
+}
+.rb-t__card[aria-pressed="true"] .rb-t__card__name { color: var(--rb-text-accent); }
+.rb-t__card__desc {
+  font-size: var(--rb-text-2xs);
+  line-height: 1.4;
+  color: var(--rb-text-muted);
+}
+
+/* ---------- The paper ---------- */
+
+.rb-t__paper {
+  position: relative;
+  display: block;
+  width: 126px;
+  max-width: 100%;
+  /* The one page, in px — ui/design.js writes --rb-t-page-h from the template's
+     own page size. A var rather than an inline height so the spill band below
+     can add to it. */
+  height: var(--rb-t-page-h, 170px);
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--rb-gray-0);
+  /* An inset ring rather than a border: the sheet inside is 126px wide and
+     SHEET_W in ui/design.js is that same 126, so a border would take the
+     content box down to 124 and the miniature page would be cropped a pixel
+     down each side by the overflow above. */
+  box-shadow: inset 0 0 0 1px var(--rb-border), var(--rb-shadow-sm);
+  border-radius: 2px;
+  pointer-events: none;
+  user-select: none;
+}
+/* The band of a second page, shown only when this template spills. A card that
+   hid the overflow would be flattering the template. */
+.rb-t__page2 {
+  position: absolute;
+  left: 4px;
+  right: 0;
+  top: calc(var(--rb-t-page-h, 170px) - 2px);
+  bottom: 0;
+  display: none;
+  background: var(--rb-gray-100);
+  border-top: 1px solid var(--rb-border);
+  z-index: 0;
+}
+.rb-t__paper[data-pages="many"] {
+  height: calc(var(--rb-t-page-h, 170px) + 7px);
+}
+.rb-t__paper[data-pages="many"] .rb-t__page2 { display: block; }
+
+.rb-t__sheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  transform-origin: 0 0;
+  background: var(--rb-gray-0);
+  color: var(--rb-gray-900);
+  padding: var(--rb-doc-margin, 0.6in);
+  font-family: var(--rb-doc-font, var(--rb-font-sans));
+  font-size: var(--rb-doc-size, 10.5pt);
+  line-height: var(--rb-doc-leading, 1.32);
+  letter-spacing: var(--rb-doc-tracking, 0);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: break-word;
+}
+/* base.css already zeroes margins, padding and list-style on these; only the
+   heading defaults, which would otherwise come in at 2em, need saying. */
+.rb-t__sheet h1, .rb-t__sheet h2, .rb-t__sheet h3, .rb-t__sheet h4 { font: inherit; }
+.rb-t__flow { display: block; }
+
+/* The card is a <button>, and a button may only hold phrasing content, so the
+   whole miniature is built from spans. These are the ones that have to be
+   blockified to lay out; the rest are flex or grid items and are blockified
+   by their parent. */
+.rb-t__name,
+.rb-t__label,
+.rb-t__sec,
+.rb-t__sec-title,
+.rb-t__sec-body,
+.rb-t__entry,
+.rb-t__role,
+.rb-t__sub,
+.rb-t__prose,
+.rb-t__list,
+.rb-t__li { display: block; }
+
+.rb-t__head {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--rb-doc-size) * 1.6);
+  padding-bottom: calc(var(--rb-doc-size) * 0.75);
+  margin-bottom: var(--rb-doc-section-gap, 14pt);
+  border-bottom: max(var(--rb-doc-rule, 1pt), 0.5pt) solid var(--rb-doc-accent, var(--rb-gray-900));
+}
+.rb-t__id { flex: 1 1 auto; min-width: 0; }
+.rb-t__name {
+  font-size: calc(var(--rb-doc-size) * 1.85);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--rb-doc-accent, var(--rb-gray-900));
+}
+.rb-t__label {
+  margin-top: calc(var(--rb-doc-size) * 0.12);
+  font-size: calc(var(--rb-doc-size) * 1.06);
+  color: var(--rb-gray-600);
+}
+
+/* One contact line, exactly as the document renders it. */
+.rb-t__contact {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 var(--rb-doc-section-gap, 14pt);
+  font-size: calc(var(--rb-doc-size) * 0.92);
+  color: var(--rb-gray-700);
+}
+.rb-t__contact-item { white-space: nowrap; }
+.rb-t__contact-item + .rb-t__contact-item::before {
+  content: "·";
+  margin: 0 0.32em;
+  color: var(--rb-gray-400);
+}
+
+.rb-t__sec { margin-top: var(--rb-doc-section-gap, 14pt); }
+.rb-t__head + .rb-t__sec { margin-top: 0; }
+.rb-t__sec-title {
+  margin-bottom: calc(var(--rb-doc-size) * 0.42);
+  padding-bottom: calc(var(--rb-doc-size) * 0.2);
+  border-bottom: max(var(--rb-doc-rule, 1pt), 0.5pt) solid var(--rb-doc-accent, var(--rb-gray-900));
+  font-size: var(--rb-doc-size, 10.5pt);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rb-doc-accent, var(--rb-gray-900));
+}
+.rb-t__sheet[data-heading="title"] .rb-t__sec-title {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: calc(var(--rb-doc-size) * 1.1);
+}
+.rb-t__sheet[data-heading="rule"] .rb-t__sec-title {
+  padding-bottom: calc(var(--rb-doc-size) * 0.24);
+  margin-bottom: calc(var(--rb-doc-size) * 0.6);
+  border-bottom-width: calc(max(var(--rb-doc-rule, 1pt), 0.5pt) * 2);
+}
+
+.rb-t__entry + .rb-t__entry { margin-top: var(--rb-doc-entry-gap, 7pt); }
+.rb-t__row {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--rb-doc-size) * 1.6);
+}
+.rb-t__lead {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: calc(var(--rb-doc-size) * 1.06);
+  font-weight: 700;
+}
+.rb-t__when {
+  flex: none;
+  font-size: calc(var(--rb-doc-size) * 0.92);
+  color: var(--rb-gray-600);
+  white-space: nowrap;
+}
+.rb-t__role .rb-t__lead { font-size: var(--rb-doc-size); font-weight: 600; }
+.rb-t__sub { color: var(--rb-gray-700); }
+.rb-t__role { margin-top: calc(var(--rb-doc-size) * 0.22); }
+.rb-t__prose { max-width: 38em; }
+
+.rb-t__list { margin-top: calc(var(--rb-doc-size) * 0.3); }
+.rb-t__li {
+  position: relative;
+  padding-left: calc(var(--rb-doc-size) * 1.25);
+}
+.rb-t__li + .rb-t__li { margin-top: calc(var(--rb-doc-size) * 0.14); }
+.rb-t__li::before {
+  content: var(--rb-doc-bullet, "•");
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.8em;
+  color: var(--rb-doc-accent, var(--rb-gray-900));
+  font-weight: 700;
+}
+.rb-t__sheet[data-bullet="none"] .rb-t__li { padding-left: 0; }
+.rb-t__sheet[data-bullet="none"] .rb-t__li::before { content: none; }
+
+/* The sidebar template really does split its body in two; the card shows the
+   same split, with the same hairline. */
+.rb-t__body {
+  display: grid;
+  grid-template-columns: 2.15in minmax(0, 1fr);
+  column-gap: calc(var(--rb-doc-size) * 1.8);
+  align-items: start;
+  margin-top: var(--rb-doc-section-gap, 14pt);
+}
+.rb-t__col { min-width: 0; }
+.rb-t__col--side {
+  padding-right: calc(var(--rb-doc-size) * 1.1);
+  border-right: max(var(--rb-doc-rule, 1pt), 0.5pt) solid var(--rb-gray-200);
+}
+.rb-t__col .rb-t__sec:first-child { margin-top: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-t__card { transition: none; }
+}
+
+/* ---------- The single page: intro over editor ----------
+ * The shell is a three-column grid and must stay one. The intro is a sibling
+ * above it, inside a column flex that owns the viewport height, so adding the
+ * pitch cannot steal a grid track and squash the editor. */
+.rb-app {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--rb-chrome-h));
+  margin-top: var(--rb-chrome-h);
+  overflow: hidden;
+  background: var(--rb-bg);
+}
+.rb-intro { flex: 0 0 auto; }
+/* Fixed-height app window: the intro and the editor share the viewport and the
+ * editor does its own scrolling. The indexable copy below lives outside this
+ * element so the page can still scroll to it. */
+.rb-marketing { border-top: 1px solid var(--rb-border); }
+
+/* ---------- Single page: the intro above the editor ----------
+ * One block, last in the file, so nothing earlier can win on order. The shell
+ * is a three-column grid and must stay one; the intro is a sibling above it.
+ * basis 0 — not auto — or the shell's base is its whole content height, it
+ * absorbs all the overflow and collapses to zero. */
+.rb-app {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--rb-chrome-h, 53px));
+  overflow: hidden;
+  background: var(--rb-bg);
+}
+.rb-app > .rb-intro { flex: 0 0 auto; max-height: 46dvh; overflow-y: auto; }
+.rb-app > .rb-shell { flex: 1 1 0; height: auto; min-height: 0; }
+.rb-marketing { border-top: 1px solid var(--rb-border); }
+
+/* The intro must never need scrolling to be read. */
+.rb-app > .rb-intro { max-height: 42dvh; }
+
+/* ---------- Topbar site nav ----------
+ * Sits between the title and the controls, and drops out before it can push
+ * the document controls off the end of the bar. */
+.rb-topbar__nav { display: flex; gap: 2px; margin-left: var(--rb-space-3); }
+.rb-topbar__navlink {
+  padding: 5px var(--rb-space-2);
+  border-radius: var(--rb-radius-sm);
+  font-size: var(--rb-text-sm);
+  font-weight: 500;
+  color: var(--rb-text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--rb-dur-fast) var(--rb-ease-out), background var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-topbar__navlink:hover { color: var(--rb-text); background: var(--rb-bg-hover); }
+@media (max-width: 1180px) { .rb-topbar__nav { display: none; } }
+
+/* The brand is a link home, but it must still read as the wordmark and not as
+ * a hyperlink: no underline, no visited colour, no pointer cursor change. */
+.rb-topbar__home,
+.rb-topbar__home:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  color: var(--rb-text);
+  text-decoration: none;
+  font-weight: 660;
+  letter-spacing: -0.02em;
+  font-size: 1.0625rem;
+  white-space: nowrap;
+  flex: none;
+}
+.rb-topbar__home:hover { color: var(--rb-text); }
+.rb-brand__mark {
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--rb-accent-600);
+  color: #fff;
+  flex: none;
+}

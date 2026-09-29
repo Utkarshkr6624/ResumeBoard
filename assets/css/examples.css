@@ -1,0 +1,799 @@
+/* Resumeboard — styles for the standalone site pages
+ * about.html, privacy.html, 404.html, and everything under examples/.
+ *
+ * The app shell (index.html) is styled by home.css; /guides by site.css and
+ * /ats + /templates by gallery.css. This file holds the shared site shell for
+ * the .rb-site family and restyles the resume document scale for a plain
+ * article context rather than borrowing the in-app renderer.
+ *
+ * The shell values below (1200px measure, 56px bar, 26px brand tile, 64px
+ * section rhythm) are repeated in those three sheets on purpose: each page
+ * links exactly one of them and there is no build step to share them. Keep
+ * the four in step.
+ */
+
+:root {
+  --rbx-measure: 68ch;
+  --rbx-page: 1200px;
+  --rbx-gutter: var(--rb-space-6);
+  --rbx-head-h: 3.5rem;
+  --rbx-mark: 26px;
+  --rbx-h1: 2.25rem;
+  --rbx-section: var(--rb-space-16);
+  --rbx-top: var(--rb-space-16);
+  --rbx-paper-w: 8.5in;
+
+  /* Small text the reader has to read. See the note in home.css. */
+  --rbx-label: var(--rb-text-secondary);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) { --rbx-label: var(--rb-text-muted); }
+}
+html[data-theme="dark"] { --rbx-label: var(--rb-text-muted); }
+
+/* ---------- Shell ---------- */
+
+.rb-site {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.rb-site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--rb-z-header);
+  background: color-mix(in srgb, var(--rb-bg-elevated) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--rb-border);
+}
+
+.rb-site-header__inner {
+  max-width: var(--rbx-page);
+  margin: 0 auto;
+  min-height: var(--rbx-head-h);
+  padding: 0 var(--rbx-gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-6);
+}
+
+.rb-site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--rb-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.rb-site-brand:hover { color: var(--rb-text); }
+.rb-site-brand:hover .rb-site-mark { background: var(--rb-accent-700); }
+
+/* The mark is the document the site is named for, in reverse out of the accent
+ * tile — the same tile the favicon draws and the editor's top bar draws. It
+ * scales with the box rather than carrying a pixel size, so the tile stays
+ * square at every breakpoint. */
+.rb-site-mark {
+  width: var(--rbx-mark);
+  height: var(--rbx-mark);
+  flex: none;
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-accent-600);
+  color: var(--rb-gray-0);
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-site-mark svg {
+  width: 68%;
+  height: 68%;
+}
+
+.rb-site-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+  margin-left: auto;
+  /* Below roughly 430px the four or six labels cannot share the bar with the
+   * brand, and a wrapping bar doubles the header height page to page. Scroll
+   * the row instead, the way the gallery nav already does. */
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rb-site-nav::-webkit-scrollbar { display: none; }
+.rb-site-nav a {
+  padding: 6px var(--rb-space-3);
+  border-radius: var(--rb-radius-sm);
+  color: var(--rb-text-secondary);
+  text-decoration: none;
+  font-size: var(--rb-text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  flex: none;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out), color var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-site-nav a:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+.rb-site-nav a[aria-current="page"] {
+  color: var(--rb-text);
+  font-weight: 600;
+  background: var(--rb-bg-hover);
+}
+/* privacy.html is the one page in this family that carries a theme control,
+   as a labelled button rather than a glyph. Same box as the icon toggles on
+   the landing page and the guides, so the bar does not change weight. */
+.rb-site-header [data-theme-toggle] {
+  height: 32px;
+  min-width: 32px;
+  padding: 0 var(--rb-space-3);
+  font-size: var(--rb-text-base);
+  font-weight: 500;
+}
+@media (max-width: 720px) {
+  .rb-site-header__inner { padding: 0 var(--rb-space-4); gap: var(--rb-space-3); }
+  .rb-site-nav a { padding: 5px var(--rb-space-2); font-size: var(--rb-text-sm); }
+}
+
+.rb-site-main { flex: 1 0 auto; }
+
+.rbx-wrap {
+  max-width: var(--rbx-page);
+  margin: 0 auto;
+  padding: 0 var(--rbx-gutter);
+}
+.rbx-prose { max-width: var(--rbx-measure); }
+@media (max-width: 720px) {
+  .rbx-wrap { padding: 0 var(--rb-space-4); }
+}
+
+.rb-site-footer {
+  margin-top: var(--rb-space-20);
+  border-top: 1px solid var(--rb-border);
+  background: var(--rb-bg-sunken);
+}
+.rb-site-footer__inner {
+  max-width: var(--rbx-page);
+  margin: 0 auto;
+  padding: var(--rb-space-12) var(--rbx-gutter) var(--rb-space-8);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-8);
+  justify-content: space-between;
+}
+.rb-site-footer nav { display: flex; flex-direction: column; gap: var(--rb-space-1); }
+.rb-site-footer h2 {
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-2);
+}
+.rb-site-footer a { color: var(--rb-text-secondary); text-decoration: none; font-size: var(--rb-text-sm); }
+.rb-site-footer a:hover { color: var(--rb-text); text-decoration: underline; }
+.rb-site-footer p { font-size: var(--rb-text-sm); color: var(--rbx-label); max-width: 42ch; }
+@media (max-width: 720px) {
+  .rb-site-footer__inner { padding: var(--rb-space-8) var(--rb-space-4) var(--rb-space-6); gap: var(--rb-space-6); }
+}
+
+/* ---------- Page furniture ---------- */
+
+.rb-page-head {
+  padding: var(--rbx-top) 0 var(--rb-space-10);
+  border-bottom: 1px solid var(--rb-border);
+}
+.rb-page-head h1 {
+  font-size: var(--rbx-h1);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 680;
+  margin-bottom: var(--rb-space-4);
+}
+.rb-page-head .lede {
+  font-size: var(--rb-text-lg);
+  line-height: 1.55;
+  color: var(--rb-text-secondary);
+  max-width: var(--rbx-measure);
+}
+@media (max-width: 720px) {
+  .rb-page-head { padding: var(--rb-space-10) 0 var(--rb-space-6); }
+  .rb-page-head h1 { font-size: 1.75rem; }
+  .rb-page-head .lede { font-size: var(--rb-text-md); }
+}
+
+.eyebrow {
+  display: block;
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-3);
+}
+
+.rb-section { padding: var(--rbx-section) 0; }
+.rb-section + .rb-section { border-top: 1px solid var(--rb-border); }
+.rb-section h2 {
+  font-size: var(--rb-text-2xl);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 660;
+  margin-bottom: var(--rb-space-3);
+}
+.rb-section h3 {
+  font-size: var(--rb-text-md);
+  font-weight: 620;
+  margin-bottom: var(--rb-space-2);
+}
+.rb-section > .rbx-wrap > p,
+.rb-section > .rbx-wrap > ul,
+.rb-section > .rbx-wrap > ol { max-width: var(--rbx-measure); }
+.rb-section p { color: var(--rb-text-secondary); line-height: 1.65; margin-bottom: var(--rb-space-3); }
+.rb-section p:last-child { margin-bottom: 0; }
+.rb-section strong { color: var(--rb-text); font-weight: 600; }
+
+.rbx-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--rb-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-2);
+  max-width: var(--rbx-measure);
+  color: var(--rb-text-secondary);
+  line-height: 1.6;
+}
+.rbx-list > li { position: relative; padding-left: var(--rb-space-5); }
+.rbx-list > li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rb-border-strong);
+}
+.rbx-list--check > li::before {
+  content: "";
+  left: 0;
+  top: 0.35em;
+  width: 13px;
+  height: 7px;
+  border-radius: 0;
+  border-left: 2px solid var(--rb-green-600);
+  border-bottom: 2px solid var(--rb-green-600);
+  background: none;
+  transform: rotate(-45deg);
+}
+.rbx-list--no > li::before { display: none; }
+.rbx-list--no > li { padding-left: 0; }
+.rbx-list--num { counter-reset: rbx; }
+.rbx-list--num > li { padding-left: var(--rb-space-8); }
+.rbx-list--num > li::before {
+  counter-increment: rbx;
+  content: counter(rbx);
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--rb-radius-full);
+  background: var(--rb-bg-sunken);
+  color: var(--rb-text-secondary);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  letter-spacing: 0;
+}
+
+.rbx-note {
+  border-left: 2px solid var(--rb-accent-400);
+  padding: var(--rb-space-1) 0 var(--rb-space-1) var(--rb-space-4);
+  color: var(--rb-text-secondary);
+  font-size: var(--rb-text-base);
+  line-height: 1.6;
+  max-width: var(--rbx-measure);
+  margin: var(--rb-space-5) 0;
+}
+
+.rbx-code {
+  font-family: var(--rb-font-mono);
+  font-size: var(--rb-text-xs);
+  background: var(--rb-bg-sunken);
+  border: 1px solid var(--rb-border-subtle);
+  border-radius: var(--rb-radius-xs);
+  padding: 1px 5px;
+  color: var(--rb-text);
+  word-break: break-word;
+}
+.rbx-path {
+  display: block;
+  font-family: var(--rb-font-mono);
+  font-size: var(--rb-text-xs);
+  color: var(--rb-text-secondary);
+  background: var(--rb-bg-inset);
+  border: 1px solid var(--rb-border-subtle);
+  border-radius: var(--rb-radius-sm);
+  padding: var(--rb-space-3) var(--rb-space-4);
+  word-break: break-all;
+}
+
+.rbx-actions { display: flex; flex-wrap: wrap; gap: var(--rb-space-3); align-items: center; }
+
+/* Headings inside a section have no margin of their own; this restores the gap
+ * when a paragraph list separates them from the heading above. */
+.rbx-mt-6 { margin-top: var(--rb-space-6); }
+
+/* The base .rb-badge is the site-wide pill; these chips are the same primitive
+   at the same size, so they are not re-sized here. */
+.rbx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-2);
+  margin-top: var(--rb-space-5);
+}
+
+.rbx-fictional {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  font-size: var(--rb-text-xs);
+  color: var(--rbx-label);
+  border: 1px dashed var(--rb-border-strong);
+  border-radius: var(--rb-radius-sm);
+  padding: var(--rb-space-1) var(--rb-space-2);
+  margin-bottom: var(--rb-space-4);
+}
+
+.rb-btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+
+/* ---------- Cards & grids ---------- */
+
+.rb-grid {
+  display: grid;
+  gap: var(--rb-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+.rb-grid--2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+.rb-card-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-2);
+  padding: var(--rb-space-5);
+  background: var(--rb-bg-elevated);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--rb-dur-fast) var(--rb-ease-out),
+              box-shadow var(--rb-dur-fast) var(--rb-ease-out),
+              transform var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-card-link:hover {
+  border-color: var(--rb-border-strong);
+  box-shadow: var(--rb-shadow-md);
+  transform: translateY(-1px);
+}
+.rb-card-link__kicker {
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rbx-label);
+}
+.rb-card-link__title {
+  font-size: var(--rb-text-lg);
+  font-weight: 640;
+  letter-spacing: -0.015em;
+  color: var(--rb-text);
+}
+.rb-card-link__text { font-size: var(--rb-text-base); color: var(--rb-text-secondary); line-height: 1.55; }
+.rb-card-link__more {
+  margin-top: auto;
+  padding-top: var(--rb-space-2);
+  font-size: var(--rb-text-sm);
+  font-weight: 600;
+  color: var(--rb-text-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+}
+
+.rb-plain-card {
+  padding: var(--rb-space-5);
+  background: var(--rb-bg-elevated);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+}
+.rb-plain-card h3 { font-size: var(--rb-text-md); font-weight: 620; margin-bottom: var(--rb-space-2); }
+.rb-plain-card p { font-size: var(--rb-text-base); color: var(--rb-text-secondary); line-height: 1.6; }
+
+/* ---------- At-a-glance table ---------- */
+
+.rbx-table-wrap { overflow-x: auto; margin-bottom: var(--rb-space-5); }
+.rbx-table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-size: var(--rb-text-base);
+}
+.rbx-table th, .rbx-table td {
+  text-align: left;
+  padding: var(--rb-space-3) var(--rb-space-4);
+  border-bottom: 1px solid var(--rb-border-subtle);
+  vertical-align: top;
+}
+.rbx-table th {
+  font-size: var(--rb-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rbx-label);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rbx-table td { color: var(--rb-text-secondary); }
+.rbx-table td:first-child { color: var(--rb-text); font-weight: 550; white-space: nowrap; }
+
+/* ---------- The static resume document ---------- */
+
+.rbx-doc-shell {
+  background: var(--rb-bg-sunken);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  padding: var(--rb-space-8) var(--rb-space-6);
+  overflow-x: auto;
+}
+@media (max-width: 720px) {
+  .rbx-doc-shell { padding: var(--rb-space-4) var(--rb-space-3); border-radius: var(--rb-radius-md); }
+}
+
+.rbx-doc {
+  --rbx-doc-w: var(--rbx-paper-w);
+  --rbx-doc-size: 10.5pt;
+  --rbx-doc-margin: 0.55in;
+  --rbx-doc-accent: var(--rb-gray-900);
+  --rbx-doc-gap: 15pt;
+  --rbx-doc-entry: 8pt;
+  --rbx-doc-bullet: "•";
+  width: var(--rbx-doc-w);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: var(--rbx-doc-margin);
+  background: #fff;
+  color: #151a23;
+  font-family: var(--rb-doc-font, var(--rb-font-sans));
+  font-size: var(--rbx-doc-size);
+  line-height: 1.34;
+  box-shadow: var(--rb-shadow-doc);
+  border-radius: 2px;
+}
+.rbx-doc--blue   { --rbx-doc-accent: #1f3a5f; }
+.rbx-doc--sienna { --rbx-doc-accent: #8a4b1f; }
+.rbx-doc--green  { --rbx-doc-accent: #2f5d50; }
+.rbx-doc--slate  { --rbx-doc-accent: #3d3f52; }
+.rbx-doc--plum   { --rbx-doc-accent: #5b3a6e; }
+
+/* headingStyle: uppercase | title | rule — mirrors the design option in the app */
+.rbx-doc[data-heading="title"] .rbx-doc__h {
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-size: 1.06em;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.rbx-doc[data-heading="rule"] .rbx-doc__h {
+  border-bottom-style: solid;
+  border-bottom-width: 0.8pt;
+  padding-bottom: 3pt;
+}
+.rbx-doc[data-heading="uppercase"] .rbx-doc__h {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.rbx-doc[data-bullet="dash"] { --rbx-doc-bullet: "–"; }
+.rbx-doc[data-bullet="square"] { --rbx-doc-bullet: "▪"; }
+
+.rbx-doc__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--rb-space-4);
+  padding-bottom: var(--rbx-doc-entry);
+  border-bottom: 1.2pt solid var(--rbx-doc-accent);
+  margin-bottom: var(--rbx-doc-gap);
+}
+.rbx-doc__name {
+  font-size: 1.9em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #151a23;
+}
+.rbx-doc__label {
+  font-size: 1.02em;
+  color: var(--rbx-doc-accent);
+  font-weight: 600;
+  margin-top: 2pt;
+}
+.rbx-doc__contact {
+  text-align: right;
+  font-size: 0.94em;
+  line-height: 1.5;
+  color: #363e4c;
+  flex: none;
+  max-width: 46%;
+}
+.rbx-doc__contact a { color: inherit; text-decoration: none; }
+.rbx-doc__contact span { white-space: nowrap; }
+.rbx-doc__contact > * + * { margin-top: 1pt; }
+
+.rbx-doc__sec { margin-bottom: var(--rbx-doc-gap); }
+.rbx-doc__sec:last-child { margin-bottom: 0; }
+.rbx-doc__h {
+  font-size: 0.92em;
+  font-weight: 700;
+  color: var(--rbx-doc-accent);
+  margin-bottom: 6pt;
+  border-bottom: 0.8pt solid color-mix(in srgb, var(--rbx-doc-accent) 32%, #fff);
+  padding-bottom: 2.5pt;
+}
+.rbx-doc__summary { color: #232936; line-height: 1.42; }
+
+.rbx-doc__entry + .rbx-doc__entry {
+  margin-top: var(--rbx-doc-entry);
+  padding-top: var(--rbx-doc-entry);
+  border-top: 0.5pt solid #e4e7ec;
+}
+.rbx-doc__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--rb-space-3);
+}
+.rbx-doc__org { font-size: 1.04em; font-weight: 680; letter-spacing: -0.005em; color: #151a23; }
+.rbx-doc__dates {
+  flex: none;
+  font-size: 0.92em;
+  color: #4d5666;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.rbx-doc__where { font-size: 0.95em; color: #4d5666; margin-top: 1pt; }
+.rbx-doc__role-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--rb-space-3);
+  margin-top: 3pt;
+}
+.rbx-doc__role { font-size: 0.98em; font-weight: 620; color: #232936; }
+.rbx-doc__role-dates {
+  flex: none;
+  font-size: 0.92em;
+  color: #4d5666;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.rbx-doc__entry--simple .rbx-doc__org { font-weight: 650; }
+.rbx-doc__entry--simple .rbx-doc__where { font-style: italic; }
+
+.rbx-doc__list {
+  list-style: none;
+  margin: 4pt 0 0;
+  padding: 0;
+}
+.rbx-doc__list > li {
+  position: relative;
+  padding-left: 12pt;
+  margin-bottom: 2.5pt;
+  line-height: 1.36;
+}
+.rbx-doc__list > li:last-child { margin-bottom: 0; }
+.rbx-doc__list > li::before {
+  content: var(--rbx-doc-bullet);
+  position: absolute;
+  left: 0;
+  color: var(--rbx-doc-accent);
+}
+
+.rbx-doc__skills { display: flex; flex-direction: column; gap: 3pt; }
+.rbx-doc__skill-label { font-weight: 660; color: #151a23; }
+.rbx-doc__skill-label::after { content: ":"; font-weight: 400; color: #4d5666; }
+.rbx-doc__skill-items { color: #232936; }
+
+.rbx-doc__tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3pt 5pt;
+  margin: 0;
+  padding: 0;
+  font-size: 0.94em;
+  color: #232936;
+}
+.rbx-doc__tags > li { border: 0.5pt solid #d7dbe3; border-radius: 2pt; padding: 0.5pt 4pt; }
+
+.rbx-doc__meta {
+  display: flex;
+  gap: var(--rb-space-3);
+  font-size: 0.95em;
+  color: #4d5666;
+  flex-wrap: wrap;
+}
+.rbx-doc__meta > div { min-width: 0; }
+.rbx-doc__meta dt { font-weight: 660; color: #151a23; display: inline; }
+.rbx-doc__meta dd { display: inline; margin: 0 0 0 4pt; }
+
+/* ---------- Example page layout ---------- */
+
+.rbx-example {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--rb-space-10);
+  align-items: start;
+  padding: var(--rb-space-10) 0;
+}
+@media (max-width: 1024px) {
+  .rbx-example { grid-template-columns: minmax(0, 1fr); gap: var(--rb-space-6); }
+}
+
+.rbx-aside {
+  position: sticky;
+  top: calc(var(--rbx-head-h) + var(--rb-space-6));
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-5);
+}
+@media (max-width: 1024px) {
+  .rbx-aside { position: static; }
+}
+
+.rbx-annot h2 {
+  font-size: var(--rb-text-lg);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  margin-bottom: var(--rb-space-1);
+}
+.rbx-annot__sub {
+  font-size: var(--rb-text-sm);
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-4);
+}
+.rbx-annot ol { counter-reset: annot; list-style: none; margin: 0; padding: 0; }
+.rbx-annot li {
+  counter-increment: annot;
+  position: relative;
+  padding-left: var(--rb-space-8);
+  margin-bottom: var(--rb-space-4);
+  font-size: var(--rb-text-base);
+  line-height: 1.55;
+  color: var(--rb-text-secondary);
+}
+.rbx-annot li::before {
+  content: counter(annot);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--rb-radius-full);
+  background: var(--rb-bg-sunken);
+  border: 1px solid var(--rb-border);
+  color: var(--rb-text-secondary);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+.rbx-annot li b { color: var(--rb-text); font-weight: 620; }
+
+.rbx-cta {
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  background: var(--rb-bg-elevated);
+  padding: var(--rb-space-5);
+}
+.rbx-cta h2 { font-size: var(--rb-text-md); font-weight: 640; margin-bottom: var(--rb-space-2); }
+.rbx-cta p { font-size: var(--rb-text-sm); color: var(--rb-text-secondary); line-height: 1.55; margin-bottom: var(--rb-space-4); }
+.rbx-cta .rbx-actions { flex-direction: column; align-items: stretch; }
+.rbx-cta .rbx-actions .rb-btn { width: 100%; }
+
+.rbx-status {
+  font-size: var(--rb-text-xs);
+  color: var(--rbx-label);
+  margin-top: var(--rb-space-3);
+  line-height: 1.5;
+}
+.rbx-status[data-state="error"] { color: var(--rb-red-500); }
+.rbx-status[data-state="ready"] { color: var(--rb-green-600); }
+html[data-theme="dark"] .rbx-status[data-state="ready"] { color: #6ee7b7; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rbx-status[data-state="ready"] { color: #6ee7b7; }
+}
+
+.rbx-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-3);
+  justify-content: space-between;
+  padding: var(--rb-space-6) 0;
+  border-top: 1px solid var(--rb-border-subtle);
+}
+.rbx-pager a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  text-decoration: none;
+  color: var(--rb-text-secondary);
+  font-weight: 550;
+  font-size: var(--rb-text-sm);
+  padding: var(--rb-space-2) var(--rb-space-3);
+  border-radius: var(--rb-radius-sm);
+}
+.rbx-pager a:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+.rbx-pager .is-next { margin-left: auto; }
+.rbx-pager .is-filler { flex: 1 1 auto; }
+
+/* ---------- 404 ---------- */
+
+.rbx-404-code {
+  font-size: clamp(3.5rem, 12vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-2);
+}
+.rbx-404-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-1);
+}
+.rbx-404-links a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rb-space-4);
+  padding: var(--rb-space-3) var(--rb-space-4);
+  border-radius: var(--rb-radius-md);
+  border: 1px solid var(--rb-border);
+  background: var(--rb-bg-elevated);
+  text-decoration: none;
+  color: var(--rb-text);
+  font-weight: 550;
+  transition: border-color var(--rb-dur-fast) var(--rb-ease-out), background var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rbx-404-links a:hover { border-color: var(--rb-border-strong); background: var(--rb-bg-hover); }
+.rbx-404-links span { font-weight: 400; font-size: var(--rb-text-sm); color: var(--rb-text-muted); text-align: right; }
+
+/* ---------- Print: the resume and nothing else ---------- */
+
+@media print {
+  .rb-site-header,
+  .rb-site-footer,
+  .rbx-aside,
+  .rbx-pager,
+  .rbx-404-links,
+  .rbx-actions { display: none !important; }
+
+  body { background: #fff; }
+  .rbx-example { display: block; padding: 0; }
+  .rbx-doc-shell { background: none; border: 0; padding: 0; border-radius: 0; }
+  .rbx-doc {
+    width: auto;
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+  .rbx-doc__entry, .rbx-doc__sec { break-inside: avoid; }
+  .rbx-doc__h { break-after: avoid; }
+  @page { margin: 0.6in; }
+}

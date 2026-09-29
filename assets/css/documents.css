@@ -1,0 +1,706 @@
+/* Resumeboard — documents workspace
+ *
+ * The cover letter and the interview-prep sheet. Two documents that sit beside
+ * the resume rather than inside it, so this file never styles #rb-doc, the
+ * stage or the panel: the editor underneath must look exactly the same with
+ * the workspace open as with it closed.
+ *
+ * Colours resolve through tokens.css like everything else. The letter is paper
+ * and does not invert with the theme — it is an artifact that gets printed.
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. Entry control in the toolstrip
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.rb-docs-switch {
+  flex: none;
+  gap: var(--rb-space-1);
+}
+
+.rb-docs-switch__btn {
+  color: var(--rb-text-secondary);
+}
+
+.rb-docs-switch__btn.is-active {
+  background: var(--rb-accent-50);
+  color: var(--rb-accent-700);
+}
+
+html[data-theme="dark"] .rb-docs-switch__btn.is-active,
+.rb-docs-switch__btn.is-active {
+  background: var(--rb-accent-900);
+  color: var(--rb-accent-200);
+}
+
+/* The bar is a horizontal scroller on a phone. Dropping the labels is what
+ * keeps two controls plus the text-size control inside 360px; the aria-label
+ * and the tooltip still name them. */
+@media (max-width: 700px) {
+  .rb-docs-switch__btn .rb-btn__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. The workspace shell
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.rb-ds-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--rb-z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rb-space-4);
+  background: rgba(12, 16, 23, .55);
+  animation: rb-fade var(--rb-dur-base) var(--rb-ease-out);
+}
+
+.rb-ds {
+  display: flex;
+  flex-direction: column;
+  width: min(1180px, 100%);
+  height: min(88vh, 860px);
+  min-height: 0;
+  background: var(--rb-bg);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-xl);
+  box-shadow: var(--rb-shadow-xl);
+  overflow: hidden;
+  animation: rb-pop var(--rb-dur-base) var(--rb-ease-out);
+}
+
+.rb-ds:focus {
+  outline: none;
+}
+
+.rb-ds__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  flex: none;
+  min-height: 52px;
+  padding: var(--rb-space-2) var(--rb-space-3);
+  border-bottom: 1px solid var(--rb-border);
+  background: var(--rb-bg-elevated);
+}
+
+.rb-ds__title {
+  margin: 0;
+  font-size: var(--rb-text-lg);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.rb-ds__seg {
+  flex: none;
+}
+
+.rb-ds__actions-host {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  flex: none;
+}
+
+.rb-ds__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+}
+
+/* The details toggle only means anything where the details can be hidden. */
+.rb-ds__sidebtn {
+  display: none;
+}
+
+.rb-ds__ibtn {
+  flex: none;
+}
+
+.rb-ds__body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.rb-ds__side {
+  flex: 0 0 320px;
+  width: 320px;
+  min-height: 0;
+  padding: var(--rb-space-4);
+  border-right: 1px solid var(--rb-border);
+  background: var(--rb-bg-elevated);
+}
+
+.rb-ds__side-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-3);
+}
+
+.rb-ds__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--rb-space-4);
+  background: var(--rb-bg-sunken);
+}
+
+.rb-ds__main-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-3);
+  min-height: 100%;
+}
+
+.rb-ds__hint {
+  margin: 0;
+  max-width: 68ch;
+  line-height: 1.5;
+}
+
+.rb-ds__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-3);
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: var(--rb-space-3);
+  border-top: 1px solid var(--rb-border-subtle);
+}
+
+.rb-ds__count-note {
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-left: var(--rb-space-1);
+}
+
+.rb-ds__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-1);
+  margin-top: var(--rb-space-2);
+  padding-top: var(--rb-space-3);
+  border-top: 1px solid var(--rb-border-subtle);
+}
+
+.rb-ds__section:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.rb-ds__section-title {
+  margin: 0;
+  font-size: var(--rb-text-sm);
+  font-weight: 650;
+  color: var(--rb-text);
+}
+
+.rb-ds__field {
+  gap: var(--rb-space-1);
+}
+
+.rb-ds__row {
+  display: flex;
+  gap: var(--rb-space-2);
+}
+
+/* A --block button inside a flex row is only as wide as its label unless the
+ * row says otherwise, and a half-width "Clear every tick" reads as a mistake. */
+.rb-ds__row > .rb-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rb-ds__note {
+  margin: var(--rb-space-1) 0 0;
+  line-height: 1.5;
+}
+
+.rb-meter {
+  flex: 1 1 8rem;
+  min-width: 6rem;
+  height: 6px;
+  border-radius: var(--rb-radius-full);
+  background: var(--rb-bg-sunken);
+  overflow: hidden;
+}
+
+.rb-meter__fill {
+  display: block;
+  height: 100%;
+  background: var(--rb-accent-600);
+  transition: width var(--rb-dur-base) var(--rb-ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-ds-backdrop, .rb-ds { animation: none; }
+  .rb-meter__fill { transition: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. The letter page
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.rb-letter-wrap {
+  display: flex;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.rb-letter {
+  /* Paper stays paper in both themes: this is a document that gets printed. */
+  --_paper: var(--rb-gray-0);
+  --_ink: var(--rb-gray-900);
+  --_ink-soft: var(--rb-gray-700);
+  --_ink-mute: var(--rb-gray-600);
+
+  width: var(--rb-letter-page-w, 8.5in);
+  min-height: var(--rb-letter-page-h, 11in);
+  padding: var(--rb-doc-margin, 0.6in);
+  background: var(--_paper);
+  color: var(--_ink);
+  font-family: var(--rb-doc-font, var(--rb-font-sans));
+  font-size: var(--rb-doc-size, 10.5pt);
+  line-height: calc(var(--rb-doc-leading, 1.32) * 1.42);
+  box-shadow: var(--rb-shadow-doc);
+  border-radius: 2px;
+}
+
+.rb-letter[data-page-size="A4"] {
+  --rb-letter-page-w: 210mm;
+  --rb-letter-page-h: 297mm;
+}
+
+.rb-letter__sheet {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Explicit margins rather than a flex gap: a letter has four kinds of space
+ * in it — inside an address block, between paragraphs, before the greeting,
+ * before the sign-off — and one uniform gap cannot tell them apart. */
+.rb-letter__sheet p,
+.rb-letter__sheet address {
+  margin: 0;
+}
+
+.rb-letter__sender {
+  font-size: calc(var(--rb-doc-size, 10.5pt) * 1.04);
+  font-weight: 650;
+  letter-spacing: -0.005em;
+}
+
+.rb-letter__sender-meta {
+  margin-top: 1pt !important;
+  color: var(--_ink-mute);
+  font-size: calc(var(--rb-doc-size, 10.5pt) * 0.92);
+}
+
+.rb-letter__rule {
+  height: 0;
+  margin: calc(var(--rb-doc-section-gap, 14pt) * 0.6) 0 0 !important;
+  border: 0;
+  border-top: var(--rb-doc-rule, 0.6pt) solid var(--rb-doc-accent, var(--rb-gray-900));
+  opacity: .5;
+}
+
+.rb-letter__date {
+  margin-top: var(--rb-doc-section-gap, 14pt) !important;
+}
+
+.rb-letter__to {
+  font-style: normal;
+}
+
+.rb-letter__to p + p {
+  margin-top: 0 !important;
+}
+
+.rb-letter__p {
+  margin-top: var(--rb-doc-entry-gap, 7pt) !important;
+  text-align: left;
+  hyphens: none;
+}
+
+.rb-letter__greeting {
+  margin-top: var(--rb-doc-section-gap, 14pt) !important;
+}
+
+.rb-letter__signoff {
+  margin-top: var(--rb-doc-section-gap, 14pt) !important;
+}
+
+.rb-letter__signer {
+  margin-top: 0 !important;
+}
+
+/* Editing happens on the page, so the affordance is the same one the resume
+ * uses. Dotted at rest, because these are full-width blocks: a solid rule
+ * under every paragraph reads as a table, not as something you can click. */
+.rb-letter [data-lpath] {
+  border-radius: 3px;
+  outline: none;
+  border-bottom: 1px dotted var(--rb-border);
+  transition: border-color var(--rb-dur-fast) var(--rb-ease-out), background var(--rb-dur-fast) var(--rb-ease-out);
+  cursor: text;
+}
+
+.rb-letter [data-lpath]:hover {
+  background: var(--rb-gray-50);
+  border-bottom-color: var(--rb-gray-300);
+}
+
+.rb-letter [data-lpath]:focus,
+.rb-letter [data-lpath]:focus-visible {
+  background: var(--rb-accent-50);
+  border-bottom-style: solid;
+  border-bottom-color: var(--rb-accent-500);
+}
+
+.rb-letter [data-lpath]:empty::before {
+  content: attr(data-placeholder);
+  color: var(--rb-gray-400);
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* A phone has no 8.5in to give away. Below the point where the sheet would be
+ * narrower than the stage, the page box goes and the letter becomes a column
+ * of text, so nothing is cut off and nothing scrolls sideways. */
+@media (max-width: 900px) {
+  .rb-letter-wrap { justify-content: stretch; }
+  .rb-letter {
+    width: auto;
+    min-height: 0;
+    padding: var(--rb-space-5);
+    box-shadow: var(--rb-shadow-sm);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. The prep sheet
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.rb-prep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-5);
+  max-width: 62ch;
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--rb-space-5);
+  background: var(--rb-bg-elevated);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  box-shadow: var(--rb-shadow-sm);
+}
+
+.rb-prep__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: var(--rb-space-3);
+  border-bottom: 1px solid var(--rb-border-subtle);
+}
+
+.rb-prep__title {
+  margin: 0;
+  font-size: var(--rb-text-lg);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.rb-prep__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-2);
+}
+
+.rb-prep__group-title {
+  margin: 0;
+  font-size: var(--rb-text-sm);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rb-text-secondary);
+}
+
+.rb-prep__group-note {
+  margin: 0 0 var(--rb-space-1);
+  line-height: 1.5;
+}
+
+.rb-prep__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rb-space-3);
+  padding: var(--rb-space-2) var(--rb-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--rb-radius-md);
+  cursor: pointer;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out), border-color var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+.rb-prep__item:hover {
+  background: var(--rb-bg-hover);
+  border-color: var(--rb-border-subtle);
+}
+
+.rb-prep__item:has(input:checked) {
+  background: var(--rb-green-50);
+  border-color: var(--rb-green-200);
+}
+
+html[data-theme="dark"] .rb-prep__item:has(input:checked) {
+  background: rgba(4, 120, 87, .16);
+  border-color: rgba(4, 120, 87, .4);
+}
+
+.rb-prep__item input[type="checkbox"] {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin: 1px 0 0;
+  accent-color: var(--rb-accent-600);
+  cursor: pointer;
+}
+
+.rb-prep__item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.rb-prep__item-label {
+  font-size: var(--rb-text-base);
+  line-height: 1.45;
+  color: var(--rb-text);
+}
+
+.rb-prep__item:has(input:checked) .rb-prep__item-label {
+  color: var(--rb-text-secondary);
+  text-decoration: line-through;
+  text-decoration-color: var(--rb-text-faint);
+}
+
+.rb-prep__item-hint {
+  line-height: 1.5;
+}
+
+.rb-prep__item-flag {
+  flex: none;
+  align-self: center;
+  font-size: var(--rb-text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--rb-text-muted);
+  background: var(--rb-bg-sunken);
+  border-radius: var(--rb-radius-full);
+  padding: 1px var(--rb-space-2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. Narrow viewports — the sheet becomes a single column with a disclosure
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 760px) {
+  .rb-ds-backdrop { padding: 0; }
+
+  .rb-ds {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    border: 0;
+  }
+
+  .rb-ds__bar {
+    flex-wrap: wrap;
+    row-gap: var(--rb-space-2);
+    padding: var(--rb-space-2);
+  }
+
+  /* Three rows on a phone, in reading order: what this is, which document,
+   * what you can do to it. Unordered flex children would land the icon
+   * buttons on the first row instead, above the title. */
+  .rb-ds__title {
+    order: 1;
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    font-size: var(--rb-text-base);
+  }
+
+  .rb-ds__close { order: 2; }
+
+  .rb-ds__bar > .rb-spacer { display: none; }
+
+  .rb-ds__seg {
+    order: 3;
+    width: 100%;
+  }
+
+  .rb-ds__seg .rb-seg__btn {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .rb-ds__actions-host {
+    order: 4;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+
+  .rb-ds__sidebtn {
+    order: 5;
+    display: inline-flex;
+  }
+
+  .rb-ds__body {
+    flex-direction: column;
+  }
+
+  /* On a phone the details are a disclosure: the document is the thing being
+     read, and the form that shapes it is one tap away. */
+  .rb-ds__side {
+    flex: none;
+    width: auto;
+    max-height: 58%;
+    border-right: 0;
+    border-bottom: 1px solid var(--rb-border);
+  }
+
+  .rb-ds[data-side="closed"] .rb-ds__side {
+    display: none;
+  }
+
+  .rb-ds__main { padding: var(--rb-space-3); }
+
+  .rb-prep { padding: var(--rb-space-4); gap: var(--rb-space-4); }
+
+  .rb-ds__printbtn .rb-btn__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. Print
+   ═══════════════════════════════════════════════════════════════════════════
+   The print host lives inside #rb-overlay-root, which templates.css keeps out
+   of its "hide every body child" rule. Print puts the root back in normal
+   flow, drops everything else in it, and gives the clone its own named page.
+   Margins are padding on the sheet, exactly as the resume does it, so the
+   browser's own unprintable area can never clip the first line. */
+
+@page rb-docpage {
+  size: 8.5in 11in;
+  margin: 0;
+}
+
+@page rb-docpage-a4 {
+  size: 210mm 297mm;
+  margin: 0;
+}
+
+@media print {
+  html[data-rb-print-doc] #rb-overlay-root {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    z-index: auto !important;
+  }
+
+  html[data-rb-print-doc] #rb-overlay-root > :not(#rb-doc-print-host) {
+    display: none !important;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host {
+    display: block !important;
+    page: rb-docpage;
+  }
+
+  html[data-rb-print-doc="a4"] #rb-doc-print-host {
+    page: rb-docpage-a4;
+  }
+
+  /* The clone keeps the page geometry, but the surrounding app is gone, so
+   * the paper has to be re-established here. */
+  html[data-rb-print-doc] #rb-doc-print-host .rb-letter {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host .rb-letter [data-lpath] {
+    background: transparent !important;
+    border-bottom-color: transparent !important;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host .rb-letter [data-lpath]:empty::before {
+    content: none !important;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host .rb-prep {
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host .rb-prep__item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host .rb-prep__group-title {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host .rb-prep__head {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* The tick box is the one interactive control that has to survive onto
+   * paper, so the print pass redraws it as a square instead of leaving
+   * whatever the engine decides to print for a checkbox. */
+  html[data-rb-print-doc] #rb-doc-print-host .rb-prep__item input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 11pt !important;
+    height: 11pt !important;
+    border: 1pt solid var(--rb-print-rule, #6b6b6b) !important;
+    border-radius: 1pt !important;
+    background: transparent !important;
+    margin: 0 !important;
+  }
+
+  html[data-rb-print-doc] #rb-doc-print-host .rb-prep__item input[type="checkbox"]:checked {
+    background: var(--rb-print-ink, #000) !important;
+    box-shadow: inset 0 0 0 2.5pt var(--rb-print-paper, #fff) !important;
+  }
+}

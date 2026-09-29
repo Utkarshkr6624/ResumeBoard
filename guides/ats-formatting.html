@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATS formatting: what parsers actually read</title>
+<meta name="description" content="How an applicant tracking system reads your file, which six formatting habits vendors document as breaking a parse, and how to test your PDF in five minutes.">
+<link rel="canonical" href="https://resumeboard.app/guides/ats-formatting.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="ATS formatting: what parsers actually read">
+<meta property="og:description" content="How an applicant tracking system reads your file, which six formatting habits vendors document as breaking a parse, and how to test your PDF in five minutes.">
+<meta property="og:url" content="https://resumeboard.app/guides/ats-formatting.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard - a resume builder that keeps your work on your machine">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ATS formatting: what parsers actually read">
+<meta name="twitter:description" content="How an applicant tracking system reads your file, which six formatting habits vendors document as breaking a parse, and how to test your PDF in five minutes.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/guides/ats-formatting.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/guides/ats-formatting.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#4743e0">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script>(function(){try{var t=localStorage.getItem('rb:theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://resumeboard.app/" },
+    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://resumeboard.app/guides/" },
+    { "@type": "ListItem", "position": 3, "name": "ATS formatting", "item": "https://resumeboard.app/guides/ats-formatting.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do applicant tracking systems reject resumes automatically?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not according to anything the vendors publish. None of them documents an automatic rejection rule, and none of them publishes a parse accuracy rate either. What Greenhouse does document is what a failed parse looks like: the resume has only been attached to the candidate, and the details have to be typed in by hand. Workday documents the same shape of outcome, a profile with fields the recruiter corrects. The documented failure mode is an empty or half-empty form, not a black hole."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is a PDF safer than a Word document?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Both are accepted, so neither is safer by format alone. Greenhouse’s candidate guidance says to upload a PDF for best results. Workday’s resume endpoint accepts DOCX and PDF, and adds one condition to the PDF: it must contain text that is not image-based. So the real question is not which extension you send. It is whether your file has a text layer, which is a property of the export rather than of the format."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I really have to avoid two columns?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, if your file might reach a parser, and the rule is not folklore. Greenhouse lists resumes that have a columned layout among the formatting that breaks a parse. Workday’s published guidelines say to avoid tabular and column formats. Two vendors, in their own words. If you are still considering a sidebar, read the two-column guide, which covers the cases where it is defensible and the single-column alternatives that solve the same problem."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I check whether my PDF has a text layer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Select all the text in the PDF and copy it, then paste it into a plain text editor and read it in order. If you get words back, the file has a text layer. If you get nothing, or a garbled handful of fragments, the file is effectively a picture of a page. The second test is reading order: copy the text and check that it comes out in the order a person would read it, with dates attached to the right jobs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is putting my name in the page header really a problem?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Both vendors that publish a failure list name it. Greenhouse lists resumes with the name and contact information in the header, footer, or text box. Workday’s guidelines say to avoid personal information in the header and footer sections, and separately ask for the candidate’s name at the top of the document, in initial capitals, on its own line. The practical consequence is straightforward: text in a running header is not the first line of the body, so it is the text least likely to be picked up as your name."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What file size is too big?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on the vendor, and both numbers are published. Greenhouse will not parse a resume larger than 2.5 MB and names high-quality images as the usual reason people hit it. Lever accepts files up to 10 MB. Since 2.5 MB is the tighter of the two, treat it as the ceiling: an ordinary one-page text resume is nowhere near it, so if your export crosses that line, a photo or a graphic is in there and the graphic is what should go."
+      }
+    }
+  ]
+}
+</script>
+<script src="../assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="../assets/css/motion.css">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-192.png">
+<link rel="manifest" href="../manifest.webmanifest">
+</head>
+<body>
+<a class="site-skip" href="#main">Skip to content</a>
+<div class="reading-progress" role="presentation"><span class="reading-progress__bar" data-progress></span></div>
+
+<header class="masthead">
+  <div class="masthead__inner">
+    <a class="brand" href="../index.html">
+      <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg></span>
+      <span>Resumeboard</span>
+    </a>
+    <button type="button" class="icon-btn nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Open the guides menu" data-tip="Browse the guides">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+    </button>
+    <nav class="nav" id="site-nav" data-nav aria-label="Guides">
+      <a class="nav__link" href="index.html">All guides</a>
+      <a class="nav__link" href="resume-basics.html">Resume basics</a>
+      <a class="nav__link" href="ats-formatting.html" aria-current="page">ATS formatting</a>
+      <a class="nav__link" href="action-verbs.html">Action verbs</a>
+      <a class="nav__link" href="quantifying-impact.html">Quantifying impact</a>
+      <a class="nav__link" href="when-to-use-two-columns.html">Two columns</a>
+      <a class="nav__link" href="../contact.html">Contact</a>
+      <a class="btn btn--primary nav__cta" href="../editor.html#start">Open the builder</a>
+    </nav>
+    <div class="rb-sz-host" data-site-size></div>
+    <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch to dark theme" data-tip="Switch to dark theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"></path></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"></path></svg>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <div class="shell">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li data-reveal><a href="../index.html">Home</a></li>
+        <li data-reveal><a href="index.html">Guides</a></li>
+        <li data-reveal><span aria-current="page">ATS formatting</span></li>
+      </ol>
+    </nav>
+
+    <header class="pagehead">
+      <p class="hero__eyebrow">Guide 02</p>
+      <h1 class="pagehead__title">ATS formatting: what parsers actually read</h1>
+      <p class="pagehead__lede">An applicant tracking system does exactly two things to your file: it turns the file into a stream of characters, then it tries to put those characters into form fields. This guide is about surviving those two steps, and every rule on it is traced to something a vendor has actually written down.</p>
+      <p class="pagehead__meta">
+        <span class="tag">Parseability</span>
+        <span><span data-reading-time>9 min read</span></span>
+        <a href="../ats/index.html">Vendor-by-vendor reference</a>
+      </p>
+    </header>
+
+    <div class="article" data-article>
+      <nav class="toc" data-toc aria-label="On this page">
+        <p class="toc__title">On this page</p>
+        <ul class="toc__list">
+          <li data-reveal><a class="toc__link" href="#happens">What happens to your file</a></li>
+          <li data-reveal><a class="toc__link" href="#documented">What the vendors document</a></li>
+          <li data-reveal><a class="toc__link" href="#layout">Six layout habits that break a parse</a></li>
+          <li data-reveal><a class="toc__link" href="#dates">Dates, and why they break first</a></li>
+          <li data-reveal><a class="toc__link" href="#identity">Names, employers and job titles</a></li>
+          <li data-reveal><a class="toc__link" href="#files">The file itself</a></li>
+          <li data-reveal><a class="toc__link" href="#test">Test your own file in five minutes</a></li>
+          <li data-reveal><a class="toc__link" href="#checklist">The compliant checklist</a></li>
+          <li data-reveal><a class="toc__link" href="#faq">Questions about parsing</a></li>
+        </ul>
+      </nav>
+
+      <details class="toc toc--inline" data-toc>
+        <summary class="toc__summary">On this page</summary>
+        <ul class="toc__list">
+          <li data-reveal><a class="toc__link" href="#happens">What happens to your file</a></li>
+          <li data-reveal><a class="toc__link" href="#documented">What the vendors document</a></li>
+          <li data-reveal><a class="toc__link" href="#layout">Six layout habits that break a parse</a></li>
+          <li data-reveal><a class="toc__link" href="#dates">Dates, and why they break first</a></li>
+          <li data-reveal><a class="toc__link" href="#identity">Names, employers and job titles</a></li>
+          <li data-reveal><a class="toc__link" href="#files">The file itself</a></li>
+          <li data-reveal><a class="toc__link" href="#test">Test your own file in five minutes</a></li>
+          <li data-reveal><a class="toc__link" href="#checklist">The compliant checklist</a></li>
+          <li data-reveal><a class="toc__link" href="#faq">Questions about parsing</a></li>
+        </ul>
+      </details>
+
+      <div class="prose">
+        <p class="lede">Here is the part of resume writing that punishes you silently. A bullet with a weak verb reads badly and you can see it. A two-column layout that scrambles the parse produces a recruiter staring at an empty candidate profile, and you never find out. The whole discipline on this page is about making sure that a second reader, one made of software, finds the same things a first reader does.</p>
+
+        <h2 id="happens">What happens to your file</h2>
+
+        <p>Every system covered on this site performs the same four steps. The differences between vendors live in steps two and three.</p>
+
+        <ol>
+          <li data-reveal><strong>Upload.</strong> You attach a file to a form. This is the only step the vendor fully controls, and it is the step with the hardest published limits: file type, file size, and whether the file contains text or a picture of text.</li>
+          <li data-reveal><strong>Text extraction.</strong> Something converts your document into characters. A PDF is fundamentally a set of instructions for drawing a page, not a block of text, so a parser either reads the text layer that a word processor embedded or falls back to optical character recognition. This is where image-only resumes die, and it is the one failure every vendor names.</li>
+          <li data-reveal><strong>Field mapping.</strong> The character stream is matched against profile fields: name, email, phone, employer, title, dates. This is where layout matters, because a parser reading two columns has to guess which column a given line belongs to, and a parser reading a table has to decide which cell is a label and which is a value.</li>
+          <li data-reveal><strong>Human review.</strong> Every vendor documents that a person is meant to correct what the parser filled. Greenhouse tells candidates to review the parsed data before submitting all applications. Workday describes resume parsing as populating fields that the recruiter then reviews. Nothing a parser produces is treated as authoritative by the people who built it.</li>
+        </ol>
+
+        <p>That fourth step is the one worth sitting with. The system is not designed to be the judge of your resume. It is a typing shortcut for the recruiter, and it is allowed to be wrong.</p>
+
+        <div class="note">
+          <p class="callout-title">What nobody publishes</p>
+          <p>No applicant tracking system vendor publishes a parser specification, a ranking rule, a keyword list, or an accuracy rate. Greenhouse says parsing "can make mistakes." Workday says results "can vary." Neither gives a number. So this guide does not tell you what percentage of resumes get filtered out, because that number does not exist in public and inventing one is how the rest of this genre got its reputation. Everything below is a documented rule, not an estimate.</p>
+        </div>
+
+        <div class="takeaways">
+          <span class="eyebrow">The short version</span>
+          <ul>
+            <li data-reveal>A PDF is a drawing. If the text is not in it as text, nothing can extract it.</li>
+            <li data-reveal>The parser is guessing which line belongs to which field. Layout is what makes that guess hard.</li>
+            <li data-reveal>Two vendors publish the failure list. Read it instead of guessing: Greenhouse and Workday.</li>
+            <li data-reveal>You can test your own file in five minutes, and the test is definitive rather than hopeful.</li>
+          </ul>
+        </div>
+
+        <h2 id="documented">What the vendors document</h2>
+
+        <p>Five systems are documented in detail on this site, and the table below is the short version. Every claim in it is linked to the vendor's own page, and each vendor has a longer page on this site that separates what is documented from what is inference.</p>
+
+        <table>
+          <caption class="u-visually-hidden">Documented resume parsing behaviour, by vendor</caption>
+          <thead>
+            <tr><th scope="col">Vendor</th><th scope="col">Documented limit</th><th scope="col">Publishes failure modes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="../ats/greenhouse.html">Greenhouse</a></td>
+              <td>Will not parse a file larger than <strong>2.5&nbsp;MB</strong></td>
+              <td>Yes, a named list of the formatting that breaks a parse, including columns, tables, headers, footers, text boxes, graphics and letter-spaced words</td>
+            </tr>
+            <tr>
+              <td><a href="../ats/workday.html">Workday</a></td>
+              <td>DOCX and PDF, where the PDF "must contain text that's not image-based"</td>
+              <td>Yes, in full. Its developer documentation publishes parsing guidelines for people writing resumes, not just for integrators</td>
+            </tr>
+            <tr>
+              <td><a href="../ats/taleo.html">Oracle Taleo</a></td>
+              <td>Set by the employer's own configuration</td>
+              <td>Indirectly. Oracle documents parsing as a third-party service delivered as is</td>
+            </tr>
+            <tr>
+              <td><a href="../ats/lever.html">Lever</a></td>
+              <td><strong>.doc, .docx, .pdf, .txt</strong> up to <strong>10&nbsp;MB</strong></td>
+              <td>Partly. It documents which fields parsing populates and that a hosted-site setting can disable email parsing</td>
+            </tr>
+            <tr>
+              <td><a href="../ats/icims.html">iCIMS</a></td>
+              <td>Word or PDF, per customer configuration</td>
+              <td>Only at the level of a product explainer. Behaviour is per customer and not published</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Read that table as a floor rather than a ceiling. A single company can change parser settings, turn parsing off entirely, or run a different system behind the careers page than the one named in the footer. You cannot tell from outside which situation you are in, which is precisely why the safe move is the layout every vendor's documentation points at.</p>
+
+        <h2 id="layout">Six layout habits that break a parse</h2>
+
+        <p>These are the six that appear in the vendors' own failure lists, with the fix beside each one. Nothing on this list is a style opinion.</p>
+
+        <table>
+          <caption class="u-visually-hidden">Formatting habits documented as causing a failed resume parse</caption>
+          <thead>
+            <tr><th scope="col">The habit</th><th scope="col">What the vendor says</th><th scope="col">Do this instead</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Two or more columns</td>
+              <td>Greenhouse lists "resumes that have a columned layout" as a parse failure. Workday says to "avoid tabular and column formats."</td>
+              <td>One column. If a sidebar is genuinely the point of the design, read the <a href="when-to-use-two-columns.html">two-column guide</a> before you decide</td>
+            </tr>
+            <tr>
+              <td>Tables used for layout</td>
+              <td>Greenhouse names "complex resumes with tables, headers, and footers." A table makes the parser choose between reading across and reading down.</td>
+              <td>Use a real list, or space the fields with tabs and rules in a way that keeps one fact per line</td>
+            </tr>
+            <tr>
+              <td>Name and contact in a header, footer or text box</td>
+              <td>Greenhouse names it. Workday says to "avoid personal information in the header and footer sections, such as name, phone and address."</td>
+              <td>Put them in the body, in the first four lines, in initial capitals</td>
+            </tr>
+            <tr>
+              <td>Graphics, photos, logos, skill bars</td>
+              <td>Greenhouse lists "graphics, photos, or word art" and uploads that are "an image, rather than a document." Workday says to avoid "visual objects such as images, text boxes, clip arts, logos, and annotations."</td>
+              <td>Nothing. A five-point proficiency bar communicates nothing a word does not, and it is a second file-size problem</td>
+            </tr>
+            <tr>
+              <td>Letter-spaced words</td>
+              <td>Greenhouse is unusually specific: a word with spaces between the letters "won't be recognized as a single word and can't make sense of the data."</td>
+              <td>Letter spacing for a design effect. It is the most counter-intuitive entry on the list, because to a reader it is a strong visual choice</td>
+            </tr>
+            <tr>
+              <td>One heading covering two sections</td>
+              <td>Workday is explicit: provide proper headings such as <code>EDUCATION</code> and <code>EXPERIENCE</code>, and "don't combine multiple sections under a single heading such as <em>EDUCATION and EXPERIENCE</em>."</td>
+              <td>One heading, one section. Its parser returns a fixed set of named sections and a combined heading lands in none of them</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Notice that four of those six are invisible to the person who designed the page. The letter spacing looks deliberate. The logo looks professional. The text box is how the tool placed the name neatly. The failure only exists in the gap between what a person sees and what a line of extracted text says, which is why this is the one area of resume writing where you cannot check your own work by looking at it.</p>
+
+        <h2 id="dates">Dates, and why they break first</h2>
+
+        <p>Dates matter more than they look like they matter, because a date is not a fact on your resume. It is the fact the parser uses to attach everything else to. If the date for a job ends up on the wrong entry, or inside the previous entry's bullet, the employment history the recruiter sees is quietly wrong. Nothing marks it as wrong, and nobody notices for a week.</p>
+
+        <p>Three things cause this. The first is a mix of formats, which no reader minds and every parser does. The second is a date set in a text box or a right-aligned tab stop far from the role it belongs to. The third is a date format the parser cannot resolve, and the resolution depends on the region the tool is configured for rather than the region you are in.</p>
+
+        <p>Workday publishes the label it looks for, which is unusually helpful. Its documentation gives the literal form <code>Date: Jan 2015 &ndash; Present</code>. Unambiguous month name, four-digit year, explicit present. Greenhouse separately flags abbreviated job titles as hard to resolve, and the same ambiguity applies to abbreviated and ambiguous dates.</p>
+
+        <div class="ex">
+          <div class="ex__head">
+            <span class="ex__caption" data-kind="Before">Three date formats on one page</span>
+          </div>
+          <div class="ex__panes">
+            <div class="pane pane--before" id="ex-dates-before">
+              <span class="pane__tag">Mixed</span>
+              <div class="snip">
+                <div class="snip__head">
+                  <span class="snip__role">Warehouse Team Lead</span>
+                  <span class="snip__dates">01/2021 &ndash; 11/23</span>
+                </div>
+                <p class="snip__org">Northgate Logistics Ltd, Leeds</p>
+                <p class="snip__contact">2019 - 2021</p>
+              </div>
+              <div class="snip">
+                <div class="snip__head">
+                  <span class="snip__role">Delivery Driver</span>
+                  <span class="snip__dates">Jan 2018 &ndash; Dec 2020</span>
+                </div>
+                <p class="snip__org">Harbourside Haulage, Hull</p>
+              </div>
+            </div>
+            <div class="pane pane--after" id="ex-dates-after">
+              <span class="pane__tag">Consistent</span>
+              <div class="snip">
+                <div class="snip__head">
+                  <span class="snip__role">Warehouse Team Lead</span>
+                  <span class="snip__dates">Jan 2021 &ndash; Nov 2023</span>
+                </div>
+                <p class="snip__org">Northgate Logistics Ltd, Leeds</p>
+                <p class="snip__contact">Note: also held the driver role below concurrently, two to three days a week.</p>
+              </div>
+              <div class="snip">
+                <div class="snip__head">
+                  <span class="snip__role">Delivery Driver</span>
+                  <span class="snip__dates">Jan 2018 &ndash; Dec 2020</span>
+                </div>
+                <p class="snip__org">Harbourside Haulage Ltd, Hull</p>
+              </div>
+            </div>
+          </div>
+          <p class="pane__copy">
+            <button type="button" class="btn btn--tiny" data-copy="#ex-dates-after" aria-label="Copy the improved date formatting to the clipboard">Copy</button>
+          </p>
+        </div>
+
+        <p>Three changes, all mechanical. Every date is spelled the same way, with the month named rather than numbered, which removes the March-versus-May problem entirely. The overlapping roles are declared in plain text instead of left to look like a mistake. And the employer names carry their suffix, which is a documented Greenhouse rule rather than a style choice.</p>
+
+        <h2 id="identity">Names, employers and job titles</h2>
+
+        <p>Three fields cause disproportionate damage for a specific reason: they are the fields a parser matches against a database to decide whether this is a new person or an existing one. Get them subtly wrong and you do not get a worse score, you get a duplicate profile or a person who cannot be found later.</p>
+
+        <p>Workday is the most prescriptive vendor here, and its published rules are worth following literally rather than approximately. It asks that you start the name with the hint <code>Name: Xxxx Yyyy</code>, that names appear on separate lines, that the candidate's name sits at the top of the document, that multi-word names start with initial capitals or full capitals, and that you avoid writing names in all lower case. It gives literal examples for the other fields too, including <code>Email:</code>, <code>Mobile Phone:</code> and <code>Date:</code>. Labelled hints are not a hack. They are the documented input format.</p>
+
+        <p>Greenhouse adds two rules from the other direction. It documents that company names lacking identifying words such as Inc., Co., Ltd or LLC cause problems, and that incomplete job titles such as "Sr. Account Exec" are hard to resolve against the full form. The reason is the same in both cases: matching is done against stored strings, and an abbreviation is a lookup that can miss.</p>
+
+        <div class="ex">
+          <div class="ex__head">
+            <span class="ex__caption" data-kind="After">A header a parser can use</span>
+          </div>
+          <div class="ex__panes">
+            <div class="pane pane--after" id="ex-hdr-ok">
+              <span class="pane__tag">Parses cleanly</span>
+              <p class="snip__kicker">Jordan Reyes-Mbeki</p>
+              <p class="snip__contact">Supply Chain Operations Manager<br>Manchester, United Kingdom<br>jordan.reyes.mbeki@fastmail.example<br>+44 7700 900412</p>
+            </div>
+            <div class="pane pane--before" id="ex-hdr-bad">
+              <span class="pane__tag">Decorative</span>
+              <p class="snip__kicker">J o r d a n &nbsp; R e y e s - M b e k i</p>
+              <p class="snip__contact">✉ jordan.reyes.mbeki@fastmail.example<br>☎ +44 7700 900412<br>Supply Chain Operations Mgr. &mdash; MCR</p>
+            </div>
+          </div>
+        </div>
+
+        <p>The right-hand version is not badly made. It is somebody's best work with a word processor. It fails on four counts at once: the letter-spaced name, an icon instead of the word before the email address, the abbreviation of the job title, and a location that a recruiter in another country cannot place. None of it is visible as a mistake. That is the point.</p>
+
+        <h2 id="files">The file itself</h2>
+
+        <p>Two properties matter and both are documented: whether the file contains text, and how large it is.</p>
+
+        <p><strong>Text.</strong> Workday's condition on a PDF is that it "must contain text that's not image-based." Greenhouse lists uploads that are "an image, rather than a document (such as a .docx or a .pdf)" as a failure. These sound like different rules and they are the same rule seen from two directions. A PDF saved from a word processor contains text. A PDF produced by scanning a page, or by printing to PDF from a document that embeds your resume as a picture, does not.</p>
+
+        <p><strong>Size.</strong> Greenhouse stops at 2.5&nbsp;MB. Lever accepts up to 10&nbsp;MB. Use the tighter number. An ordinary one-page resume exported without images is tens of kilobytes, so crossing 2.5&nbsp;MB requires a deliberate act, and that act is nearly always an embedded photo or a full-bleed background. Greenhouse names high-quality images as the reason people hit the ceiling. If your export is suddenly enormous, that is what happened, and the fix is to delete the image rather than compress the file.</p>
+
+        <div class="note">
+          <p class="callout-title">DOCX is a reasonable second choice</p>
+          <p>If you are unsure whether your export pipeline produces a text layer, send the DOCX. Workday lists it with no additional condition, and Greenhouse asks candidates to upload a PDF for best results rather than requiring one. Sending the format you are certain about beats sending the format you are hoping about. If a posting states a required format, follow the posting.</p>
+        </div>
+
+        <h2 id="test">Test your own file in five minutes</h2>
+
+        <p>This is the part that converts the whole page from advice into a check. It takes less time than the last email you sent, and it is definitive rather than hopeful.</p>
+
+        <ol>
+          <li data-reveal><strong>Open the exported file, not the document you edited.</strong> The file you are about to upload, from disk, in a fresh window. The version in your editor is not the version under test.</li>
+          <li data-reveal><strong>Select everything and copy it.</strong> <code>Ctrl</code> and <code>A</code>, then <code>Ctrl</code> and <code>C</code>, on a Mac <code>Command</code> and <code>A</code> and <code>C</code>.</li>
+          <li data-reveal><strong>Paste it into a plain text editor.</strong> Not a word processor, which will re-apply formatting and hide the problem. Notepad, TextEdit in plain text mode, or any editor that shows you nothing but characters.</li>
+          <li data-reveal><strong>Read it in order.</strong> Is your name the first thing? Is each date next to the job it belongs to? Did anything merge, or move a line, or come out twice? Two-column layouts fail here. Tables fail here. Text boxes fail here.</li>
+          <li data-reveal><strong>Check the file size.</strong> If it is over 2.5&nbsp;MB, find the image and remove it, then export again.</li>
+        </ol>
+
+        <p>If the text comes out in the order you meant, the file is sound for a text-based parser. That is as close to a guarantee as this problem allows, and it costs one coffee's worth of attention per application, or a single check per version if you reuse one export.</p>
+
+        <h2 id="checklist">The compliant checklist</h2>
+
+        <p>Every line below is a restatement of a rule one of the vendors published, with nothing added for style.</p>
+
+        <ul>
+          <li data-reveal><strong>Text-based file.</strong> DOCX, or a PDF with a text layer. Never a scan, never a flattened image.</li>
+          <li data-reveal><strong>Under 2.5&nbsp;MB.</strong> The Greenhouse ceiling, and the tighter of the two published limits.</li>
+          <li data-reveal><strong>No graphics, photos, logos, icons, or skill bars.</strong> Named independently by Greenhouse and Workday.</li>
+          <li data-reveal><strong>No letter spacing on words.</strong> Greenhouse states it stops the parser recognising a word.</li>
+          <li data-reveal><strong>One column.</strong> No sidebar, no parallel skills column, no newsletter-style rail.</li>
+          <li data-reveal><strong>No tables used for layout.</strong> A table makes the parser choose a reading direction it cannot verify.</li>
+          <li data-reveal><strong>Name and contact in the body of the first page, in initial capitals, in the first four lines.</strong> Not in a header, footer or text box.</li>
+          <li data-reveal><strong>Standard section headings, one per section.</strong> <code>EXPERIENCE</code>, <code>EDUCATION</code>, <code>SKILLS</code>. Do not merge two under one heading.</li>
+          <li data-reveal><strong>One date format everywhere.</strong> Month name plus four-digit year, with an explicit present or end date.</li>
+          <li data-reveal><strong>Employers written out with their suffix</strong> where they have one, and job titles spelled out in full rather than abbreviated.</li>
+          <li data-reveal><strong>Bullets at the start of every line</strong> inside an entry, so one entry cannot bleed into the next.</li>
+        </ul>
+
+        <p>For the long form of each of these, with the vendor's own wording and a link to the source, see the <a href="../ats/index.html">vendor reference</a>, and then the page for the system you are actually applying through: <a href="../ats/greenhouse.html">Greenhouse</a>, <a href="../ats/workday.html">Workday</a>, <a href="../ats/taleo.html">Oracle Taleo</a>, <a href="../ats/lever.html">Lever</a>, <a href="../ats/icims.html">iCIMS</a>.</p>
+
+        <h3>Where the rules above come from</h3>
+
+        <p>Every claim on this page is drawn from the vendor's own published documentation. None of them is a statistic, and none of them is us describing how a parser behaves on average. These are the documents, so you can check any line of the checklist against the source and see whether it still says what it said when this page was written.</p>
+
+        <ul>
+          <li data-reveal><a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Greenhouse Support &mdash; Unsuccessful resume parse</a>: the 2.5&nbsp;MB limit, the named list of formatting that breaks a parse, and the placeholder-data rule.</li>
+          <li data-reveal><a href="https://developer.workday.com/documentation/GUID-f07adb7f-630e-42a2-9de9-a39652e34ec5-enHYPHENus">Workday Developers &mdash; Resume REST API</a>: the "Resume Guidelines for Improved Parsing Results" section, including the layout, structure, name and labelled-hint rules, and the accepted file types.</li>
+          <li data-reveal><a href="https://doc.workday.com/admin-guide/en-us/human-capital-management/recruiting/candidates/set-up-prospects-and-candidates/hdc1552497830785.html">Workday Documentation &mdash; Concept: Resume Parsing</a>: the fields Workday will not auto-fill.</li>
+          <li data-reveal><a href="https://help.lever.co/s/article/Understanding-Resume-Parsing">Lever Support &mdash; Understanding Resume Parsing</a>: accepted file types and the 10&nbsp;MB limit.</li>
+          <li data-reveal><a href="https://docs.oracle.com/en/cloud/saas/taleo-enterprise/25a/otcug/c-profileimportoptionsforcandidates.html">Oracle &mdash; Profile Import Options for Candidates</a>: how Taleo treats parsing as a configured, third-party service.</li>
+          <li data-reveal><a href="https://www.icims.com/blog/what-is-cv-resume-parsing/">iCIMS &mdash; What is CV/Resume parsing?</a>: the product explainer, and the limit of what it documents.</li>
+        </ul>
+
+        <p>Vendors change their documentation, and a parsing rule that was accurate when this page was written may have moved. That is the one caveat worth carrying: the rules are quoted, not inferred, so you can re-check them, and you should.</p>
+
+        <div class="note">
+          <p class="callout-title">Next</p>
+          <p>The file now survives step two. The <a href="action-verbs.html">action verbs guide</a> is about what happens in step three, where the parser matches your text against what the employer is looking for. And if a sidebar is on your mind, the <a href="when-to-use-two-columns.html">two-column guide</a> makes the case against it honestly, including the three situations where it holds up.</p>
+        </div>
+
+        <h2 id="faq">Questions about parsing</h2>
+
+        <div class="faq">
+          <details class="faq__item">
+            <summary class="faq__q">Do applicant tracking systems reject resumes automatically?</summary>
+            <div class="faq__a">
+              <p>Not according to anything the vendors publish. None of them documents an automatic rejection rule, and none of them publishes a parse accuracy rate either. What Greenhouse does document is what a failed parse looks like: the resume has only been attached to the candidate, and the details have to be typed in by hand. Workday documents the same shape of outcome, a profile with fields the recruiter corrects. The documented failure mode is an empty or half-empty form, not a black hole.</p>
+            </div>
+          </details>
+
+          <details class="faq__item">
+            <summary class="faq__q">Is a PDF safer than a Word document?</summary>
+            <div class="faq__a">
+              <p>Both are accepted, so neither is safer by format alone. Greenhouse's candidate guidance says to upload a PDF for best results. Workday's resume endpoint accepts DOCX and PDF, and adds one condition to the PDF: it must contain text that is not image-based. So the real question is not which extension you send. It is whether your file has a text layer, which is a property of the export rather than of the format.</p>
+            </div>
+          </details>
+
+          <details class="faq__item">
+            <summary class="faq__q">Do I really have to avoid two columns?</summary>
+            <div class="faq__a">
+              <p>Yes, if your file might reach a parser, and the rule is not folklore. Greenhouse lists resumes that have a columned layout among the formatting that breaks a parse. Workday's published guidelines say to avoid tabular and column formats. Two vendors, in their own words. If you are still considering a sidebar, read the <a href="when-to-use-two-columns.html">two-column guide</a>, which covers the cases where it is defensible and the single-column alternatives that solve the same problem.</p>
+            </div>
+          </details>
+
+          <details class="faq__item">
+            <summary class="faq__q">How do I check whether my PDF has a text layer?</summary>
+            <div class="faq__a">
+              <p>Select all the text in the PDF and copy it, then paste it into a plain text editor and read it in order. If you get words back, the file has a text layer. If you get nothing, or a garbled handful of fragments, the file is effectively a picture of a page. The second test is reading order: copy the text and check that it comes out in the order a person would read it, with dates attached to the right jobs.</p>
+            </div>
+          </details>
+
+          <details class="faq__item">
+            <summary class="faq__q">Is putting my name in the page header really a problem?</summary>
+            <div class="faq__a">
+              <p>Both vendors that publish a failure list name it. Greenhouse lists resumes with the name and contact information in the header, footer, or text box. Workday's guidelines say to avoid personal information in the header and footer sections, and separately ask for the candidate's name at the top of the document, in initial capitals, on its own line. The practical consequence is straightforward: text in a running header is not the first line of the body, so it is the text least likely to be picked up as your name.</p>
+            </div>
+          </details>
+
+          <details class="faq__item">
+            <summary class="faq__q">What file size is too big?</summary>
+            <div class="faq__a">
+              <p>It depends on the vendor, and both numbers are published. Greenhouse will not parse a resume larger than 2.5&nbsp;MB and names high-quality images as the usual reason people hit it. Lever accepts files up to 10&nbsp;MB. Since 2.5&nbsp;MB is the tighter of the two, treat it as the ceiling: an ordinary one-page text resume is nowhere near it, so if your export crosses that line, a photo or a graphic is in there and the graphic is what should go.</p>
+            </div>
+          </details>
+        </div>
+
+        <nav class="pager" aria-label="Guide navigation">
+          <a class="pager__link" href="resume-basics.html">
+            <span class="pager__dir">Back</span>
+            <span class="pager__title">Resume basics</span>
+          </a>
+          <a class="pager__link pager__next" href="action-verbs.html">
+            <span class="pager__dir">Next</span>
+            <span class="pager__title">Action verbs</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__grid">
+      <div>
+        <a class="brand" href="../index.html">
+          <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg></span>
+          <span>Resumeboard</span>
+        </a>
+        <p class="footer__blurb">A resume builder that runs entirely in your browser. Nothing is uploaded, nothing is tracked, and your draft never leaves this device.</p>
+      </div>
+      <div>
+        <h2 class="footer__heading">Guides</h2>
+        <ul class="footer__list">
+          <li data-reveal><a href="resume-basics.html">Resume basics</a></li>
+          <li data-reveal><a href="ats-formatting.html">ATS formatting</a></li>
+          <li data-reveal><a href="action-verbs.html">Action verbs</a></li>
+          <li data-reveal><a href="quantifying-impact.html">Quantifying impact</a></li>
+          <li data-reveal><a href="when-to-use-two-columns.html">When to use two columns</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__heading">Start here</h2>
+        <ul class="footer__list">
+          <li data-reveal><a href="index.html">All guides</a></li>
+          <li data-reveal><a href="../editor.html#start">Open the builder</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bar">
+      <p>&copy; 2026 Resumeboard</p>
+      <p class="footer__bar-spacer">Works offline. No accounts, no analytics, no uploads.</p>
+    </div>
+  </div>
+
+    <p class="rb-foot__contact"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> <span aria-hidden="true">&middot;</span> <a href="../contact.html">Contact</a></p>
+</footer>
+
+<p class="u-visually-hidden" data-live role="status" aria-live="polite"></p>
+
+<script>
+/* Resumeboard guides — progressive enhancement. Every page is complete and
+ * readable with scripting off; this adds theme persistence, the mobile nav,
+ * a scroll-aware table of contents, reading time and copy buttons. */
+(function (win, doc) {
+  'use strict';
+
+  var RB = win.RB = win.RB || {};
+  var THEME_KEY = 'rb:theme';
+  var THEMES = ['light', 'dark'];
+  var WORDS_PER_MINUTE = 225;
+  var SPY_OFFSET = 96;
+
+  function storage() {
+    try { return win.localStorage; } catch (e) { return null; }
+  }
+
+  function resolveTheme() {
+    var root = doc.documentElement;
+    var attr = root ? root.getAttribute('data-theme') : null;
+    if (THEMES.indexOf(attr) !== -1) return attr;
+    return win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function syncThemeLabels() {
+    var label = resolveTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+    var buttons = doc.querySelectorAll('[data-theme-toggle]');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute('aria-label', label);
+      buttons[i].setAttribute('data-tip', label);
+    }
+  }
+
+  function setTheme(mode) {
+    var root = doc.documentElement;
+    if (!root) return;
+    if (THEMES.indexOf(mode) === -1) root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', mode);
+    var s = storage();
+    if (s) {
+      try { s.setItem(THEME_KEY, mode); } catch (e) { /* private mode: the choice just will not persist */ }
+    }
+    syncThemeLabels();
+  }
+
+  function toggleTheme() {
+    setTheme(resolveTheme() === 'dark' ? 'light' : 'dark');
+  }
+
+  function copyFallback(text) {
+    var host = doc.body;
+    if (!host) return false;
+    var field = doc.createElement('textarea');
+    field.className = 'offscreen-clip';
+    field.value = text;
+    field.setAttribute('readonly', '');
+    host.appendChild(field);
+    field.select();
+    var ok = false;
+    try { ok = doc.execCommand('copy'); } catch (e) { ok = false; }
+    host.removeChild(field);
+    return ok;
+  }
+
+  function copyText(text) {
+    if (win.navigator && win.navigator.clipboard && win.isSecureContext) {
+      return win.navigator.clipboard.writeText(text);
+    }
+    return Promise.resolve(copyFallback(text));
+  }
+
+  function announce(message) {
+    var live = doc.querySelector('[data-live]');
+    if (!live) return;
+    live.textContent = '';
+    win.setTimeout(function () { live.textContent = message; }, 30);
+  }
+
+  function readingTime(root) {
+    if (!root) return null;
+    var text = (root.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!text) return null;
+    return Math.max(1, Math.round(text.split(' ').length / WORDS_PER_MINUTE));
+  }
+
+  function initTheme() {
+    syncThemeLabels();
+    var buttons = doc.querySelectorAll('[data-theme-toggle]');
+    for (var i = 0; i < buttons.length; i++) buttons[i].addEventListener('click', toggleTheme);
+    if (!win.matchMedia) return;
+    var query = win.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function () { syncThemeLabels(); };
+    if (query.addEventListener) query.addEventListener('change', onSystemChange);
+    else if (query.addListener) query.addListener(onSystemChange);
+  }
+
+  function initNav() {
+    var toggle = doc.querySelector('[data-nav-toggle]');
+    var nav = doc.querySelector('[data-nav]');
+    if (!toggle || !nav) return;
+
+    function setOpen(open) {
+      nav.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close the guides menu' : 'Open the guides menu');
+      toggle.setAttribute('data-tip', open ? 'Close the guides menu' : 'Browse the guides');
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    doc.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape' || !nav.classList.contains('is-open')) return;
+      setOpen(false);
+      toggle.focus();
+    });
+
+    doc.addEventListener('click', function (event) {
+      if (!nav.classList.contains('is-open')) return;
+      if (nav.contains(event.target) || toggle.contains(event.target)) return;
+      setOpen(false);
+    });
+  }
+
+  function initToc() {
+    var navs = doc.querySelectorAll('[data-toc]');
+    if (!navs.length) return;
+
+    var links = [];
+    for (var i = 0; i < navs.length; i++) {
+      var found = navs[i].querySelectorAll('a[href^="#"]');
+      for (var j = 0; j < found.length; j++) links.push(found[j]);
+    }
+    if (!links.length) return;
+
+    var targets = [];
+    for (var k = 0; k < links.length; k++) {
+      var id = links[k].getAttribute('href').slice(1);
+      var heading = id ? doc.getElementById(id) : null;
+      if (heading) targets.push({ heading: heading, link: links[k] });
+    }
+    if (!targets.length) return;
+
+    var pending = false;
+
+    function update() {
+      pending = false;
+      var active = targets[0];
+      for (var i = 0; i < targets.length; i++) {
+        if (targets[i].heading.getBoundingClientRect().top - SPY_OFFSET <= 0) active = targets[i];
+      }
+      for (var j = 0; j < targets.length; j++) {
+        var isActive = targets[j] === active;
+        targets[j].link.classList.toggle('is-active', isActive);
+        if (isActive) targets[j].link.setAttribute('aria-current', 'true');
+        else targets[j].link.removeAttribute('aria-current');
+      }
+    }
+
+    function schedule() {
+      if (pending) return;
+      pending = true;
+      win.requestAnimationFrame(update);
+    }
+
+    win.addEventListener('scroll', schedule, { passive: true });
+    win.addEventListener('resize', schedule);
+    update();
+  }
+
+  function initProgress() {
+    var bar = doc.querySelector('[data-progress]');
+    var article = doc.querySelector('[data-article]');
+    if (!bar || !article) return;
+
+    var pending = false;
+
+    function update() {
+      pending = false;
+      var box = article.getBoundingClientRect();
+      var travel = box.height - win.innerHeight;
+      var ratio = travel > 0 ? (win.innerHeight - box.top) / travel : (box.top <= 0 ? 1 : 0);
+      bar.style.transform = 'scaleX(' + Math.min(1, Math.max(0, ratio)) + ')';
+    }
+
+    function schedule() {
+      if (pending) return;
+      pending = true;
+      win.requestAnimationFrame(update);
+    }
+
+    win.addEventListener('scroll', schedule, { passive: true });
+    win.addEventListener('resize', schedule);
+    update();
+  }
+
+  function initReadingTime() {
+    var minutes = readingTime(doc.querySelector('[data-article]'));
+    if (!minutes) return;
+    var slots = doc.querySelectorAll('[data-reading-time]');
+    for (var i = 0; i < slots.length; i++) slots[i].textContent = minutes + ' min read';
+  }
+
+  function onCopyClick(event) {
+    var button = event.currentTarget;
+    var selector = button.getAttribute('data-copy');
+    var target = selector ? doc.querySelector(selector) : null;
+    if (!target) return;
+    var text = (target.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!text) return;
+
+    var original = button.textContent;
+    copyText(text).then(function (ok) {
+      if (ok === false) {
+        announce('Copying is blocked here. Select the text and press control C.');
+        return;
+      }
+      button.textContent = 'Copied';
+      button.setAttribute('data-copied', '');
+      announce('Example copied to the clipboard.');
+      win.setTimeout(function () {
+        button.textContent = original;
+        button.removeAttribute('data-copied');
+      }, 1600);
+    }, function () {
+      announce('Copying is blocked here. Select the text and press control C.');
+    });
+  }
+
+  function initCopy() {
+    var buttons = doc.querySelectorAll('[data-copy]');
+    for (var i = 0; i < buttons.length; i++) buttons[i].addEventListener('click', onCopyClick);
+  }
+
+  function init() {
+    if (!doc.documentElement) return;
+    initTheme();
+    initNav();
+    initToc();
+    initProgress();
+    initReadingTime();
+    initCopy();
+  }
+
+  RB.site = {
+    init: init,
+    setTheme: setTheme,
+    toggleTheme: toggleTheme,
+    resolveTheme: resolveTheme,
+    readingTime: readingTime,
+    copyText: copyText
+  };
+
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', init);
+  else init();
+})(window, document);
+</script>
+<script src="../assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="../assets/js/motion.js?v=d639f64b7f"></script>
+  <div class="rb-contact" role="contentinfo" aria-label="Contact">
+    <span class="rb-contact__label">Built by</span>
+    <strong class="rb-contact__name">Utkarsh</strong>
+    <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>
+    <span class="rb-contact__dot" aria-hidden="true">·</span>
+    <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </div>
+</body>
+</html>

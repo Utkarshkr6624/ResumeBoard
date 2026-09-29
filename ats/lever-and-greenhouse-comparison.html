@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Greenhouse vs Lever: what each vendor documents</title>
+<meta name="description" content="Greenhouse publishes a parse failure list, a 2.5MB limit and 28 languages. Lever publishes three fields and a 10MB limit. Both compared, with sources.">
+<link rel="canonical" href="https://resumeboard.app/ats/lever-and-greenhouse-comparison.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Greenhouse vs Lever: what each vendor documents">
+<meta property="og:description" content="Greenhouse publishes a parse failure list, a 2.5MB limit and 28 languages. Lever publishes three fields and a 10MB limit. Both compared, with sources.">
+<meta property="og:url" content="https://resumeboard.app/ats/lever-and-greenhouse-comparison.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard - a resume builder that keeps your work on your machine">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Greenhouse vs Lever: what each vendor documents">
+<meta name="twitter:description" content="Greenhouse publishes a parse failure list, a 2.5MB limit and 28 languages. Lever publishes three fields and a 10MB limit. Both compared, with sources.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/ats/lever-and-greenhouse-comparison.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/ats/lever-and-greenhouse-comparison.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#4743e0">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/gallery.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Greenhouse vs Lever: what each vendor documents",
+  "description": "Greenhouse publishes a parse failure list, a 2.5MB limit and 28 languages. Lever publishes three fields and a 10MB limit. Both compared, with sources.",
+  "url": "https://resumeboard.app/ats/lever-and-greenhouse-comparison.html",
+  "inLanguage": "en",
+  "isPartOf": { "@type": "WebSite", "name": "Resumeboard", "url": "https://resumeboard.app/" },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Resumeboard", "item": "https://resumeboard.app/" },
+      { "@type": "ListItem", "position": 2, "name": "ATS guide", "item": "https://resumeboard.app/ats/" },
+      { "@type": "ListItem", "position": 3, "name": "Lever vs Greenhouse", "item": "https://resumeboard.app/ats/lever-and-greenhouse-comparison.html" }
+    ]
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Which is better for resume parsing, Greenhouse or Lever?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Neither is documented as better, and the question cannot be answered from public sources. Neither vendor publishes a parse accuracy figure, a benchmark, or a conformance test. What can be compared is documentation, and on documentation Greenhouse is far ahead: nine named failure modes, a stated parse ceiling, a stated placeholder rule, and 28 listed languages, against three named fields and an upload ceiling. If you want a defensible rule: write to Greenhouse's published constraints. They are stricter than anything Lever publishes, and Lever publishes nothing that they break."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need a different resume for Greenhouse and for Lever?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Every layout rule Greenhouse publishes is compatible with what Lever publishes, and Lever adds no documented requirement beyond file types and a size ceiling. One document, written to the Greenhouse rules, satisfies both. The difference between the two systems is in how much of your resume reaches the employer as labelled values, not in what the file has to look like."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is a two-page resume safe on Greenhouse or on Lever?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Neither vendor publishes anything about page count, so no two-page resume is documented as safe or unsafe by either. Greenhouse's failure list names columns, tables, headers, footers, text boxes, graphics and letter-spaced words, and length is not among them. Lever publishes no failure list. The documented problems are all layout problems, and a second page gives layout problems more room, so keep to one page wherever the content allows it and let a second page be the result of real content rather than a design decision."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the maximum resume file size for each?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Greenhouse: 2.5 MB, as a limit on parsing. A larger file can still be attached to the candidate, and its details then have to be typed in by hand. Lever: 10 MB, as a limit on uploading, stated in an article about managing files rather than about parsing. Nothing says how large a file Lever's parser will read. Because the two limits measure different things, treat 2.5 MB as the number that matters and you will be inside both."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which file format should I upload?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A text-based PDF or a DOCX. Greenhouse tells candidates to upload a PDF for best results and names .docx and .pdf in its own documentation. Lever's uploader documents .doc, .docx, .pdf and .txt, phrased as \"such as\", which is an illustrative list rather than a complete one. Neither vendor documents a picture-of-text PDF, and Greenhouse names resumes uploaded as an image as a cause of a failed parse. If you export a PDF, open it and try to select the text on the page: if you cannot select it, it is a picture."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if I anonymise my resume for a blind application?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "On Greenhouse, the vendor documents that the parser discards data it judges to be placeholder. A name written as \"First Last\" and a town name are skipped, because that information \"can't be definitively proven as real or fake\" in the other direction, while the phone number and the first line of the address still parse. Fake company names such as \"Company 1\" and \"Any Company\" are named as the kind of data that gets discarded. If you are offered a blind process, use the employer's. Greenhouse's own answer to this is its Anonymize resumes feature. Lever publishes nothing on the question at all."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does either vendor score or rank my resume?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Neither publishes a scoring or ranking rule. Greenhouse's Talent Matching documentation describes which data is processed for that feature, and is explicit that it does not extract fields beyond skills, job titles, years of experience, employment dates and company names, but it does not describe a score or a ranking formula. Lever publishes nothing about matching. Where a job posting advertises an automated ranking or screening feature, treat it as a separate product from the resume parser. That is how both vendors write about it, and it is why a resume written for a parser and a resume written for a ranking model are not the same exercise."
+      }
+    }
+  ]
+}
+</script>
+<script src="../assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="../assets/css/motion.css">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-192.png">
+<link rel="manifest" href="../manifest.webmanifest">
+</head>
+<body>
+<a class="gp-skiplink" href="#main">Skip to content</a>
+
+<header class="gp-top">
+  <div class="gp-top__in">
+    <a class="gp-brand" href="../index.html">
+      <svg class="gp-brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" stroke-linejoin="round"/>
+        <path d="M14 2v5h5" stroke-linejoin="round"/>
+        <path d="M8 13h8M8 17h5" stroke-linecap="round"/>
+      </svg>
+      Resumeboard
+    </a>
+    <nav class="gp-nav" aria-label="Main">
+      <span class="rb-sz-host" data-site-size></span>
+      <a href="../editor.html#start">Builder</a>
+      <a href="../templates/index.html">Templates</a>
+      <a href="index.html" aria-current="page">ATS guide</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="gp-main" id="main" tabindex="-1">
+  <div class="gp-wrap">
+
+    <nav class="gp-crumbs" aria-label="Breadcrumb">
+      <a href="../index.html">Resumeboard</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <a href="index.html">ATS guide</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <span aria-current="page">Lever vs Greenhouse</span>
+    </nav>
+
+    <div class="gp-prose">
+      <h1 class="gp-h1">Greenhouse vs Lever, as each of them documents it</h1>
+      <p class="gp-lead">These two get compared constantly, and almost every comparison online is made up. This one is built from the two vendors' own support articles, with every claim linked, and it says plainly where the documentation runs out.</p>
+
+      <div class="gp-note gp-note--info">
+        <div class="gp-note__body">
+          <p class="gp-note__title">What this page compares, and what it does not</p>
+          <p class="gp-note__text">It compares two <strong>documentation sets</strong>. It does not compare parser quality, because neither vendor publishes a parse accuracy figure, an A/B result, or a conformance test. A vendor that documents more is not thereby better at parsing; they have simply decided to publish more. Every claim below is quoted or paraphrased from a vendor page, and every gap is named as a gap.</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">The short version</h2>
+      <p>If you read nothing else: Greenhouse gives you rules you can satisfy, and Lever gives you almost nothing to satisfy. The one documented difference with a real consequence is not about the file. It is that two of Lever's employer-side settings can switch off or skip parsing entirely without telling you, while Greenhouse's documented constraints all apply to the document in your hands.</p>
+      <p>So: write one plain, single-column, text-based document, keep it well under 2.5&nbsp;MB, and on a Lever application type your details into the form rather than trusting the pre-fill. That is the whole practical difference.</p>
+
+      <h2 class="gp-h2">Side by side</h2>
+      <p>Every cell below is drawn from a vendor's own words. Where a vendor has published nothing on a row, the cell says so rather than filling the gap with a guess. Read the two vendor pages first if you want the quotations in context: <a href="greenhouse.html">Greenhouse</a> and <a href="lever.html">Lever</a>.</p>
+
+      <div class="gp-table-scroll">
+        <table class="gp-table">
+          <caption>What Greenhouse and Lever each publish about resume parsing</caption>
+          <thead>
+            <tr>
+              <th scope="col">Question</th>
+              <th scope="col">Greenhouse documents</th>
+              <th scope="col">Lever documents</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">What the parser extracts</th>
+              <td>It "scans an imported resume and auto-fills appropriate fields". The only field list Greenhouse publishes names skills, job titles, years of experience, employment start and end dates, and company names, and adds that it "does not extract additional fields beyond" those. <a href="https://support.greenhouse.io/hc/en-us/articles/41131616864283-Talent-Matching-Data-Processing-FAQ">Talent Matching Data Processing FAQ</a></td>
+              <td>"Name, organization, and contact details." Three things, and nothing else is claimed. <a href="https://help.lever.co/s/article/Understanding-Resume-Parsing">Understanding Resume Parsing</a></td>
+            </tr>
+            <tr>
+              <th scope="row">When parsing runs</th>
+              <td>On import, when a new candidate or prospect is added to the account. <a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a></td>
+              <td>On candidate application, on manual upload from the candidate profile, and on referral submission. <a href="https://help.lever.co/s/article/Adding-candidates">Adding candidates</a>, <a href="https://help.lever.co/s/article/Submitting-referrals">Submitting referrals</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Largest file</th>
+              <td><strong>2.5&nbsp;MB</strong>, and it is a limit on <em>parsing</em>: "Greenhouse Recruiting can't parse resumes larger than 2.5MB." A file over it can still be attached, it just will not be read.</td>
+              <td><strong>10&nbsp;MB</strong>, and it is a limit on <em>uploading</em>: "The maximum resume file size you can upload is 10MB." Nothing states how large a file the parser will read. <a href="https://help.lever.co/s/article/Adding-and-deleting-resumes">Adding and deleting resumes</a></td>
+            </tr>
+            <tr>
+              <th scope="row">File formats named</th>
+              <td>PDF for best results, and .docx and .pdf named as examples of a document rather than an image. No exhaustive accepted-format list is published on the pages cited here.</td>
+              <td>.doc, .docx, .pdf and .txt, introduced with "such as", which makes it an illustrative list rather than a complete one. The same article is the source of the 10&nbsp;MB figure.</td>
+            </tr>
+            <tr>
+              <th scope="row">Published failure modes</th>
+              <td><strong>Nine, named:</strong> spaces between letters, graphics or photos, uploads that are images, tables and headers and footers, contact details in a header or footer or text box, columned layouts, sections without clear headings, company names with no identifying suffix, and abbreviated job titles.</td>
+              <td><strong>None.</strong> There is no article on why a resume failed to parse, and no way to learn in advance which layouts Lever struggles with.</td>
+            </tr>
+            <tr>
+              <th scope="row">Partial parses</th>
+              <td>Explicitly documented and expected: the parse "might be partially successful (automatically filling some information, but skipping others)", with no error shown to the candidate. Plan for some fields filled and some blank.</td>
+              <td>Not documented. Whether a partly-read resume produces a partly-filled profile is not stated.</td>
+            </tr>
+            <tr>
+              <th scope="row">Placeholder data</th>
+              <td>Documented, and specific. A name of "First Last" and a town name are "automatically skipped by the parser", while the phone number and the first line of the address still parse. Fake company names such as "Company 1" and "Any Company" are named as the kind of data that gets discarded.</td>
+              <td>Not documented.</td>
+            </tr>
+            <tr>
+              <th scope="row">Languages</th>
+              <td>A published list of 28 languages with "full parsing capabilities", including regional variants such as Canadian French. <a href="https://support.greenhouse.io/hc/en-us/articles/205019689-Resume-parsing-with-non-English-languages">Resume parsing with non-English languages</a></td>
+              <td>No language list is published.</td>
+            </tr>
+            <tr>
+              <th scope="row">Multi-page documents</th>
+              <td><strong>Nothing published.</strong> No page limit, no statement about whether a second page is read, no mention of page count in the failure list.</td>
+              <td><strong>Nothing published.</strong></td>
+            </tr>
+            <tr>
+              <th scope="row">Scoring or ranking</th>
+              <td>Talent Matching is documented as a separate feature with its own data-processing FAQ. No ranking rule, no keyword list, no weighting.</td>
+              <td>Nothing published about matching. Where a posting advertises an automated ranking feature, that is separate from resume parsing and Lever does not document how it scores.</td>
+            </tr>
+            <tr>
+              <th scope="row">Accuracy figures</th>
+              <td>None. Greenhouse documents that parsing "can make mistakes" and that a parse can be partial, and publishes no rate.</td>
+              <td>None.</td>
+            </tr>
+            <tr>
+              <th scope="row">Employer-side switches</th>
+              <td>Availability depends on subscription tier and the user's permission level, and Greenhouse has an <a href="https://support.greenhouse.io/hc/en-us/articles/19864880540827-Anonymize-resumes">Anonymize resumes</a> feature. None of these are visible to a candidate.</td>
+              <td>Two, and both change the outcome silently: a "Skip email address parsing" setting that leaves the email field empty, and a Postings API job site, which "does not support auto-parsing of resumes to pre-populate applications". <a href="https://help.lever.co/s/article/Configure-Your-Lever-hosted-Job-Site">Configure Your Lever-hosted Job Site</a>, <a href="https://help.lever.co/s/article/Lever-Career-Site-Options">Lever Career Site Options</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="gp-h2">The size limits are not the same kind of limit</h2>
+      <p>This is the most commonly mangled row in any comparison you will read online, so it is worth stating on its own.</p>
+      <p>Greenhouse's 2.5&nbsp;MB is a <strong>parse ceiling</strong>. The vendor's own description of a failure is that the resume "has only been attached to the candidate" and its details must be typed in by hand. The upload worked. The reading did not.</p>
+      <p>Lever's 10&nbsp;MB is an <strong>upload ceiling</strong>, stated in an article about managing candidate files. Nothing Lever publishes says its parser reads a file of any particular size, or that the parser handles every type the uploader accepts.</p>
+      <div class="gp-note gp-note--stop">
+        <div class="gp-note__body">
+          <p class="gp-note__title">What follows from that</p>
+          <p class="gp-note__text">A 4&nbsp;MB resume can sail through a Lever application and leave you with an empty profile, with no message explaining why. The same file on Greenhouse is attached to the candidate and read by nobody. If you want one ceiling to rule both, use 2.5&nbsp;MB. A text-only PDF of a two-page resume is normally a small fraction of that; the only realistic way to exceed it is images, which is exactly the case Greenhouse names as the usual cause.</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">Structured fields versus free text</h2>
+      <p>Both vendors parse on upload and hand the result to a human. The difference is how much of your resume arrives as a labelled value a recruiter can sort on, and how much arrives as text someone has to read.</p>
+
+      <div class="gp-table-scroll">
+        <table class="gp-table">
+          <caption>What each vendor claims to extract from a resume, field by field</caption>
+          <thead>
+            <tr>
+              <th scope="col">On your resume</th>
+              <th scope="col">Greenhouse</th>
+              <th scope="col">Lever</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Name</th>
+              <td>Auto-filled as a field.</td>
+              <td>Named as extracted.</td>
+            </tr>
+            <tr>
+              <th scope="row">Email, phone, address</th>
+              <td>Auto-filled as fields. Phone and the first line of the address are the two items Greenhouse says survive a placeholder check.</td>
+              <td>Named as "contact details", as one group rather than separate values. Email parsing can be switched off by the employer, which leaves the field empty.</td>
+            </tr>
+            <tr>
+              <th scope="row">Employer</th>
+              <td>Company names are named as extracted, in a context where identifying suffixes matter.</td>
+              <td>Named, as "organization".</td>
+            </tr>
+            <tr>
+              <th scope="row">Job title</th>
+              <td>Job titles are named as extracted, and abbreviated titles are named as a cause of trouble.</td>
+              <td>Not claimed.</td>
+            </tr>
+            <tr>
+              <th scope="row">Employment dates</th>
+              <td>Start and end dates of employment are named as extracted.</td>
+              <td>Not claimed.</td>
+            </tr>
+            <tr>
+              <th scope="row">Years of experience</th>
+              <td>Named as extracted.</td>
+              <td>Not claimed.</td>
+            </tr>
+            <tr>
+              <th scope="row">Skills</th>
+              <td>Named as extracted.</td>
+              <td>Not claimed.</td>
+            </tr>
+            <tr>
+              <th scope="row">Bullet text, summary, everything else</th>
+              <td>Not named as a structured field. Greenhouse's Talent Matching FAQ says the parser does not extract fields beyond the five categories above.</td>
+              <td>Not named. Lever makes no claim about any of it.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="gp-small">One caveat on the Greenhouse column, because it is easy to overstate. The only field-level list Greenhouse publishes comes from the Talent Matching data-processing FAQ, not from the general candidate-profile parse. Greenhouse documents the general parse as auto-filling "appropriate fields" without enumerating them. So the honest reading is that the five categories above are the only categories Greenhouse has confirmed in writing, not a complete field map. A recruiter searching by years of experience on a Greenhouse site is filtering on a structured value; a recruiter searching for a phrase in your summary is searching free text, on either system.</p>
+
+      <h2 class="gp-h2">Multi-page resumes: the honest answer is that there isn't one</h2>
+      <p>You will find confident claims on both sides. Neither vendor has published anything that supports them.</p>
+      <ul>
+        <li data-reveal><strong>Greenhouse publishes no page limit and no statement about page two.</strong> Its failure list names columns, tables, headers, footers, text boxes, graphics, photos, word art, letter-spaced words, placeholder-looking data, suffixes and abbreviations. Page count is not in it.</li>
+        <li data-reveal><strong>Lever publishes no failure list at all</strong>, so there is nothing to read a page count into.</li>
+        <li data-reveal><strong>The one adjacent fact either vendor offers is about weight, not length.</strong> Greenhouse attributes overshooting its 2.5&nbsp;MB limit to "a lot of high-quality images", which is a file-size observation, not a page-count observation.</li>
+      </ul>
+      <p>Absence of a published rule is not a published permission. A two-page resume is not documented as unsafe on either system, and it is not documented as safe either. Treat the question the way you would treat any undocumented behaviour: pick the option that has no documented failure mode attached to it. One page where one page will do is that option, because the failure modes both vendors do document are all layout problems, and a second page gives those problems more room.</p>
+
+      <h2 class="gp-h2">What this means for how you should format a resume</h2>
+      <p>Take the intersection. Everything below is a restatement of a rule one of the two vendors published, and none of it contradicts anything the other one says. If you only ever apply to one of them, this still holds.</p>
+
+      <div class="gp-verdicts gp-mt-5">
+        <div class="gp-verdict gp-verdict--good">
+          <p class="gp-verdict__title">Do this</p>
+          <ul>
+            <li data-reveal>One column, running top to bottom. Greenhouse names "resumes that have a columned layout" as a cause of a partial parse.</li>
+            <li data-reveal>Your name and contact details in the body of the document, as ordinary paragraphs. Not a header, not a footer, not a text box.</li>
+            <li data-reveal>Name first, at the top, so a parser looking for three values finds them in the order it will look for them.</li>
+            <li data-reveal>Real section headings, in the same place in every section: Experience, Education, Skills.</li>
+            <li data-reveal>Employers written out with their suffix. <span class="gp-hash">Northwind Labs Inc.</span>, not <span class="gp-hash">Northwind</span>.</li>
+            <li data-reveal>Titles spelled out. <span class="gp-hash">Senior Product Designer</span>, not <span class="gp-hash">Sr. PD</span>.</li>
+            <li data-reveal>A text-based PDF or a DOCX, under 2.5&nbsp;MB, with no photo and no graphics.</li>
+            <li data-reveal>On a Lever application, type your email and phone into the form even if they pre-fill. The skip-parsing setting is real and invisible.</li>
+          </ul>
+        </div>
+        <div class="gp-verdict gp-verdict--bad">
+          <p class="gp-verdict__title">Not this</p>
+          <ul>
+            <li data-reveal>A two-column layout with a tinted sidebar, however well it looks to you. It is the single most-named failure on the one vendor that publishes failures.</li>
+            <li data-reveal>Contact details in the running header, so page two loses them.</li>
+            <li data-reveal>Tables used to align dates against roles.</li>
+            <li data-reveal>A skill rating bar, an icon next to your email address, or a letter-spaced name in the masthead.</li>
+            <li data-reveal>A photo. Greenhouse names photos as a parse failure, and adds bias risk that has nothing to do with parsing.</li>
+            <li data-reveal>A resume exported as an image rather than a document.</li>
+            <li data-reveal>Placeholder names like "First Last" or "Company 1" to anonymise a resume. Greenhouse documents that the parser discards them.</li>
+            <li data-reveal>A file you have not looked at since it was exported. A parse failure is silent, and no vendor shows the candidate an error.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>The <a href="../templates/print-safe.html">print-safe template</a> satisfies every item in both lists. If you want a layout with some presence to it, the <a href="../templates/classic.html">classic template</a> still meets every documented rule on this page, because all of those rules are about structure rather than restraint.</p>
+
+      <h2 class="gp-h2">Where the two genuinely diverge</h2>
+      <p>Not in the file. In what happens to it after it arrives.</p>
+      <div class="gp-grid gp-grid--2 gp-mt-5">
+        <div class="gp-card gp-card--flat">
+          <p class="gp-card__title">On Greenhouse</p>
+          <p class="gp-card__note">The employer is a fixed set of constraints you can check yourself against before you send anything: a size ceiling, nine named layout failures, a named placeholder-data rule, and a list of 28 languages. You can be certain you have satisfied every published rule, and a partial parse is documented as the normal failure rather than a mystery. What is left is the part no vendor documents, which is how well the parsed result is presented to the person reading it.</p>
+        </div>
+        <div class="gp-card gp-card--flat">
+          <p class="gp-card__title">On Lever</p>
+          <p class="gp-card__note">The employer holds switches you cannot see. A hosted site can be configured to skip email parsing entirely, and a careers site built on the Postings API is documented as supporting no auto-parsing at all, so on some Lever sites there is no parse whatever you upload. The three fields Lever claims are the three fields you can also type into a form in under a minute. That is the gap to manage, and it is a form-filling habit rather than a formatting change.</p>
+        </div>
+      </div>
+      <p>Neither vendor documents how a partial or empty parse is shown to a recruiter. Treat both files as the beginning of a conversation rather than the whole of it: put your name, your current role and your most relevant employer in the first three lines, where they are visible to a human whether or not a machine extracted them.</p>
+
+      <h2 class="gp-h2" id="faq">Questions people actually ask</h2>
+
+      <h3 class="gp-h3">Which is better for resume parsing, Greenhouse or Lever?</h3>
+      <p>Neither is documented as better, and the question cannot be answered from public sources. Neither vendor publishes a parse accuracy figure, a benchmark, or a conformance test. What can be compared is documentation, and on documentation Greenhouse is far ahead: nine named failure modes, a stated parse ceiling, a stated placeholder rule, and 28 listed languages, against three named fields and an upload ceiling. If you want a defensible rule: write to Greenhouse's published constraints. They are stricter than anything Lever publishes, and Lever publishes nothing that they break.</p>
+
+      <h3 class="gp-h3">Do I need a different resume for Greenhouse and for Lever?</h3>
+      <p>No. Every layout rule Greenhouse publishes is compatible with what Lever publishes, and Lever adds no documented requirement beyond file types and a size ceiling. One document, written to the Greenhouse rules, satisfies both. The difference between the two systems is in how much of your resume reaches the employer as labelled values, not in what the file has to look like.</p>
+
+      <h3 class="gp-h3">Is a two-page resume safe on Greenhouse or on Lever?</h3>
+      <p>Neither vendor publishes anything about page count, so no two-page resume is documented as safe or unsafe by either. Greenhouse's failure list names columns, tables, headers, footers, text boxes, graphics and letter-spaced words, and length is not among them. Lever publishes no failure list. The documented problems are all layout problems, and a second page gives layout problems more room, so keep to one page wherever the content allows it and let a second page be the result of real content rather than a design decision.</p>
+
+      <h3 class="gp-h3">What is the maximum resume file size for each?</h3>
+      <p>Greenhouse: 2.5&nbsp;MB, as a limit on parsing. A larger file can still be attached to the candidate, and its details then have to be typed in by hand. Lever: 10&nbsp;MB, as a limit on uploading, stated in an article about managing files rather than about parsing. Nothing says how large a file Lever's parser will read. Because the two limits measure different things, treat 2.5&nbsp;MB as the number that matters and you will be inside both.</p>
+
+      <h3 class="gp-h3">Which file format should I upload?</h3>
+      <p>A text-based PDF or a DOCX. Greenhouse tells candidates to upload a PDF for best results and names .docx and .pdf in its own documentation. Lever's uploader documents .doc, .docx, .pdf and .txt, phrased as "such as", which is an illustrative list rather than a complete one. Neither vendor documents a picture-of-text PDF, and Greenhouse names resumes uploaded as an image as a cause of a failed parse. If you export a PDF, open it and try to select the text on the page: if you cannot select it, it is a picture.</p>
+
+      <h3 class="gp-h3">What happens if I anonymise my resume for a blind application?</h3>
+      <p>On Greenhouse, the vendor documents that the parser discards data it judges to be placeholder. A name written as "First Last" and a town name are skipped, because that information "can't be definitively proven as real or fake" in the other direction, while the phone number and the first line of the address still parse. Fake company names such as "Company 1" and "Any Company" are named as the kind of data that gets discarded. If you are offered a blind process, use the employer's. Greenhouse's own answer to this is its Anonymize resumes feature. Lever publishes nothing on the question at all.</p>
+
+      <h3 class="gp-h3">Does either vendor score or rank my resume?</h3>
+      <p>Neither publishes a scoring or ranking rule. Greenhouse's Talent Matching documentation describes which data is processed for that feature, and is explicit that it does not extract fields beyond skills, job titles, years of experience, employment dates and company names, but it does not describe a score or a ranking formula. Lever publishes nothing about matching. Where a job posting advertises an automated ranking or screening feature, treat it as a separate product from the resume parser. That is how both vendors write about it, and it is why a resume written for a parser and a resume written for a ranking model are not the same exercise.</p>
+
+      <ul class="gp-src">
+        <li data-reveal>
+          <span class="gp-src-label">Greenhouse sources</span>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a> &mdash; the 2.5MB parse ceiling, the nine failure modes, the partial-parse behaviour, the placeholder-data rule<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/43418495049499-MyGreenhouse-FAQ-for-Candidates">MyGreenhouse FAQ for Candidates</a> &mdash; PDF guidance and the instruction to review parsed data before submitting<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/205019689-Resume-parsing-with-non-English-languages">Resume parsing with non-English languages</a> &mdash; the 28-language list<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/41131616864283-Talent-Matching-Data-Processing-FAQ">Talent Matching Data Processing FAQ</a> &mdash; the only field list Greenhouse publishes<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/19864880540827-Anonymize-resumes">Anonymize resumes</a> &mdash; the supported way to blind a resume
+        </li>
+        <li data-reveal>
+          <span class="gp-src-label">Lever sources</span>
+          <a href="https://help.lever.co/s/article/Understanding-Resume-Parsing">Understanding Resume Parsing</a> &mdash; the one-paragraph article naming three extracted items<br>
+          <a href="https://help.lever.co/s/article/Adding-and-deleting-resumes">Adding and deleting resumes</a> &mdash; the file types and the 10MB upload limit<br>
+          <a href="https://help.lever.co/s/article/Configure-Your-Lever-hosted-Job-Site">Configure Your Lever-hosted Job Site</a> &mdash; the skip-email-parsing setting<br>
+          <a href="https://help.lever.co/s/article/Lever-Career-Site-Options">Lever Career Site Options</a> &mdash; the Postings API exception, where no auto-parsing runs<br>
+          <a href="https://help.lever.co/s/article/Adding-candidates">Adding candidates</a> and <a href="https://help.lever.co/s/article/Submitting-referrals">Submitting referrals</a> &mdash; when the parse triggers
+        </li>
+        <li data-reveal>
+          <span class="gp-src-label">What neither vendor publishes</span>
+          Page limits or multi-page behaviour, parse accuracy figures, ranking or keyword rules, per-employer parser configuration, and any statement about what happens to text the parser could not classify.
+        </li>
+      </ul>
+    </div>
+
+    <div class="gp-cta gp-cta--primary">
+      <div class="gp-cta__body">
+        <p class="gp-cta__title">Check the file against both sets of rules at once</p>
+        <p class="gp-cta__text">Every rule on this page is either a Greenhouse-documented failure or a plain-English field that Lever documents extracting. Resumeboard's ATS check reads your own file against both and tells you which page each problem is on.</p>
+        <p class="gp-small gp-mt-4">Opens the builder. The check is under <span class="gp-hash">Check</span>, on the <span class="gp-hash">ATS</span> tab.</p>
+      </div>
+      <div class="gp-cta__actions">
+        <a class="gp-btn gp-btn--primary" href="../editor.html#start">Open the ATS check</a>
+        <a class="gp-btn gp-btn--secondary" href="greenhouse.html">Greenhouse in detail</a>
+        <a class="gp-btn gp-btn--secondary" href="lever.html">Lever in detail</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="gp-foot">
+  <div class="gp-wrap">
+    <div class="gp-foot__grid">
+      <div>
+        <h2>Builder</h2>
+        <ul>
+          <li data-reveal><a href="../editor.html#start">Open Resumeboard</a></li>
+          <li data-reveal><a href="../editor.html#start">ATS check</a></li>
+          <li data-reveal><a href="../guides/index.html">Writing guides</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>ATS guide</h2>
+        <ul>
+          <li data-reveal><a href="index.html">How ATS read resumes</a></li>
+          <li data-reveal><a href="greenhouse.html">Greenhouse</a></li>
+          <li data-reveal><a href="lever.html">Lever</a></li>
+          <li data-reveal><a href="workday.html">Workday</a></li>
+          <li data-reveal><a href="taleo.html">Oracle Taleo</a></li>
+          <li data-reveal><a href="icims.html">iCIMS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Templates</h2>
+        <ul>
+          <li data-reveal><a href="../templates/print-safe.html">Print-safe</a></li>
+          <li data-reveal><a href="../templates/classic.html">Classic</a></li>
+          <li data-reveal><a href="../templates/minimal.html">Minimal</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="gp-foot__legal"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> · <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a> · Resumeboard is a static site with no analytics and no backend. Every vendor claim on this page is quoted or paraphrased from the help-centre articles linked above and in the source list. Both vendors change their documentation, so check the source before relying on a detail. Where a vendor publishes nothing, this page says so rather than inferring. Resumeboard is not affiliated with Greenhouse or Lever.</p>
+  </div>
+<p class="rb-foot__contact"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> <span aria-hidden="true">&middot;</span> <a href="../contact.html">Contact</a></p>
+</footer>
+
+<script src="../assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="../assets/js/motion.js?v=d639f64b7f"></script>
+</body>
+</html>

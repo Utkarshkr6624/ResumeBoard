@@ -1,0 +1,306 @@
+/* Resumeboard — editor surfaces
+ *
+ * Skin for the four interactive surfaces: the form panel, the rail,
+ * the analysis panel and the design panel. app.css owns placement; this
+ * file owns what lives inside the panel body. Panels mount into
+ * .rb-panel__body, which is already the scroll container and already
+ * padded — never add a second scroller.
+ *
+ * ── WHAT IS LEFT IN HERE, AND WHY ─────────────────────────────────────────
+ * Almost everything here is a DESCENDANT or CHILD rule hanging off a class
+ * base.css owns: .rb-field, .rb-input, .rb-label, .rb-btn, .rb-badge, .rb-range,
+ * .rb-empty. The left-hand classes below (.rb-tabs--panel, .rb-form__grid,
+ * .rb-range-row, .rb-color-field, .rb-control-row, .rb-form__split) are not
+ * emitted by anything today — they are left in place as scoping anchors
+ * because dropping them would also drop the rule that styles the live half.
+ *
+ *   .rb-tabs--panel  panel tab bar        .rb-tabs--sub
+ *   .rb-form__grid   12-col grid          .rb-control-row
+ *   .rb-form__row    label left, control right
+ *   .rb-form__split  two controls sharing a line ([data-inline])
+ *   .rb-range-row    label + value + slider (JS sets --_range-pct, a NUMBER)
+ *   .rb-color-field  hex input            .rb-contrast-note.is-ok
+ *   .rb-empty--compact / .rb-empty--inline    the only left-hand classes the
+ *                                             panel JS really does emit
+ *
+ * `body #rb-panel …` rules are scoped to beat the stylesheets that
+ * ui/forms.js, ui/design.js and ui/analysis-panel.js inject at runtime.
+ *
+ * An earlier revision of this file also carried a whole panel system that no
+ * longer exists — .rb-edit, .rb-repeater/.rb-item, .rb-disclosure, .rb-chips,
+ * .rb-swatches, .rb-score, .rb-meter, .rb-tpl-grid and friends. Those rules
+ * were removed: nothing in the HTML or in any module emitted those class
+ * names, and removing them changed no pixel and no computed style in any
+ * editor state. Do not re-add a rule here without checking that something
+ * actually emits its selector.
+ *
+ * State is expressed with data-attributes wherever it comes from the model
+ * (data-status, data-template, aria-pressed/aria-current) so re-render is a
+ * pure attribute swap. Tones are class modifiers so JS never inlines a color.
+ */
+
+/* ============================================================
+   1. Private palette
+   Mode-sensitive values live here so the dark overrides below are
+   one short block instead of a duplicated rule set.
+   ============================================================ */
+
+.rb-edit,
+.rb-rail,
+.rb-analysis,
+.rb-design,
+.rb-panel {
+  --_edge: var(--rb-border-subtle);
+  --_edge-strong: var(--rb-border);
+  --_surface: var(--rb-bg-elevated);
+  --_surface-sunken: var(--rb-bg-inset);
+  --_tint: color-mix(in srgb, var(--rb-accent-600) 8%, transparent);
+  --_tint-strong: color-mix(in srgb, var(--rb-accent-600) 14%, transparent);
+  --_ring-soft: color-mix(in srgb, var(--rb-accent-500) 24%, transparent);
+  --_ok: var(--rb-green-600);
+  --_warn: var(--rb-amber-600);
+  --_bad: var(--rb-red-500);
+  --_ok-tint: var(--rb-green-50);
+  --_warn-tint: var(--rb-amber-50);
+  --_bad-tint: var(--rb-red-50);
+  --_ok-text: var(--rb-green-700);
+  --_warn-text: var(--rb-amber-700);
+  --_bad-text: var(--rb-red-700);
+  --_hairline: color-mix(in srgb, var(--rb-gray-950) 14%, transparent);
+  --_shadow-card: var(--rb-shadow-xs);
+  --_shadow-raise: var(--rb-shadow-md);
+}
+
+/* Dark mode only needs the feedback ramps re-pointed: the *-50 light tints
+   are near-white and would blow out against a dark surface. The dark values
+   are the ones base.css already uses for badges, so a chip and a badge of
+   the same status read identically. */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) :is(.rb-edit, .rb-rail, .rb-analysis, .rb-design, .rb-panel) {
+    --_ok: #6ee7b7;
+    --_warn: #fcd34d;
+    --_bad: #fca5a5;
+    --_ok-tint: rgba(4, 120, 87, .18);
+    --_warn-tint: rgba(181, 71, 8, .20);
+    --_bad-tint: rgba(217, 45, 32, .18);
+    --_shadow-card: none;
+  }
+}
+html[data-theme="dark"] :is(.rb-edit, .rb-rail, .rb-analysis, .rb-design, .rb-panel) {
+  --_ok: #6ee7b7;
+  --_warn: #fcd34d;
+  --_bad: #fca5a5;
+  --_ok-tint: rgba(4, 120, 87, .18);
+  --_warn-tint: rgba(181, 71, 8, .20);
+  --_bad-tint: rgba(217, 45, 32, .18);
+  --_shadow-card: none;
+}
+
+/* ============================================================
+   2. Tab bars
+   ============================================================ */
+
+/* Additive modifier: app.css already gives .rb-panel__tabs its flex row,
+   min-height, padding, border and scroll. Only the treatment is added here. */
+.rb-tabs--panel { gap: 0; background: var(--rb-bg-elevated); }
+.rb-tabs--panel .rb-tab {
+  flex: none;
+  padding: var(--rb-space-3) var(--rb-space-3);
+  font-size: var(--rb-text-sm);
+  font-weight: 550;
+  color: var(--rb-text-muted);
+}
+.rb-tabs--panel .rb-tab:hover { background: var(--rb-bg-hover); color: var(--rb-text); border-radius: var(--rb-radius-sm) var(--rb-radius-sm) 0 0; }
+.rb-tabs--panel .rb-tab[aria-selected="true"] { color: var(--rb-text); font-weight: 600; }
+/* Top rule instead of base.css's underline: the panel tab bar sits against
+   a scroll container, where an underline reads as a stray border. */
+.rb-tabs--panel .rb-tab[aria-selected="true"] {
+  border-bottom-color: transparent;
+}
+.rb-tabs--panel .rb-tab[aria-selected="true"]::after {
+  content: '';
+  position: absolute;
+  left: var(--rb-space-2);
+  right: var(--rb-space-2);
+  top: 0;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--rb-accent-600);
+}
+.rb-tabs--panel .rb-tab[aria-selected="true"] .rb-i { color: var(--rb-text-accent); }
+.rb-tabs--panel .rb-tab__count[data-alert="true"] { background: var(--_bad-tint); color: var(--_bad-text); }
+
+.rb-tabs--sub { border-bottom-color: var(--_edge); margin-bottom: var(--rb-space-1); }
+.rb-tabs--sub .rb-tab { padding: var(--rb-space-1) var(--rb-space-2); font-size: var(--rb-text-xs); }
+.rb-tabs--sub .rb-tab[aria-selected="true"] { color: var(--rb-text-accent); }
+
+@media (max-width: 560px) {
+  .rb-tabs--panel .rb-tab .rb-tab__label { display: none; }
+  .rb-tabs--panel .rb-tab { padding: var(--rb-space-3) var(--rb-space-2); }
+}
+
+/* ============================================================
+   4. Form groups and fields
+   ============================================================ */
+
+/* 12-column grid: a field is full width unless [data-cols] says otherwise. */
+.rb-form__grid > .rb-field { grid-column: span 12; }
+.rb-form__grid > .rb-field[data-cols="2"] { grid-column: span 2; }
+.rb-form__grid > .rb-field[data-cols="3"] { grid-column: span 3; }
+.rb-form__grid > .rb-field[data-cols="4"] { grid-column: span 4; }
+.rb-form__grid > .rb-field[data-cols="6"] { grid-column: span 6; }
+.rb-form__grid > .rb-field[data-cols="8"] { grid-column: span 8; }
+.rb-form__grid > .rb-field[data-full] { grid-column: 1 / -1; }
+/* Label above, control below. base.css owns the generic .rb-field; these
+   scopes keep the panel's label tuning away from the document's .rb-field. */
+.rb-form__grid .rb-label,
+.rb-item__body .rb-label,
+.rb-edit .rb-label { line-height: 1.3; }
+.rb-label__count.is-over { color: var(--_bad-text); }
+
+.rb-field.is-invalid > .rb-input,
+.rb-field.is-invalid > .rb-select,
+.rb-field.is-invalid > .rb-textarea,
+.rb-field.is-invalid > .rb-chips {
+  border-color: var(--_bad);
+  background: var(--_bad-tint);
+}
+.rb-field.is-invalid > .rb-input:focus,
+.rb-field.is-invalid > .rb-textarea:focus,
+.rb-field.is-invalid > .rb-chips:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--_bad) 20%, transparent);
+}
+.rb-field.is-invalid > .rb-label { color: var(--_bad-text); }
+.rb-field.is-valid > .rb-input,
+.rb-field.is-valid > .rb-textarea { border-color: color-mix(in srgb, var(--_ok) 55%, var(--rb-border-strong)); }
+
+.rb-field__msg .rb-i { flex: none; }
+
+/* Compact control-plus-actions row: label, control, trailing buttons. */
+.rb-control-row > .rb-input,
+.rb-control-row > .rb-select { flex: 1 1 auto; min-width: 0; }
+.rb-control-row > .rb-btn { flex: none; }
+
+/* Label left, control right — used for switches and inline option sets. */
+.rb-form__row-label .rb-label { font-size: var(--rb-text-base); color: var(--rb-text); font-weight: 500; }
+.rb-form__row > .rb-switch,
+.rb-form__row > .rb-seg,
+.rb-form__row > .rb-btn { flex: none; }
+
+.rb-form__split > .rb-field { width: 100%; }
+.rb-form__split[data-inline] > .rb-field:first-child { flex: 1 1 auto; min-width: 0; }
+.rb-form__split[data-inline] > .rb-field:last-child { flex: 0 0 auto; width: auto; }
+.rb-form__split[data-inline] > .rb-btn { flex: none; margin-bottom: 1px; }
+
+/* ============================================================
+   3. Color, contrast and range controls
+   JS sets --_range-pct (0–100) on the row. It is a number, never a color,
+   so no color ever leaves tokens.css.
+   ============================================================ */
+
+.rb-color-field .rb-input { font-family: var(--rb-font-mono); font-size: var(--rb-text-sm); text-transform: lowercase; }
+.rb-contrast-note.is-ok { color: var(--_ok-text); }
+
+.rb-range-row .rb-range { height: 18px; }
+.rb-range-row .rb-range::-webkit-slider-runnable-track {
+  background: linear-gradient(to right,
+    var(--rb-accent-600) 0 var(--_range-pct, 50%),
+    var(--rb-bg-active) var(--_range-pct, 50%) 100%);
+}
+.rb-range-row .rb-range::-moz-range-track {
+  background: linear-gradient(to right,
+    var(--rb-accent-600) 0 var(--_range-pct, 50%),
+    var(--rb-bg-active) var(--_range-pct, 50%) 100%);
+}
+.rb-range-row .rb-range:hover::-webkit-slider-thumb { border-color: var(--rb-accent-600); }
+.rb-range-row .rb-range:active::-webkit-slider-thumb { transform: scale(1.15); }
+.rb-range-row .rb-range:focus-visible { outline: none; }
+.rb-range-row .rb-range:focus-visible::-webkit-slider-thumb { box-shadow: var(--rb-focus-ring); }
+.rb-range-row .rb-range:focus-visible::-moz-range-thumb { box-shadow: var(--rb-focus-ring); }
+
+/* ============================================================
+   4. Analysis rows
+   ============================================================ */
+
+.rb-check__title .rb-badge { margin-left: var(--rb-space-1); vertical-align: 1px; }
+
+/* ============================================================
+   5. Empty states
+   ============================================================ */
+
+.rb-empty--compact { padding: var(--rb-space-8) var(--rb-space-4); gap: var(--rb-space-2); }
+.rb-empty--compact .rb-empty__icon { width: 36px; height: 36px; border-radius: var(--rb-radius-md); }
+.rb-empty--compact .rb-empty__icon .rb-i { width: 18px; height: 18px; }
+.rb-empty--compact .rb-empty__title { font-size: var(--rb-text-base); }
+.rb-empty--compact .rb-empty__text { font-size: var(--rb-text-xs); }
+.rb-empty--inline {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  padding: var(--rb-space-3);
+  gap: var(--rb-space-3);
+}
+.rb-empty--inline .rb-empty__icon { width: 32px; height: 32px; flex: none; border-radius: var(--rb-radius-sm); }
+.rb-empty--inline .rb-empty__text { flex: 1 1 auto; min-width: 0; }
+.rb-empty--inline .rb-btn { flex: none; }
+
+/* ============================================================
+   6. Panel body: fit the modules' own markup
+   ui/forms.js, ui/design.js and ui/analysis-panel.js each inject
+   their stylesheet at runtime, after this file, so every rule here
+   that has to beat one of them is scoped to #rb-panel.
+   ============================================================ */
+
+/* Page padding for a panel that mounts a bare .rb-col. The Edit and Design
+   panels bring their own --rb-space-4; the importer brings none, so its
+   paragraphs, its "Four ways in" intro and its cards ran flush to the panel
+   edge — and in the phone sheet, flush to the screen edge. */
+body #rb-panel .rb-pane__view > .rb-col { padding-inline: var(--rb-space-4); }
+
+/* The check panel's tab strip is a sibling of a scrolling body inside a
+   height-constrained column, so it took its share of the shrink and collapsed
+   to 7px: the Score / Linter / ATS / Job match row was a sliver of clipped
+   text on every viewport shorter than the panel's content. */
+body #rb-panel .rb-an__tabs { flex: none; }
+
+/* Each grade card is already nested inside the score card. A second border and
+   32px of padding cost the check rows 68px of width, and the evidence text —
+   the part that has to be read — was wrapping at 81px inside a 320px panel. */
+body #rb-panel .rb-an__card .rb-an__card {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+/* ---------- Repeater entry head ---------- */
+
+/* Five actions — move up, move down, hide, duplicate, delete — leave the
+   title 99px in a 380px panel, 39px in a 320px one and 24px in the phone
+   sheet, so "Rhode Island School of Design" was a stub and an ellipsis. The
+   row is not operable and not readable at that width, so below 380px of card
+   the actions take their own line and the title takes the full width. The
+   query is on the card rather than the window because a panel-width card at a
+   768px window is 702px and keeps the single-line head. */
+body #rb-panel .rbf-entry { container: rbf-entry / inline-size; }
+
+@container rbf-entry (max-width: 380px) {
+  body #rb-panel .rbf-entry__head {
+    flex-wrap: wrap;
+    row-gap: var(--rb-space-1);
+  }
+  body #rb-panel .rbf-entry__title { flex: 1 1 100%; }
+}
+
+/* ============================================================
+   7. Narrow layouts
+   Component-level only — where the panel sits is app.css's call.
+   ============================================================ */
+
+@media (max-width: 560px) {
+  .rb-form__grid { grid-template-columns: minmax(0, 1fr); }
+  .rb-form__grid > .rb-field { grid-column: 1 / -1 !important; }
+  .rb-form__split[data-inline] { flex-direction: column; align-items: stretch; }
+  .rb-form__split[data-inline] > .rb-field:last-child,
+  .rb-form__split[data-inline] > .rb-btn { width: 100%; }
+  .rb-empty { padding: var(--rb-space-8) var(--rb-space-4); }
+}

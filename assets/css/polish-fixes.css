@@ -1,0 +1,191 @@
+/* Resumeboard — final polish pass
+ * ============================================================================
+ * Loaded after every other stylesheet. Each block below is a defect found in a
+ * headless browser during the release pass, with the reproduction recorded in
+ * the comment. Nothing here is decorative: if a rule stops fixing the
+ * behaviour it names, delete it rather than leaving it to rot.
+ *
+ * Selectors are out-specified where a runtime module injects its own <style>
+ * after the document's stylesheets (app.css documents this: use `body #id`,
+ * never a bare `#id`).
+ *
+ * The one defect this pass found that is NOT fixed here is the editor
+ * collapsing to 0px: index.html inlines the landing copy as a body sibling,
+ * which a 100dvh `overflow: hidden` body grid cannot hold. app.css now sizes
+ * the shell against `--rb-chrome-h` and lets the document scroll, which is the
+ * correct fix and belongs in the file that owns the grid. Section 1 below
+ * completes it at phone widths, where that reservation was still wrong.
+ * ============================================================================ */
+
+/* ---------- 1. A 52px phantom band under the phone topbar ----------
+
+ * REPRO: 360x640 (any width ≤760). The topbar measures 97px but holds 45px of
+ * content, so 52px of empty bar sits under it, and the status bar ends at
+ * y=692 — 52px below the bottom of a 640px viewport.
+ *   document.querySelector('#rb-topbar').getBoundingClientRect().height
+ *     // 97
+ *   document.querySelector('#rb-topbar .rb-topbar__mobile')  // height 44
+ *   document.querySelector('#rb-topbar .rb-topbar__inner')   // display none
+ *
+ * CAUSE: app.css reserves `--rb-chrome-h` for the chrome above the shell and,
+ * under 760px, sets it to `--rb-topbar-h + --rb-subbar-h + 1px` (52 + 44 + 1).
+ * That assumes both bars are on screen. ui/chrome.js's own 760px media query
+ * does the opposite: `.rb-topbar__inner{display:none}` and
+ * `.rb-topbar__mobile{display:flex}`. One bar is rendered, two are reserved.
+ *
+ * FIX: reserve the bar that is actually rendered. Desktop already resolves to
+ * `--rb-topbar-h + 1px`, which is why this only ever showed at phone widths.
+ */
+@media (max-width: 760px) {
+  :root { --rb-chrome-h: calc(var(--rb-subbar-h) + 1px); }
+}
+
+/* The app is the first viewport of a scrolling document, so a wheel gesture
+ * that runs out of stage has to carry on into the page. app.css sets
+ * `overscroll-behavior: contain` on the stage, which stops exactly that: the
+ * stage traps the gesture at its own edge and the 7,000px of landing copy
+ * below the app can only be reached by an anchor jump or a scrollbar, never by
+ * scrolling. Verified: 40 wheel notches at 360x640 left both #rb-stage.scrollTop
+ * and window.scrollY at 0. */
+body.rb-body--app #rb-stage { overscroll-behavior-y: auto; }
+
+/* ---------- 2. The toolstrip and status bar are empty bands ----------
+
+ * REPRO: any viewport. Both containers have zero children.
+ *   document.querySelectorAll('#rb-toolstrip *').length   // 0
+ *   document.querySelectorAll('#rb-statusbar *').length   // 0
+ *
+ * No module populates them, so they render as 44px + 30px of dead chrome
+ * between the topbar and the document — on a 640px phone, 12% of the viewport
+ * spent on two empty strips, one of which is an `overflow-x: auto` strip that
+ * therefore swallows horizontal swipes.
+ *
+ * The surfaces stay in the DOM (print.css and export/pdf.js address them by
+ * id); they are only not rendered while they hold nothing. The `:empty` test
+ * stops matching the moment a module adds a child and the band comes back by
+ * itself.
+ */
+body.rb-body--app #rb-toolstrip:empty,
+body.rb-body--app #rb-statusbar:empty { display: none; }
+
+/* ---------- 3. The resume does not fit the pane, so the page scrolls sideways
+
+ * REPRO 1024x768, and to a lesser degree 1440x900:
+ *   const s = document.querySelector('#rb-stage');
+ *   s.scrollWidth   // 636 at 1024x768, 814 at 1440x900
+ *   s.clientWidth   // 398 at 1024x768, 754 at 1440x900
+ * An 816px sheet in a 398px pane: 60% of the resume is off-screen at 1024x768,
+ * and even at 1440x900 the right margin is cut off. There is a horizontal
+ * scrollbar, and `--rb-doc-zoom` is stuck at `1` because the only control that
+ * would change it lives in the empty toolstrip (see 2).
+ *
+ * CAUSE: templates.css gives up the literal 8.5in sheet below a 900px
+ * *viewport*. The viewport is the wrong yardstick: with the rail and panel
+ * both docked the pane is `viewport - 294 - 320`, so a 1024px window leaves
+ * 398px of stage and still takes the 900px "wide" branch, rendering a full
+ * sheet into it.
+ *
+ * FIX: size the sheet to the pane it is actually in rather than to the window.
+ * `min(100%, 8.5in)` is a no-op in a roomy pane and clamps in a tight one.
+ * `aspect-ratio` from the page tokens keeps the sheet's proportions either
+ * way, so a squeezed sheet still reads as the page it prints as, and it
+ * replaces the now-redundant `min-height: 11in` (816 x 11/8.5 is 1056, the same
+ * number). The existing ≤900px block keeps working: below that width
+ * `min(100%, 8.5in)` already resolves to `100%`.
+ *
+ * Scoped to `screen` because nothing in the print path clears `aspect-ratio`
+ * — print.css and templates.css reset the frame's width and height with
+ * `!important` but say nothing about the ratio.
+ */
+@media screen {
+  body #rb-page-frame {
+    width: min(100%, var(--rb-doc-page-w, 8.5in));
+    aspect-ratio: var(--rb-doc-page-w, 8.5in) / var(--rb-doc-page-h, 11in);
+    min-height: 0;
+  }
+}
+
+/* ---------- 4. Tooltips that render off the edge of the screen ----------
+
+ * base.css positions a tooltip with `bottom: calc(100% + 6px); left: 50%;
+ * transform: translateX(-50%); white-space: nowrap` — always above the
+ * trigger, always centred on it, never wider than the text. That is fine for
+ * a trigger in the middle of the viewport and wrong for every trigger near an
+ * edge, of which this app has a lot: the chrome is pinned to all four.
+ *
+ * REPRO: hover each of these and read the box the pseudo-element occupies
+ * (measured from `getComputedStyle(el, '::after').width` and the trigger rect):
+ *
+ *   1440x900  "Undo (Ctrl+Z)"                     y -20..4    invisible
+ *             "Redo (Ctrl+Shift+Z)"               y -20..4    invisible
+ *             "Theme: system. Switch to light."    y -20..4    invisible
+ *             "More"                               y -20..4    invisible
+ *             "Hide this panel"                    x 1367..1465, 25px cut
+ *             "Move section down"                  x 1333..1455, 15px cut
+ *             "Drag to reorder, or open options"  x  -77..116,  77px cut
+ *   1024x768  the same six, "Hide this panel" cut at x 951..1049
+ *   360x640   "Undo"/"Redo"/"Export"/"More" y -23..1, invisible
+ *             "Hide this panel" x 287..385, 25px cut
+ *
+ * The four invisible topbar tips are the worst of it: the topbar is the first
+ * thing in the layout, so "above" is always off-screen and Undo, Redo, Theme,
+ * Export and More have had no readable tooltip at any viewport.
+ *
+ * FIX, by anchoring instead of guessing. Each rule below keys off a container
+ * whose position in the viewport is a structural fact, not a coincidence:
+ * the topbar is at y=0, the rail at x=0, and the panel's action clusters are
+ * flush to the right edge of a right-anchored pane. A long tip is also allowed
+ * to wrap rather than run off, so an unforeseen trigger degrades to two lines
+ * instead of a truncated one.
+ */
+
+/* The pseudo-element is absolutely positioned inside the *trigger*, so its
+ * shrink-to-fit width is bounded by the trigger's own box. That is invisible
+ * at `left: 50%` (a 32px button still gets a 194px tip, because the used
+ * width is the max-content width) but re-appears the moment `left` is pinned
+ * to an edge: with `left: 0` on a 24px rail grip the tip measured 22px wide
+ * and 102px tall — one word per line. `width: max-content` decouples the two,
+ * so the alignment below moves the box without squeezing it. */
+.rb-tip::after {
+  width: max-content;
+  max-width: min(18rem, calc(100vw - 1rem));
+  white-space: normal;
+  text-wrap: balance;
+}
+
+/* Topbar: y=0, so "above" is never available. */
+body #rb-topbar .rb-tip::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+/* …and the last action in each bar sits against the right edge of the window,
+ * so that tip grows leftwards instead of over the edge. Measured in 360: the
+ * mobile bar's "More" measured 320..367 in a 360px window. Structural rather
+ * than by id, because the two bars are different elements — the desktop one
+ * is #rb-more-btn and the phone one has no id. */
+body #rb-topbar .rb-topbar__actions > :last-child.rb-tip::after,
+body #rb-topbar .rb-topbar__mobile > :last-child.rb-tip::after {
+  left: auto;
+  right: 0;
+}
+
+/* Rail: x=0, so centring on a 24px grip pushes half the tip off the left. */
+body #rb-rail .rb-tip::after {
+  left: 0;
+  transform: translateX(0) translateY(2px);
+}
+body #rb-rail .rb-tip:hover::after,
+body #rb-rail .rb-tip:focus-visible::after { transform: translateX(0) translateY(0); }
+
+/* Panel: flush right, so anchor the tip to the trigger's right edge and let it
+ * grow leftwards, back into the pane it belongs to. */
+body #rb-panel .rb-pane__head .rb-tip::after,
+body #rb-panel .rbf-toolbar .rb-tip::after {
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(2px);
+}
+body #rb-panel .rb-pane__head .rb-tip:hover::after,
+body #rb-panel .rb-pane__head .rb-tip:focus-visible::after,
+body #rb-panel .rbf-toolbar .rb-tip:hover::after,
+body #rb-panel .rbf-toolbar .rb-tip:focus-visible::after { transform: translateX(0) translateY(0); }

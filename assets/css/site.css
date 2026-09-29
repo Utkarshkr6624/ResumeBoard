@@ -1,0 +1,1352 @@
+/* Resumeboard — documentation site stylesheet
+ * Shared by every guides/*.html page. Self-contained: it depends on
+ * assets/css/tokens.css and nothing else, ships no webfonts, and renders
+ * fully without JavaScript. Only colors are declared here, and only as
+ * token references — no literal hex anywhere.
+ *
+ * It also carries the guides' half of the site shell. The same values live
+ * in home.css (landing), examples.css (about/privacy/404/examples) and
+ * gallery.css (ats/templates) — 1200px measure, 56px bar, 26px brand tile,
+ * 64px section rhythm, one h1 size — because each page links exactly one of
+ * those sheets and there is no build step to share them. Keep the four in
+ * step.
+ */
+
+/* ------------------------------------------------------------------ *
+ * 1. Site-level derived tokens
+ * ------------------------------------------------------------------ */
+
+:root {
+  /* One display face for the whole product. The app chrome, the landing
+   * page, the ATS guide and the gallery are all set in the interface sans;
+   * a serif here made /guides read as a different publication. */
+  --site-font-display: var(--rb-font-sans);
+  --site-font-body: var(--rb-font-sans);
+
+  --site-shell: 75rem;          /* 1200px — the site measure */
+  --site-gutter: var(--rb-space-6);
+  --site-head-h: 3.5rem;
+  --site-mark: 26px;
+  --site-h1: 2.25rem;           /* page h1, matching every other page */
+  --site-section: var(--rb-space-16);
+  --site-top: var(--rb-space-16);
+  --site-rule: 1px;
+
+  /* Reading scale, aliased onto the app type ramp rather than run as a
+   * parallel one: guides body copy used to sit at 18.8px while every other
+   * content page runs at 14px. Same steps, same names, one source. */
+  --site-t--1: var(--rb-text-xs);
+  --site-t-0:  var(--rb-text-base);
+  --site-t-1:  var(--rb-text-lg);
+  --site-t-3:  var(--rb-text-2xl);
+
+  --site-measure: 34rem;      /* prose column — ~70 characters at 14px */
+
+  /* Tinted surfaces used by callouts, before/after panes and code frames.
+   * Every one is a token alias so dark mode only has to re-point them. */
+  --site-tint-before: var(--rb-red-50);
+  --site-tint-before-edge: var(--rb-red-200);
+  --site-tint-before-ink: var(--rb-red-700);
+  --site-tint-after: var(--rb-green-50);
+  --site-tint-after-edge: var(--rb-green-200);
+  --site-tint-after-ink: var(--rb-green-700);
+  --site-tint-note: var(--rb-blue-50);
+  --site-tint-note-edge: var(--rb-blue-200);
+  --site-tint-note-ink: var(--rb-blue-700);
+  --site-tint-quote: var(--rb-bg-inset);
+  --site-shadow-card: var(--rb-shadow-sm);
+
+  /* Small text the reader has to read. See the note in home.css. */
+  --rbx-label: var(--rb-text-secondary);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --rbx-label: var(--rb-text-muted);
+    --site-tint-before: color-mix(in srgb, var(--rb-red-500) 14%, var(--rb-bg-elevated));
+    --site-tint-before-edge: color-mix(in srgb, var(--rb-red-500) 42%, var(--rb-bg-elevated));
+    --site-tint-before-ink: var(--rb-red-200);
+    --site-tint-after: color-mix(in srgb, var(--rb-green-600) 14%, var(--rb-bg-elevated));
+    --site-tint-after-edge: color-mix(in srgb, var(--rb-green-600) 42%, var(--rb-bg-elevated));
+    --site-tint-after-ink: var(--rb-green-200);
+    --site-tint-note: color-mix(in srgb, var(--rb-blue-600) 14%, var(--rb-bg-elevated));
+    --site-tint-note-edge: color-mix(in srgb, var(--rb-blue-600) 42%, var(--rb-bg-elevated));
+    --site-tint-note-ink: var(--rb-blue-200);
+    --site-tint-quote: var(--rb-bg-inset);
+    --site-shadow-card: var(--rb-shadow-md);
+  }
+}
+
+html[data-theme="dark"] {
+  --rbx-label: var(--rb-text-muted);
+  --site-tint-before: color-mix(in srgb, var(--rb-red-500) 14%, var(--rb-bg-elevated));
+  --site-tint-before-edge: color-mix(in srgb, var(--rb-red-500) 42%, var(--rb-bg-elevated));
+  --site-tint-before-ink: var(--rb-red-200);
+  --site-tint-after: color-mix(in srgb, var(--rb-green-600) 14%, var(--rb-bg-elevated));
+  --site-tint-after-edge: color-mix(in srgb, var(--rb-green-600) 42%, var(--rb-bg-elevated));
+  --site-tint-after-ink: var(--rb-green-200);
+  --site-tint-note: color-mix(in srgb, var(--rb-blue-600) 14%, var(--rb-bg-elevated));
+  --site-tint-note-edge: color-mix(in srgb, var(--rb-blue-600) 42%, var(--rb-bg-elevated));
+  --site-tint-note-ink: var(--rb-blue-200);
+  --site-tint-quote: var(--rb-bg-inset);
+  --site-shadow-card: var(--rb-shadow-md);
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. Base
+ * ------------------------------------------------------------------ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--rb-bg);
+  color: var(--rb-text);
+  font-family: var(--site-font-body);
+  font-size: var(--site-t-0);
+  line-height: 1.65;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--site-font-display);
+  font-weight: 680;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--rb-text);
+  text-wrap: balance;
+}
+
+p, ul, ol, dl, table, blockquote, pre, figure { margin: 0; }
+img, svg { display: block; max-width: 100%; }
+
+a {
+  color: var(--rb-text-accent);
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: color var(--rb-dur-fast) var(--rb-ease-out),
+              text-decoration-color var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+a:hover { color: var(--rb-accent-600); text-decoration-color: currentColor; }
+
+hr {
+  border: 0;
+  border-top: var(--site-rule) solid var(--rb-border);
+  margin: var(--rb-space-8) 0;
+}
+
+::selection {
+  background: var(--rb-accent-200);
+  color: var(--rb-gray-900);
+}
+
+:focus-visible {
+  outline: 2px solid var(--rb-accent-500);
+  outline-offset: 2px;
+  border-radius: var(--rb-radius-xs);
+}
+
+.u-visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Parking spot for the textarea used by the copy-text fallback. Kept in CSS
+ * so the script never has to inject inline style properties. */
+.offscreen-clip {
+  position: fixed;
+  top: -1000px;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * 3. Skip link, masthead, nav
+ * ------------------------------------------------------------------ */
+
+.site-skip {
+  position: absolute;
+  left: var(--rb-space-4);
+  top: var(--rb-space-2);
+  z-index: var(--rb-z-toast);
+  transform: translateY(-160%);
+  padding: var(--rb-space-2) var(--rb-space-4);
+  background: var(--rb-bg-elevated);
+  color: var(--rb-text);
+  border: var(--site-rule) solid var(--rb-border-strong);
+  border-radius: var(--rb-radius-md);
+  box-shadow: var(--rb-shadow-md);
+  font-size: var(--site-t--1);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform var(--rb-dur-base) var(--rb-ease-out);
+}
+
+.site-skip:focus-visible { transform: translateY(0); }
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: var(--rb-z-header);
+  background: color-mix(in srgb, var(--rb-bg-elevated) 88%, transparent);
+  border-bottom: var(--site-rule) solid var(--rb-border);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+}
+
+.masthead__inner {
+  max-width: var(--site-shell);
+  margin: 0 auto;
+  padding: 0 var(--site-gutter);
+  min-height: var(--site-head-h);
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-6);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  font-family: var(--site-font-display);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--rb-text);
+  text-decoration: none;
+  white-space: nowrap;
+  flex: none;
+}
+
+.brand__mark {
+  width: var(--site-mark);
+  height: var(--site-mark);
+  flex: none;
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-accent-600);
+  color: var(--rb-gray-0);
+  display: grid;
+  place-items: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-family: var(--rb-font-sans);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out);
+}
+.brand:hover .brand__mark { background: var(--rb-accent-700); }
+
+.nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-1);
+}
+
+.nav__link {
+  padding: 6px var(--rb-space-3);
+  border-radius: var(--rb-radius-sm);
+  font-size: var(--rb-text-base);
+  font-weight: 500;
+  color: var(--rb-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out),
+              color var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+.nav__link:hover {
+  background: var(--rb-bg-hover);
+  color: var(--rb-text);
+}
+
+.nav__link[aria-current="page"] {
+  color: var(--rb-text);
+  font-weight: 600;
+  background: var(--rb-bg-hover);
+}
+
+.nav__cta { margin-left: var(--rb-space-2); }
+
+/* Two classes, not one: `.icon-btn` below sets `display: inline-grid` at the
+ * same specificity, and a later rule wins. At one class this hide lost and the
+ * mobile-only button showed on every desktop page doing nothing. */
+.icon-btn.nav-toggle { display: none; margin-left: auto; }
+
+/* Icon-only control: the same ghost icon button the landing page uses.
+ * aria-label + data-tip are both required by the accessibility gate, so the
+ * tooltip styling lives here too. */
+.icon-btn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--rb-radius-sm);
+  background: transparent;
+  color: var(--rb-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  flex: none;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out),
+              color var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+.icon-btn:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+
+.icon-btn svg { width: 1.125rem; height: 1.125rem; }
+
+.icon-btn .icon-sun { display: none; }
+
+html[data-theme="dark"] .icon-btn .icon-sun { display: block; }
+html[data-theme="dark"] .icon-btn .icon-moon { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .icon-btn .icon-sun { display: block; }
+  html:not([data-theme="light"]) .icon-btn .icon-moon { display: none; }
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.5rem);
+  transform: translate(-50%, -0.25rem);
+  z-index: var(--rb-z-popover);
+  padding: 0.3rem 0.55rem;
+  max-width: 14rem;
+  width: max-content;
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-bg-inverse);
+  color: var(--rb-text-inverse);
+  font-size: var(--rb-text-2xs);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--rb-dur-fast) var(--rb-ease-out),
+              transform var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* The last control in the bar sits hard against the right edge, and a
+ * centred tooltip hanging off it made the whole document 30px wider than
+ * the viewport on a phone. The trailing control anchors inward instead. */
+.masthead__inner > .icon-btn:last-child::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, -0.25rem);
+}
+.masthead__inner > .icon-btn:last-child:hover::after,
+.masthead__inner > .icon-btn:last-child:focus-visible::after {
+  transform: translate(0, 0);
+}
+
+@media (hover: none) {
+  [data-tip]::after { display: none; }
+}
+
+/* ------------------------------------------------------------------ *
+ * 4. Buttons
+ * ------------------------------------------------------------------ */
+
+/* Sized to the .rb-btn in base.css so a button reads the same on the landing
+ * page, the gallery and here. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rb-space-2);
+  height: 32px;
+  padding: 0 var(--rb-space-4);
+  border: var(--site-rule) solid transparent;
+  border-radius: var(--rb-radius-sm);
+  font-size: var(--rb-text-base);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out),
+              border-color var(--rb-dur-fast) var(--rb-ease-out),
+              color var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+.btn--primary {
+  background: var(--rb-accent-600);
+  color: var(--rb-gray-0);
+}
+
+.btn--primary:hover { background: var(--rb-accent-700); color: var(--rb-gray-0); }
+
+.btn--ghost {
+  background: var(--rb-bg-elevated);
+  border-color: var(--rb-border-strong);
+  color: var(--rb-text);
+}
+
+.btn--ghost:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+
+.btn--tiny {
+  height: 26px;
+  padding: 0 var(--rb-space-2);
+  font-size: var(--rb-text-xs);
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-bg-elevated);
+  border-color: var(--rb-border-strong);
+  color: var(--rb-text-secondary);
+}
+
+.btn--tiny:hover { background: var(--rb-bg-hover); color: var(--rb-text); }
+
+.btn--tiny[data-copied] { color: var(--rb-text-accent); border-color: var(--rb-text-accent); }
+
+/* ------------------------------------------------------------------ *
+ * 5. Layout primitives
+ * ------------------------------------------------------------------ */
+
+.shell {
+  max-width: var(--site-shell);
+  margin: 0 auto;
+  padding: 0 var(--site-gutter);
+}
+
+.shell--narrow { max-width: 56rem; }
+
+.section { padding: var(--site-section) 0; }
+.section--tight { padding: var(--rb-space-12) 0; }
+
+.section-rule { border-top: var(--site-rule) solid var(--rb-border); }
+
+.reading-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: var(--rb-z-header);
+  background: transparent;
+  pointer-events: none;
+}
+
+.reading-progress__bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--rb-accent-600);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+/* ------------------------------------------------------------------ *
+ * 6. Hero and page headers
+ * ------------------------------------------------------------------ */
+
+.hero {
+  padding: var(--site-top) 0 var(--rb-space-12);
+  border-bottom: var(--site-rule) solid var(--rb-border);
+}
+
+.hero__eyebrow {
+  display: inline-block;
+  margin: 0 0 var(--rb-space-4);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+}
+
+.hero__title {
+  font-size: var(--site-h1);
+  max-width: 22ch;
+}
+
+.hero__lede,
+.pagehead__lede {
+  margin-top: var(--rb-space-5);
+  max-width: var(--site-measure);
+  font-size: var(--site-t-1);
+  line-height: 1.55;
+  color: var(--rb-text-secondary);
+  text-wrap: pretty;
+}
+
+.hero__actions {
+  margin-top: var(--rb-space-8);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-3);
+}
+
+.crumbs {
+  padding: var(--site-top) 0 0;
+  font-size: var(--rb-text-sm);
+  color: var(--rbx-label);
+}
+
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rb-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.crumbs li { display: flex; align-items: center; gap: var(--rb-space-2); }
+.crumbs li + li::before { content: "/"; color: var(--rb-text-faint); }
+.crumbs a { color: var(--rbx-label); text-decoration: none; }
+.crumbs a:hover { color: var(--rb-text); text-decoration: underline; }
+.crumbs [aria-current="page"] { color: var(--rb-text-secondary); }
+
+.pagehead {
+  padding: var(--rb-space-6) 0 var(--rb-space-12);
+}
+
+.pagehead__title {
+  font-size: var(--site-h1);
+  max-width: 22ch;
+  margin-top: var(--rb-space-2);
+}
+
+.pagehead__meta {
+  margin-top: var(--rb-space-5);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rb-space-2) var(--rb-space-4);
+  font-size: var(--rb-text-xs);
+  color: var(--rbx-label);
+}
+
+.pagehead__meta a { color: var(--rbx-label); }
+
+/* ------------------------------------------------------------------ *
+ * 7. Article grid: sticky table of contents + prose
+ * ------------------------------------------------------------------ */
+
+.article {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: var(--rb-space-16);
+  align-items: start;
+  padding: var(--rb-space-8) 0 var(--site-section);
+}
+
+.toc {
+  position: sticky;
+  top: calc(var(--site-head-h) + var(--rb-space-4));
+  max-height: calc(100vh - var(--site-head-h) - var(--rb-space-8));
+  overflow-y: auto;
+  font-size: var(--rb-text-sm);
+}
+
+.toc__title {
+  margin-bottom: var(--rb-space-3);
+  font-family: var(--site-font-body);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+}
+
+.toc__list { margin: 0; padding: 0; list-style: none; }
+
+.toc__list li + li { margin-top: 0.05rem; }
+
+.toc__link {
+  display: block;
+  padding: 0.3rem 0.6rem 0.3rem 0.75rem;
+  margin-left: -0.75rem;
+  border-left: 2px solid var(--rb-border);
+  color: var(--rbx-label);
+  text-decoration: none;
+  line-height: 1.4;
+  transition: color var(--rb-dur-fast) var(--rb-ease-out),
+              border-color var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+.toc__link:hover { color: var(--rb-text); border-left-color: var(--rb-border-strong); }
+
+.toc__link.is-active {
+  color: var(--rb-text);
+  font-weight: 600;
+  border-left-color: var(--rb-accent-600);
+}
+
+.toc--inline { display: none; }
+
+.toc__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--rb-space-2);
+  cursor: pointer;
+  list-style: none;
+  padding: var(--rb-space-3) var(--rb-space-4);
+  border: var(--site-rule) solid var(--rb-border);
+  border-radius: var(--rb-radius-md);
+  background: var(--rb-bg-elevated);
+  font-size: var(--rb-text-sm);
+  font-weight: 600;
+  color: var(--rb-text);
+}
+
+.toc__summary::-webkit-details-marker { display: none; }
+.toc__summary::after {
+  content: "";
+  margin-left: auto;
+  width: 0.45rem; height: 0.45rem;
+  border-right: 1.5px solid var(--rb-text-muted);
+  border-bottom: 1.5px solid var(--rb-text-muted);
+  transform: rotate(45deg) translate(-0.1rem, -0.1rem);
+}
+
+.toc--inline[open] .toc__summary::after { transform: rotate(-135deg) translate(-0.1rem, -0.1rem); }
+.toc--inline .toc__list { padding: var(--rb-space-3) var(--rb-space-2) var(--rb-space-1); }
+
+/* ------------------------------------------------------------------ *
+ * 8. Prose
+ * ------------------------------------------------------------------ */
+
+.prose {
+  max-width: var(--site-measure);
+  font-size: var(--site-t-0);
+  line-height: 1.7;
+  color: var(--rb-text);
+  text-wrap: pretty;
+}
+
+.prose > * + * { margin-top: var(--rb-space-5); }
+
+/* A prose block that opens with a heading should start on the block's own
+   top edge, not 64px below it — the sibling rule cannot out-specify
+   `.prose h2 { margin-top }`, so the reset has to come first. */
+.prose > *:first-child { margin-top: 0; }
+
+.prose h2 {
+  font-size: var(--site-t-3);
+  margin-top: var(--site-section);
+  padding-top: var(--rb-space-2);
+  scroll-margin-top: calc(var(--site-head-h) + var(--rb-space-4));
+}
+
+.prose h3 {
+  font-size: var(--site-t-1);
+  margin-top: var(--rb-space-10);
+  scroll-margin-top: calc(var(--site-head-h) + var(--rb-space-4));
+}
+
+.prose h4 {
+  font-size: var(--rb-text-md);
+  font-family: var(--site-font-body);
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-top: var(--rb-space-8);
+  scroll-margin-top: calc(var(--site-head-h) + var(--rb-space-4));
+}
+
+.prose a { font-weight: 500; }
+
+.prose strong { font-weight: 650; }
+
+.prose ul, .prose ol { padding-left: 1.35em; }
+.prose li + li { margin-top: 0.4em; }
+.prose li::marker { color: var(--rb-text-faint); }
+
+.prose dl { display: grid; gap: var(--rb-space-1); }
+.prose dt { font-weight: 650; }
+.prose dd { margin: 0 0 var(--rb-space-3); color: var(--rb-text-secondary); }
+
+.prose code {
+  font-family: var(--rb-font-mono);
+  font-size: 0.86em;
+  padding: 0.12em 0.35em;
+  border-radius: var(--rb-radius-xs);
+  background: var(--rb-bg-sunken);
+  color: var(--rb-text);
+  word-break: break-word;
+}
+
+.prose abbr[title] {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: help;
+}
+
+.prose blockquote {
+  padding-left: var(--rb-space-5);
+  border-left: 3px solid var(--rb-accent-600);
+  font-family: var(--site-font-display);
+  font-size: var(--site-t-1);
+  line-height: 1.45;
+  color: var(--rb-text);
+}
+
+.lede {
+  font-size: var(--site-t-1);
+  line-height: 1.55;
+  color: var(--rb-text-secondary);
+}
+
+.eyebrow {
+  font-family: var(--site-font-body);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+}
+
+/* Tables ---------------------------------------------------------------- */
+
+/* There is no wrapper element to scroll, so the table itself becomes the
+   scroll container once its cells can no longer fit the measure. `display:
+   block` keeps the rows in an anonymous table box, so the grid inside is
+   unchanged. */
+.prose table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--rb-text-sm);
+}
+
+.prose th, .prose td {
+  padding: var(--rb-space-3) var(--rb-space-3);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: var(--site-rule) solid var(--rb-border);
+}
+
+.prose thead th {
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+  border-bottom: var(--site-rule) solid var(--rb-border-strong);
+  white-space: nowrap;
+}
+
+.prose tbody tr:last-child td { border-bottom: 0; }
+.prose td:first-child { font-weight: 550; color: var(--rb-text); }
+.prose .is-weak { color: var(--rb-text-muted); }
+.prose .is-strong { color: var(--rb-text); font-weight: 550; }
+
+/* Callouts -------------------------------------------------------------- */
+
+.takeaways {
+  padding: var(--rb-space-6);
+  border: var(--site-rule) solid var(--rb-border);
+  border-left: 3px solid var(--rb-accent-600);
+  border-radius: var(--rb-radius-lg);
+  background: var(--rb-bg-elevated);
+}
+
+.takeaways > .eyebrow { display: block; margin-bottom: var(--rb-space-3); }
+.takeaways ul { margin: 0; padding-left: 1.2em; }
+.takeaways li + li { margin-top: 0.5em; }
+
+.note {
+  padding: var(--rb-space-5) var(--rb-space-6);
+  border: var(--site-rule) solid var(--site-tint-note-edge);
+  border-radius: var(--rb-radius-lg);
+  background: var(--site-tint-note);
+  font-size: var(--rb-text-base);
+  color: var(--rb-text);
+}
+
+.note__label {
+  display: block;
+  margin-bottom: var(--rb-space-2);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--site-tint-note-ink);
+}
+
+.note > :first-of-type { margin-top: 0; }
+.note > :last-child { margin-bottom: 0; }
+
+.callout-title {
+  font-family: var(--site-font-body);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--site-tint-note-ink);
+  margin: 0 0 var(--rb-space-2);
+}
+
+/* ------------------------------------------------------------------ *
+ * 9. Before / after comparisons
+ * ------------------------------------------------------------------ */
+
+.ex { margin: var(--rb-space-8) 0; }
+
+.ex__head {
+  margin-bottom: var(--rb-space-3);
+  display: flex;
+  align-items: baseline;
+  gap: var(--rb-space-3);
+}
+
+.ex__caption {
+  font-size: var(--rb-text-sm);
+  font-weight: 650;
+  color: var(--rb-text);
+}
+
+.ex__caption::before {
+  content: attr(data-kind);
+  margin-right: var(--rb-space-2);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ex__caption[data-kind="Before"]::before { color: var(--site-tint-before-ink); }
+.ex__caption[data-kind="After"]::before { color: var(--site-tint-after-ink); }
+
+.ex__panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--rb-space-4);
+}
+
+.pane {
+  position: relative;
+  padding: var(--rb-space-5);
+  border: var(--site-rule) solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  font-size: var(--rb-text-sm);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+.pane--before { background: var(--site-tint-before); border-color: var(--site-tint-before-edge); }
+.pane--after  { background: var(--site-tint-after);  border-color: var(--site-tint-after-edge); }
+
+.pane > :first-child { margin-top: 0; }
+.pane > :last-child { margin-bottom: 0; }
+
+.pane__tag {
+  display: inline-block;
+  margin-bottom: var(--rb-space-3);
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--rb-radius-full);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pane--before .pane__tag { background: var(--site-tint-before-edge); color: var(--site-tint-before-ink); }
+.pane--after  .pane__tag { background: var(--site-tint-after-edge);  color: var(--site-tint-after-ink); }
+
+.pane p + p { margin-top: var(--rb-space-3); }
+
+.pane__copy {
+  margin-top: var(--rb-space-4);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Resume-shaped fragments so the examples read like real documents. */
+.snip { font-family: var(--site-font-body); }
+
+.snip__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rb-space-1) var(--rb-space-3);
+}
+
+.snip__role {
+  font-family: var(--site-font-display);
+  font-size: var(--rb-text-md);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+}
+
+.snip__dates {
+  font-size: var(--rb-text-xs);
+  color: var(--rb-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.snip__org {
+  font-size: var(--rb-text-sm);
+  color: var(--rb-text-secondary);
+  margin-bottom: var(--rb-space-2);
+}
+
+.snip__bullets { margin: 0; padding-left: 1.1em; }
+.snip__bullets li + li { margin-top: 0.3em; }
+.snip__bullets li::marker { color: var(--rb-text-faint); }
+
+.snip__section {
+  margin-top: var(--rb-space-4);
+  padding-top: var(--rb-space-2);
+  border-top: var(--site-rule) solid var(--rb-border);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rb-text-secondary);
+}
+
+.snip__kicker {
+  font-size: var(--rb-text-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.snip__contact {
+  font-size: var(--rb-text-xs);
+  color: var(--rb-text-secondary);
+  line-height: 1.5;
+}
+
+.snip__col-label {
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-2);
+}
+
+.snip__skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--rb-text-xs);
+}
+
+.snip__skills li {
+  padding: 0.05rem 0.4rem;
+  border: var(--site-rule) solid var(--rb-border-strong);
+  border-radius: var(--rb-radius-full);
+  color: var(--rb-text-secondary);
+}
+
+/* Two-column vs one-column mock resume */
+.sheet {
+  display: grid;
+  gap: var(--rb-space-5);
+  font-size: var(--rb-text-sm);
+  line-height: 1.6;
+}
+
+.sheet--single { grid-template-columns: 1fr; }
+.sheet--double { grid-template-columns: 9rem minmax(0, 1fr); }
+.sheet--double > :first-child {
+  padding-right: var(--rb-space-4);
+  border-right: var(--site-rule) solid var(--rb-border);
+}
+
+.sheet__rail { font-size: var(--rb-text-xs); color: var(--rb-text-secondary); }
+.sheet__rail dt { font-size: var(--rb-text-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rbx-label); margin-top: var(--rb-space-3); }
+.sheet__rail dt:first-child { margin-top: 0; }
+.sheet__rail dd { margin: 0.15rem 0 0; }
+
+.visually-hidden-rule {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* ------------------------------------------------------------------ *
+ * 10. Card grid (guides index)
+ * ------------------------------------------------------------------ */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--rb-space-5);
+  margin-top: var(--rb-space-8);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--rb-space-6);
+  border: var(--site-rule) solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  background: var(--rb-bg-elevated);
+  box-shadow: var(--site-shadow-card);
+  text-decoration: none;
+  color: var(--rb-text);
+  transition: border-color var(--rb-dur-base) var(--rb-ease-out),
+              transform var(--rb-dur-base) var(--rb-ease-out),
+              box-shadow var(--rb-dur-base) var(--rb-ease-out);
+}
+
+.card:hover {
+  color: var(--rb-text);
+  border-color: var(--rb-border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--rb-shadow-md);
+}
+
+.card__index {
+  font-family: var(--rb-font-mono);
+  font-size: var(--rb-text-2xs);
+  color: var(--rbx-label);
+  letter-spacing: 0.05em;
+}
+
+.card__title {
+  margin-top: var(--rb-space-2);
+  font-size: var(--rb-text-md);
+  line-height: 1.3;
+}
+
+.card__body {
+  margin-top: var(--rb-space-3);
+  flex: 1;
+  font-size: var(--rb-text-sm);
+  line-height: 1.6;
+  color: var(--rb-text-secondary);
+}
+
+.card__more {
+  margin-top: var(--rb-space-5);
+  font-size: var(--rb-text-sm);
+  font-weight: 600;
+  color: var(--rb-text-accent);
+}
+
+.card__more::after { content: " \2192"; }
+
+/* The .rb-badge in base.css is the site-wide pill; .tag is the same primitive
+   under another name, so it is sized to match rather than carrying a border
+   the other families do not have. */
+.tag {
+  display: inline-block;
+  padding: 1px var(--rb-space-2);
+  border-radius: var(--rb-radius-full);
+  font-size: var(--rb-text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--rb-text-secondary);
+  background: var(--rb-bg-sunken);
+}
+
+/* ------------------------------------------------------------------ *
+ * 11. FAQ
+ * ------------------------------------------------------------------ */
+
+.faq { margin-top: var(--rb-space-6); }
+
+.faq__item {
+  border-top: var(--site-rule) solid var(--rb-border);
+}
+
+.faq__item:last-of-type { border-bottom: var(--site-rule) solid var(--rb-border); }
+
+.faq__q {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rb-space-3);
+  padding: var(--rb-space-4) 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--site-font-body);
+  font-size: var(--rb-text-md);
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--rb-text);
+}
+
+.faq__q::-webkit-details-marker { display: none; }
+
+.faq__q::before {
+  content: "";
+  flex: none;
+  width: 0.5rem; height: 0.5rem;
+  margin-top: 0.45em;
+  border-right: 1.5px solid var(--rb-text-faint);
+  border-bottom: 1.5px solid var(--rb-text-faint);
+  transform: rotate(45deg);
+  transition: transform var(--rb-dur-base) var(--rb-ease-out);
+}
+
+.faq__item[open] > .faq__q::before { transform: rotate(-135deg); margin-top: 0.6em; }
+
+.faq__q:hover { color: var(--rb-text-accent); }
+
+.faq__a {
+  padding: 0 0 var(--rb-space-5) 1.45rem;
+  font-size: var(--rb-text-sm);
+  line-height: 1.65;
+  color: var(--rb-text-secondary);
+}
+
+.faq__a > :first-child { margin-top: 0; }
+.faq__a > * + * { margin-top: var(--rb-space-3); }
+
+/* ------------------------------------------------------------------ *
+ * 12. Pager and footer
+ * ------------------------------------------------------------------ */
+
+.pager {
+  margin-top: var(--rb-space-16);
+  padding-top: var(--rb-space-8);
+  border-top: var(--site-rule) solid var(--rb-border);
+  display: grid;
+  gap: var(--rb-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.pager__link {
+  display: block;
+  padding: var(--rb-space-5);
+  border: var(--site-rule) solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  background: var(--rb-bg-elevated);
+  text-decoration: none;
+  transition: border-color var(--rb-dur-fast) var(--rb-ease-out);
+}
+
+.pager__link:hover { border-color: var(--rb-accent-600); }
+
+.pager__dir {
+  display: block;
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+}
+
+.pager__title {
+  display: block;
+  margin-top: var(--rb-space-2);
+  font-family: var(--site-font-display);
+  font-size: var(--rb-text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--rb-text);
+}
+
+.pager__next { text-align: right; }
+
+/* Same band, measure, heading scale and link scale as the footer in
+   home.css, examples.css and gallery.css. */
+.footer {
+  border-top: var(--site-rule) solid var(--rb-border);
+  background: var(--rb-bg-sunken);
+  padding: var(--rb-space-12) 0 var(--rb-space-8);
+  font-size: var(--rb-text-sm);
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(2, minmax(0, 1fr));
+  gap: var(--rb-space-8) var(--rb-space-6);
+}
+
+.footer__blurb { color: var(--rb-text-secondary); max-width: 30ch; margin-top: var(--rb-space-3); }
+
+.footer__heading {
+  font-family: var(--site-font-body);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-2);
+}
+
+.footer__list { margin: 0; padding: 0; list-style: none; }
+.footer__list li + li { margin-top: 0.35rem; }
+.footer__list a { color: var(--rb-text-secondary); text-decoration: none; }
+.footer__list a:hover { color: var(--rb-text); text-decoration: underline; }
+
+.footer__bar {
+  margin-top: var(--rb-space-8);
+  padding-top: var(--rb-space-5);
+  border-top: var(--site-rule) solid var(--rb-border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rb-space-2) var(--rb-space-6);
+  align-items: center;
+  font-size: var(--rb-text-xs);
+  color: var(--rbx-label);
+}
+
+.footer__bar p { margin: 0; }
+.footer__bar-spacer { margin-left: auto; }
+
+/* ------------------------------------------------------------------ *
+ * 13. Responsive
+ * ------------------------------------------------------------------ */
+
+@media (max-width: 62rem) {
+  .article {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--rb-space-8);
+  }
+
+  .toc { display: none; }
+  .toc--inline { display: block; position: static; max-height: none; }
+  .prose { max-width: none; }
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Six nav labels plus the brand and the CTA need roughly 900px, so the bar
+ * collapses well before common laptop widths rather than wrapping. */
+@media (max-width: 68rem) {
+  .icon-btn.nav-toggle { display: inline-grid; }
+  .nav__cta { display: none; }
+
+  .nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: var(--rb-space-2) var(--rb-space-5) var(--rb-space-5);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--rb-bg-elevated);
+    border-bottom: var(--site-rule) solid var(--rb-border);
+    box-shadow: var(--rb-shadow-md);
+    display: none;
+  }
+
+  .nav.is-open { display: flex; }
+  .nav__link { padding: var(--rb-space-3) var(--rb-space-2); font-size: var(--site-t-0); }
+  .nav__link + .nav__link { border-top: var(--site-rule) solid var(--rb-border-subtle); }
+}
+
+@media (max-width: 46rem) {
+  .shell { padding: 0 var(--rb-space-4); }
+  .hero { padding: var(--rb-space-10) 0 var(--rb-space-8); }
+  .section { padding: var(--rb-space-12) 0; }
+  .crumbs { padding-top: var(--rb-space-10); }
+  .masthead__inner { padding: 0 var(--rb-space-4); min-height: 3.25rem; }
+
+  .ex__panes { grid-template-columns: 1fr; }
+  .sheet--double { grid-template-columns: 1fr; }
+  .sheet--double > :first-child {
+    padding-right: 0;
+    padding-bottom: var(--rb-space-4);
+    border-right: 0;
+    border-bottom: var(--site-rule) solid var(--rb-border);
+  }
+
+  .footer__grid { grid-template-columns: minmax(0, 1fr); gap: var(--rb-space-8); }
+  .pager__next { text-align: left; }
+}
+
+/* ------------------------------------------------------------------ *
+ * 14. Motion and print
+ * ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .card:hover { transform: none; }
+  [data-tip]::after { transition: none; }
+}
+
+@media print {
+  .masthead, .nav, .toc, .pager, .reading-progress, .site-skip, .footer__grid { display: none; }
+  /* Ink is ink: paper is white even in dark mode, so the two literals below
+   * are deliberate rather than an oversight of the token rule. */
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .article { display: block; padding: 0; }
+  .prose, .prose h2, .prose h3 { max-width: none; }
+  .lede, .hero__lede, .pagehead__lede { max-width: none; }
+  .hero, .section, .pagehead { padding: 0 0 1.5rem; }
+  .pane, .note, .takeaways, .card { break-inside: avoid; }
+  .ex__panes { grid-template-columns: 1fr 1fr; }
+  a { color: #000; text-decoration: underline; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+/* Wide-screen editorial layout.
+ *
+ * Section content was capped at 56rem, so on a 1600px screen the page read as
+ * a narrow strip with half the viewport empty. The prose keeps a comfortable
+ * measure; the container does not, and card lists flow into columns instead of
+ * stacking in a single thin ribbon. */
+@media (min-width: 1100px) {
+  [data-article] > .section > .shell--narrow { max-width: 72rem; }
+
+  [data-article] .prose { max-width: 42rem; }
+
+  /* Two blocks of prose read as a spread; one long measure does not. */
+  [data-article] .section > .shell--narrow > .prose {
+    columns: 2;
+    column-gap: var(--rb-space-10);
+    max-width: none;
+  }
+  [data-article] .section > .shell--narrow > .prose > * {
+    break-inside: avoid;
+  }
+  /* Headings and full-width callouts must not be sliced by the columns. */
+  [data-article] .section > .shell--narrow > .prose > h2,
+  [data-article] .section > .shell--narrow > .prose > .takeaways,
+  [data-article] .section > .shell--narrow > .prose > .lede {
+    column-span: all;
+  }
+
+  [data-article] .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1500px) {
+  [data-article] .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* The lede is a measure, not a banner: at 72rem it ran edge to edge. */
+@media (min-width: 1100px) {
+  [data-article] .section > .shell--narrow > .prose > .lede { max-width: 46rem; }
+  [data-article] .page-head .lede,
+  [data-article] > .section:first-child .lede { max-width: 46rem; }
+}

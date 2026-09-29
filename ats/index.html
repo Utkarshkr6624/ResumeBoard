@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How applicant tracking systems read your resume</title>
+<meta name="description" content="What six major applicant tracking systems do to an uploaded resume, quoting each vendor's own documentation: Greenhouse, Workday, Taleo, Lever, iCIMS.">
+<link rel="canonical" href="https://resumeboard.app/ats/">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="How applicant tracking systems read your resume">
+<meta property="og:description" content="What six major applicant tracking systems do to an uploaded resume, quoting each vendor's own documentation: Greenhouse, Workday, Taleo, Lever, iCIMS.">
+<meta property="og:url" content="https://resumeboard.app/ats/">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard - a resume builder that keeps your work on your machine">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How applicant tracking systems read your resume">
+<meta name="twitter:description" content="What six major applicant tracking systems do to an uploaded resume, quoting each vendor's own documentation: Greenhouse, Workday, Taleo, Lever, iCIMS.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/ats/">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/ats/">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#4743e0">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/gallery.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "How applicant tracking systems read your resume",
+  "description": "What six major applicant tracking systems actually do to an uploaded resume, quoting each vendor's own documentation.",
+  "url": "https://resumeboard.app/ats/",
+  "inLanguage": "en",
+  "isPartOf": { "@type": "WebSite", "name": "Resumeboard", "url": "https://resumeboard.app/" },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Resumeboard", "item": "https://resumeboard.app/" },
+      { "@type": "ListItem", "position": 2, "name": "ATS guide", "item": "https://resumeboard.app/ats/" }
+    ]
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Applicant tracking systems covered",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Greenhouse", "url": "https://resumeboard.app/ats/greenhouse.html" },
+      { "@type": "ListItem", "position": 2, "name": "Workday", "url": "https://resumeboard.app/ats/workday.html" },
+      { "@type": "ListItem", "position": 3, "name": "Oracle Taleo", "url": "https://resumeboard.app/ats/taleo.html" },
+      { "@type": "ListItem", "position": 4, "name": "Lever", "url": "https://resumeboard.app/ats/lever.html" },
+      { "@type": "ListItem", "position": 5, "name": "iCIMS", "url": "https://resumeboard.app/ats/icims.html" }
+    ]
+  }
+}
+</script>
+<script src="../assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="../assets/css/motion.css">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-192.png">
+<link rel="manifest" href="../manifest.webmanifest">
+</head>
+<body>
+<a class="gp-skiplink" href="#main">Skip to content</a>
+
+<header class="gp-top">
+  <div class="gp-top__in">
+    <a class="gp-brand" href="../index.html">
+      <svg class="gp-brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" stroke-linejoin="round"/>
+        <path d="M14 2v5h5" stroke-linejoin="round"/>
+        <path d="M8 13h8M8 17h5" stroke-linecap="round"/>
+      </svg>
+      Resumeboard
+    </a>
+    <nav class="gp-nav" aria-label="Main">
+      <span class="rb-sz-host" data-site-size></span>
+      <a href="../editor.html#start">Builder</a>
+      <a href="../templates/index.html">Templates</a>
+      <a href="index.html" aria-current="page">ATS guide</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="gp-main" id="main" tabindex="-1">
+  <div class="gp-wrap">
+
+    <div class="gp-prose">
+      <h1 class="gp-h1">What an applicant tracking system actually does to your resume</h1>
+      <p class="gp-lead">Most advice about "ATS-friendly resumes" is folklore repeated by people who have never read a vendor's documentation. This page is built from what the vendors themselves publish, quoted and linked.</p>
+
+      <div class="gp-note gp-note--info">
+        <div class="gp-note__body">
+          <p class="gp-note__title">Start with the honest part</p>
+          <p class="gp-note__text">No applicant tracking system publishes its parsing rules. There is no spec, no conformance test, and no list of "keywords that pass". What vendors publish is a narrow set of facts: which file types they accept, how large a file may be, which fields the parser fills, and what makes a parse fail. Everything else on the internet is inference.</p>
+          <p class="gp-note__text">So that is what this guide does. Each vendor page below separates <strong>what the vendor documents</strong> from <strong>what it does not</strong>, and links to the source for every claim.</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">The four steps, in the order they happen</h2>
+      <p>Every system on this site does the same four things. The differences are in step two and step three.</p>
+      <ol>
+        <li data-reveal><strong>Upload.</strong> You attach a file to a form. This is the only step the vendor fully controls, and it is the step with the hardest documented limits: file type, file size, and whether the file is text or a picture of text.</li>
+        <li data-reveal><strong>Text extraction.</strong> Something turns your file into a stream of characters. A PDF is a page description, not text, so a parser either reads the text layer or runs optical character recognition. This is where image-only resumes die, and it is the one failure every vendor names.</li>
+        <li data-reveal><strong>Field mapping.</strong> The text is matched against profile fields: name, email, phone, employer, title, dates. This step is where layout matters, because a parser reading two columns has to guess which column an entry belongs to.</li>
+        <li data-reveal><strong>Human review.</strong> Every vendor documents that a person is meant to correct what the parser filled. Greenhouse tells candidates to review the parsed data "before submitting all applications"; Oracle's Taleo documentation says the candidate reviews extracted information in the next steps. Nothing a parser produces is treated as authoritative.</li>
+      </ol>
+
+      <div class="gp-note gp-note--stop">
+        <div class="gp-note__body">
+          <p class="gp-note__title">The one rule that follows from the documentation</p>
+          <p class="gp-note__text">If you remember one thing from this site, remember this: <strong>the safest resume is a single-column, text-based document with real section headings and no layout tricks</strong>. That is not a style opinion. It is the layout each vendor's own documentation steers you toward, in different words.</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">What each vendor documents</h2>
+      <p>Every claim on this table is linked to the vendor's own page. Where a vendor documents nothing, the row says so rather than guessing.</p>
+
+      <div class="gp-table-scroll">
+        <table class="gp-table">
+          <caption>Documented facts about resume parsing, by vendor</caption>
+          <thead>
+            <tr>
+              <th scope="col">Vendor</th>
+              <th scope="col">Accepts</th>
+              <th scope="col">Documents failure modes</th>
+              <th scope="col">Publishes a full parser spec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><a href="greenhouse.html">Greenhouse</a></th>
+              <td>Resume upload with auto-fill on candidate creation. Hard limit: <strong>2.5&nbsp;MB</strong>.</td>
+              <td>Yes, extensively. A named article lists the formatting that breaks a parse, including columns, tables, headers, footers, text boxes, graphics and letter-spaced words.</td>
+              <td>No.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="workday.html">Workday</a></th>
+              <td>DOCX and PDF, where the PDF "must contain text that's not image-based".</td>
+              <td>Yes. "Resume parsing results can vary based on resume format and order of words." Best results: no images, no image-based styles.</td>
+              <td>Yes &mdash; the closest thing in the industry. Workday's own developer documentation for the Resume REST API lists parsing guidelines in full.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="taleo.html">Oracle Taleo</a></th>
+              <td>Depends on the employer's configuration. Resume upload is a block in the application flow, and plain-text paste parsing is available on mobile.</td>
+              <td>Indirectly, through a long list of configuration options the employer sets. Taleo documents parsing as a third-party service delivered "as is".</td>
+              <td>No.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="lever.html">Lever</a></th>
+              <td><strong>.doc, .docx, .pdf, .txt</strong>, up to <strong>10&nbsp;MB</strong>.</td>
+              <td>Partly. Lever documents that parsing populates name, organization and contact details, and that a hosted-site setting can skip email parsing entirely.</td>
+              <td>No.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="icims.html">iCIMS</a></th>
+              <td>Word or PDF, per iCIMS's own description of the feature. Behaviour is per-customer configuration.</td>
+              <td>Only at the level of the product explainer. iCIMS does not publish parser behaviour per customer.</td>
+              <td>No.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="gp-h2">Read a vendor</h2>
+      <div class="gp-grid gp-grid--2 gp-mt-5">
+        <a class="gp-card gp-card--link" href="greenhouse.html">
+          <span class="gp-card__title">Greenhouse</span>
+          <span class="gp-card__meta">The most detailed public failure list of any major vendor.</span>
+          <span class="gp-card__note">Documents a 2.5&nbsp;MB ceiling, named parsing failure modes, and the languages it can parse.</span>
+        </a>
+        <a class="gp-card gp-card--link" href="workday.html">
+          <span class="gp-card__title">Workday</span>
+          <span class="gp-card__meta">The only vendor that publishes parsing guidelines directly.</span>
+          <span class="gp-card__note">Its developer documentation lists accepted formats, the fields it returns, and how to write a resume the parser reads cleanly.</span>
+        </a>
+        <a class="gp-card gp-card--link" href="taleo.html">
+          <span class="gp-card__title">Oracle Taleo</span>
+          <span class="gp-card__meta">Mostly private label, and it says so plainly.</span>
+          <span class="gp-card__note">Oracle documents that Taleo parsing is a third-party service delivered as is, and publishes its language support table.</span>
+        </a>
+        <a class="gp-card gp-card--link" href="lever.html">
+          <span class="gp-card__title">Lever</span>
+          <span class="gp-card__meta">The smallest documented surface, and a real file limit.</span>
+          <span class="gp-card__note">Documents accepted types, a 10&nbsp;MB limit, and a setting that turns email parsing off.</span>
+        </a>
+        <a class="gp-card gp-card--link" href="icims.html">
+          <span class="gp-card__title">iCIMS</span>
+          <span class="gp-card__meta">A product explainer, not a specification.</span>
+          <span class="gp-card__note">The most honest page here is about what iCIMS does not tell you, and what that means for you.</span>
+        </a>
+        <a class="gp-card gp-card--link" href="lever-and-greenhouse-comparison.html">
+          <span class="gp-card__title">Lever vs Greenhouse</span>
+          <span class="gp-card__meta">The comparison people actually want.</span>
+          <span class="gp-card__note">Same question, two very different documentation cultures, side by side.</span>
+        </a>
+      </div>
+
+      <h2 class="gp-h2">If you only have a minute</h2>
+      <p>The following is the union of what these vendors actually document, stripped of anything folklore. Nothing here is advice from us; every line traces to a vendor page linked on the vendor pages.</p>
+      <ul>
+        <li data-reveal><strong>Export a text-based PDF or a DOCX.</strong> Workday documents those two formats and says a PDF "must contain text that's not image-based". Greenhouse says resumes "uploaded as an image, rather than a document" fail to parse.</li>
+        <li data-reveal><strong>Keep the file small.</strong> Greenhouse stops parsing above 2.5&nbsp;MB. A resume full of high-resolution images is how people hit that ceiling without noticing.</li>
+        <li data-reveal><strong>One column.</strong> Greenhouse lists "resumes that have a columned layout" among its formatting failures. Workday's published guidelines say to avoid "tabular and column formats".</li>
+        <li data-reveal><strong>No tables, headers, footers, or text boxes.</strong> All three are named, independently, by both vendors that publish failure lists.</li>
+        <li data-reveal><strong>Use plain section headings.</strong> Workday's guidelines ask for proper headings such as <span class="gp-hash">EDUCATION</span> and <span class="gp-hash">EXPERIENCE</span>, and specifically warn against combining sections under one heading.</li>
+        <li data-reveal><strong>Put your name at the top, in capitals or initial capitals.</strong> Workday's guidelines are unusually specific: start the document with the name, write multi-word names in initial capitals, and never in all lower case.</li>
+        <li data-reveal><strong>Spell out the employer.</strong> Greenhouse documents that company names lacking identifying words such as "Inc.", "Co.", "LTD" or "LLC" cause problems, and that abbreviated titles like "Sr. Account Exec" are hard to resolve against "Senior Account Executive".</li>
+      </ul>
+
+      <h2 class="gp-h2">What this guide does not claim</h2>
+      <p>We do not rank these systems, and we do not tell you which one to optimise for. A single employer can change parser settings, disable parsing, or run a different vendor on the careers page than the one behind the job posting. Treat everything above as the best available public floor, not a ceiling.</p>
+
+      <ul class="gp-src">
+        <li data-reveal>
+          <span class="gp-src-label">Primary sources</span>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Greenhouse Support &mdash; Unsuccessful resume parse</a><br>
+          <a href="https://doc.workday.com/admin-guide/en-us/human-capital-management/recruiting/candidates/set-up-prospects-and-candidates/hdc1552497830785.html">Workday Documentation &mdash; Concept: Resume Parsing</a><br>
+          <a href="https://developer.workday.com/documentation/GUID-f07adb7f-630e-42a2-9de9-a39652e34ec5-enHYPHENus">Workday Developers &mdash; Resume REST API</a><br>
+          <a href="https://docs.oracle.com/en/cloud/saas/taleo-enterprise/25a/otcug/c-profileimportoptionsforcandidates.html">Oracle &mdash; Profile Import Options for Candidates (Taleo Enterprise Edition)</a><br>
+          <a href="https://help.lever.co/s/article/Understanding-Resume-Parsing">Lever Support &mdash; Understanding Resume Parsing</a><br>
+          <a href="https://www.icims.com/blog/what-is-cv-resume-parsing/">iCIMS &mdash; What is CV/Resume parsing?</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="gp-cta gp-cta--primary">
+      <div class="gp-cta__body">
+        <p class="gp-cta__title">Check your resume against these rules</p>
+        <p class="gp-cta__text">Resumeboard's ATS check reads your own file and tells you which of these documented rules it breaks, and on which page.</p>
+        <p class="gp-small gp-mt-4">Opens the builder. The check is under <span class="gp-hash">Check</span>, on the <span class="gp-hash">ATS</span> tab.</p>
+      </div>
+      <div class="gp-cta__actions">
+        <a class="gp-btn gp-btn--primary" href="../editor.html#start">Open the ATS check</a>
+        <a class="gp-btn gp-btn--secondary" href="../templates/print-safe.html">See the print-safe template</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="gp-foot">
+  <div class="gp-wrap">
+    <div class="gp-foot__grid">
+      <div>
+        <h2>Builder</h2>
+        <ul>
+          <li data-reveal><a href="../editor.html#start">Open Resumeboard</a></li>
+          <li data-reveal><a href="../editor.html#start">ATS check</a></li>
+          <li data-reveal><a href="../templates/index.html">Template gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>ATS guide</h2>
+        <ul>
+          <li data-reveal><a href="greenhouse.html">Greenhouse</a></li>
+          <li data-reveal><a href="workday.html">Workday</a></li>
+          <li data-reveal><a href="taleo.html">Oracle Taleo</a></li>
+          <li data-reveal><a href="lever.html">Lever</a></li>
+          <li data-reveal><a href="icims.html">iCIMS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Compare</h2>
+        <ul>
+          <li data-reveal><a href="lever-and-greenhouse-comparison.html">Lever vs Greenhouse</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="gp-foot__legal"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> · <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a> · Resumeboard is a static site with no analytics and no backend. Vendor documentation is quoted from the sources linked on each page; vendors change their documentation, so check the source before relying on a detail. Resumeboard is not affiliated with Greenhouse, Workday, Oracle, Lever or iCIMS.</p>
+  </div>
+<p class="rb-foot__contact"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> <span aria-hidden="true">&middot;</span> <a href="../contact.html">Contact</a></p>
+</footer>
+
+<script src="../assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="../assets/js/motion.js?v=d639f64b7f"></script>
+  <div class="rb-contact" role="contentinfo" aria-label="Contact">
+    <span class="rb-contact__label">Built by</span>
+    <strong class="rb-contact__name">Utkarsh</strong>
+    <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>
+    <span class="rb-contact__dot" aria-hidden="true">·</span>
+    <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </div>
+</body>
+</html>

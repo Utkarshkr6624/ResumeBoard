@@ -1,0 +1,192 @@
+/* Resumeboard — first-run onboarding and the auto-build entry points
+ *
+ * Two surfaces: the "Start your resume" choice dialog, and the call to action
+ * grafted onto the empty document. Both are deliberately plain — a column of
+ * three honest options beats a grid of four previews nobody reads.
+ */
+
+.rb-onb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-4);
+}
+
+.rb-onb__intro {
+  margin: 0;
+  font-size: var(--rb-text-base);
+  line-height: 1.55;
+  color: var(--rb-text-secondary);
+  max-width: 52ch;
+}
+
+/* ---------- the choices ---------- */
+
+.rb-onb__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rb-space-2);
+}
+
+.rb-onb__choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rb-space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--rb-space-3) var(--rb-space-4);
+  text-align: left;
+  font: inherit;
+  color: var(--rb-text);
+  background: var(--rb-bg-elevated);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius-lg);
+  box-shadow: var(--rb-shadow-xs);
+  cursor: pointer;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out),
+              border-color var(--rb-dur-fast) var(--rb-ease-out),
+              box-shadow var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-onb__choice:hover {
+  background: var(--rb-bg-hover);
+  border-color: var(--rb-border-strong);
+  box-shadow: var(--rb-shadow-sm);
+}
+.rb-onb__choice:focus-visible {
+  outline: none;
+  border-color: var(--rb-accent-500);
+  box-shadow: var(--rb-focus-ring);
+}
+.rb-onb__choice:active { transform: translateY(1px); }
+
+.rb-onb__choice--primary {
+  border-color: var(--rb-accent-200);
+  background: var(--rb-accent-50);
+}
+.rb-onb__choice--primary:hover {
+  background: var(--rb-accent-100);
+  border-color: var(--rb-accent-300);
+}
+.rb-onb__choice--primary .rb-onb__icon {
+  background: var(--rb-accent-600);
+  color: var(--rb-text-inverse);
+}
+.rb-onb__choice--primary .rb-onb__choicetitle { color: var(--rb-accent-800); }
+.rb-onb__choice--primary .rb-onb__choicedesc { color: var(--rb-accent-700); }
+
+html[data-theme="dark"] .rb-onb__choice--primary { border-color: var(--rb-accent-700); background: var(--rb-accent-900); }
+html[data-theme="dark"] .rb-onb__choice--primary:hover { background: color-mix(in srgb, var(--rb-accent-600) 26%, var(--rb-bg-elevated)); }
+html[data-theme="dark"] .rb-onb__choice--primary .rb-onb__icon { background: var(--rb-accent-400); color: var(--rb-gray-950); }
+html[data-theme="dark"] .rb-onb__choice--primary .rb-onb__choicetitle { color: var(--rb-accent-200); }
+html[data-theme="dark"] .rb-onb__choice--primary .rb-onb__choicedesc { color: var(--rb-accent-300); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-onb__choice--primary { border-color: var(--rb-accent-700); background: var(--rb-accent-900); }
+  html:not([data-theme="light"]) .rb-onb__choice--primary:hover { background: color-mix(in srgb, var(--rb-accent-600) 26%, var(--rb-bg-elevated)); }
+  html:not([data-theme="light"]) .rb-onb__choice--primary .rb-onb__icon { background: var(--rb-accent-400); color: var(--rb-gray-950); }
+  html:not([data-theme="light"]) .rb-onb__choice--primary .rb-onb__choicetitle { color: var(--rb-accent-200); }
+  html:not([data-theme="light"]) .rb-onb__choice--primary .rb-onb__choicedesc { color: var(--rb-accent-300); }
+}
+
+.rb-onb__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-top: 1px;
+  border-radius: var(--rb-radius-md);
+  background: var(--rb-bg-sunken);
+  color: var(--rb-text-secondary);
+}
+.rb-onb__icon .rb-i { width: 18px; height: 18px; }
+
+.rb-onb__choicetext {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.rb-onb__choicetitle {
+  font-size: var(--rb-text-base);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--rb-text);
+}
+.rb-onb__choicedesc {
+  font-size: var(--rb-text-xs);
+  line-height: 1.5;
+  color: var(--rb-text-secondary);
+}
+
+/* ---------- privacy note ---------- */
+
+.rb-onb__privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rb-space-2);
+  margin: 0;
+  padding-top: var(--rb-space-3);
+  border-top: 1px solid var(--rb-border-subtle);
+  font-size: var(--rb-text-xs);
+  line-height: 1.5;
+  color: var(--rb-text-muted);
+}
+.rb-onb__privacyicon {
+  flex: none;
+  display: inline-flex;
+  margin-top: 1px;
+  color: var(--rb-text-faint);
+}
+
+/* ---------- the empty document ---------- */
+
+/* templates.css resets every descendant of the page (`.rb-doc *`), which takes
+ * the border and padding off any .rb-btn that lands on the document. The empty
+ * state is the one place the editor puts chrome on the page, so the button
+ * look is restored here rather than by loosening the document reset. */
+.rb-doc__blank .rb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rb-space-2);
+  height: auto;
+  min-height: 32px;
+  max-width: 100%;
+  padding: var(--rb-space-2) var(--rb-space-4);
+  border: 1px solid var(--_bd);
+  border-radius: var(--rb-radius-sm);
+  background: var(--_bg);
+  color: var(--_fg);
+  font-size: var(--rb-text-base);
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.rb-doc__blank .rb-btn .rb-i { width: 15px; height: 15px; }
+
+.rb-doc__blank .rb-onb-doccta { margin-top: 0; }
+.rb-doc__blank .rb-doc__blank-text { margin-top: var(--rb-space-3); }
+.rb-doc__blank .rb-doc__blank-action { margin-top: var(--rb-space-3); }
+
+@media print {
+  .rb-onb-doccta { display: none !important; }
+}
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 480px) {
+  .rb-onb { gap: var(--rb-space-3); }
+  .rb-onb__choice {
+    min-height: 56px;
+    padding: var(--rb-space-3);
+    gap: var(--rb-space-2);
+  }
+  .rb-onb__icon { width: 32px; height: 32px; }
+  .rb-onb__icon .rb-i { width: 16px; height: 16px; }
+  .rb-onb__privacy { line-height: 1.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-onb__choice { transition: none; }
+  .rb-onb__choice:active { transform: none; }
+}

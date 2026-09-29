@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Greenhouse resume parsing: the documented rules</title>
+<meta name="description" content="Everything Greenhouse documents about resume parsing: the 2.5MB ceiling, the formatting that breaks a parse, the languages it can parse, and what it leaves out.">
+<link rel="canonical" href="https://resumeboard.app/ats/greenhouse.html">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Greenhouse resume parsing: the documented rules">
+<meta property="og:description" content="Everything Greenhouse documents about resume parsing: the 2.5MB ceiling, the formatting that breaks a parse, the languages it can parse, and what it leaves out.">
+<meta property="og:url" content="https://resumeboard.app/ats/greenhouse.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard - a resume builder that keeps your work on your machine">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Greenhouse resume parsing: the documented rules">
+<meta name="twitter:description" content="Everything Greenhouse documents about resume parsing: the 2.5MB ceiling, the formatting that breaks a parse, the languages it can parse, and what it leaves out.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/ats/greenhouse.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/ats/greenhouse.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#4743e0">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/gallery.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Greenhouse resume parsing: the documented rules",
+  "description": "Everything Greenhouse documents about resume parsing: the 2.5MB limit, the named formatting that breaks a parse, the languages it can parse, and what it does not tell you.",
+  "url": "https://resumeboard.app/ats/greenhouse.html",
+  "inLanguage": "en",
+  "isPartOf": { "@type": "WebSite", "name": "Resumeboard", "url": "https://resumeboard.app/" },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Resumeboard", "item": "https://resumeboard.app/" },
+      { "@type": "ListItem", "position": 2, "name": "ATS guide", "item": "https://resumeboard.app/ats/" },
+      { "@type": "ListItem", "position": 3, "name": "Greenhouse", "item": "https://resumeboard.app/ats/greenhouse.html" }
+    ]
+  }
+}
+</script>
+<script src="../assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="../assets/css/motion.css">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-192.png">
+<link rel="manifest" href="../manifest.webmanifest">
+</head>
+<body>
+<a class="gp-skiplink" href="#main">Skip to content</a>
+
+<header class="gp-top">
+  <div class="gp-top__in">
+    <a class="gp-brand" href="../index.html">
+      <svg class="gp-brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" stroke-linejoin="round"/>
+        <path d="M14 2v5h5" stroke-linejoin="round"/>
+        <path d="M8 13h8M8 17h5" stroke-linecap="round"/>
+      </svg>
+      Resumeboard
+    </a>
+    <nav class="gp-nav" aria-label="Main">
+      <span class="rb-sz-host" data-site-size></span>
+      <a href="../editor.html#start">Builder</a>
+      <a href="../templates/index.html">Templates</a>
+      <a href="index.html" aria-current="page">ATS guide</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="gp-main" id="main" tabindex="-1">
+  <div class="gp-wrap">
+
+    <nav class="gp-crumbs" aria-label="Breadcrumb">
+      <a href="../index.html">Resumeboard</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <a href="index.html">ATS guide</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <span aria-current="page">Greenhouse</span>
+    </nav>
+
+    <div class="gp-prose">
+      <h1 class="gp-h1">Greenhouse resume parsing, as Greenhouse documents it</h1>
+      <p class="gp-lead">Greenhouse publishes more about its parser than any other major vendor, including a named list of the formatting that breaks a parse. This page is that list, plus what sits around it.</p>
+
+      <div class="gp-note gp-note--ok">
+        <div class="gp-note__body">
+          <p class="gp-note__title">Best-documented vendor on this site</p>
+          <p class="gp-note__text">Greenhouse gives a specific byte limit, a specific list of layout failures, and a specific language list. You can write a resume that satisfies every stated rule. That is unusual.</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">The basics, quoted</h2>
+      <blockquote class="gp-quote">
+        <p>"When you add a candidate to Greenhouse Recruiting, you can upload a resume to try and quickly fill in the information for their candidate profile. When you parse a resume, Greenhouse Recruiting scans an imported resume and auto-fills appropriate fields with information it detects when adding a new candidate or prospect to your account."</p>
+        <cite>Greenhouse Support, <a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a></cite>
+      </blockquote>
+      <p>Two things follow immediately. The parse runs on <strong>import</strong>, so it happens when the resume reaches Greenhouse, not when a recruiter searches. And it <strong>auto-fills fields</strong>, which means what matters is whether your text lands in the right field, not whether a human can read it.</p>
+
+      <h2 class="gp-h2">The rules Greenhouse states</h2>
+      <div class="gp-table-scroll">
+        <table class="gp-table">
+          <caption>Stated Greenhouse parsing behaviour</caption>
+          <thead>
+            <tr>
+              <th scope="col">Rule</th>
+              <th scope="col">What Greenhouse says</th>
+              <th scope="col">Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">File size ceiling</th>
+              <td>"Greenhouse Recruiting can't parse resumes larger than <strong>2.5MB</strong>." A resume with a lot of high-quality images is the case Greenhouse names as the usual cause of overshooting it.</td>
+              <td><a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a></td>
+            </tr>
+            <tr>
+              <th scope="row">What happens on failure</th>
+              <td>You get a message that the resume "has only been attached to the candidate", and "you'll need to manually input the candidate's details into the fields." Partial parses are normal: "the resume parse might be partially successful (automatically filling some information, but skipping others)."</td>
+              <td><a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Best file format for candidates</th>
+              <td>"Upload a PDF for best results. If an upload fails, try re-saving your file as a PDF and reducing its file size."</td>
+              <td><a href="https://support.greenhouse.io/hc/en-us/articles/43418495049499-MyGreenhouse-FAQ-for-Candidates">MyGreenhouse FAQ for Candidates</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Images and graphics</th>
+              <td>"Resumes that include graphics, photos, or word art" and "Resumes that are uploaded as an image, rather than a document (such as a .docx or .pdf)" are both listed as causes of a failed parse.</td>
+              <td><a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Candidate responsibility</th>
+              <td>"Resume parsing is designed to save time, but can make mistakes. Be sure to review and edit your information before saving your profile and before submitting all applications."</td>
+              <td><a href="https://support.greenhouse.io/hc/en-us/articles/43418495049499-MyGreenhouse-FAQ-for-Candidates">MyGreenhouse FAQ for Candidates</a></td>
+            </tr>
+            <tr>
+              <th scope="row">What Talent Matching extracts</th>
+              <td>"It does not extract additional fields beyond skills, job titles, years of experience, start/end dates of employment, and company names from employment history during the resume parsing process."</td>
+              <td><a href="https://support.greenhouse.io/hc/en-us/articles/41131616864283-Talent-Matching-Data-Processing-FAQ">Talent Matching Data Processing FAQ</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Availability</th>
+              <td>Documented as available for the Core, Plus and Pro subscription tiers, to Job Admins who can view or edit candidates or above.</td>
+              <td><a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="gp-h2">The full list of formatting Greenhouse names as a parse failure</h2>
+      <p>This is the most useful thing Greenhouse publishes. Reproduced from the support article, with nothing added and nothing removed.</p>
+      <ul>
+        <li data-reveal>A resume with <strong>spaces between the letters</strong>. "While it may appear cohesive to the naked eye, the parser won't recognize the separate letters as a single word and can't make sense of the data."</li>
+        <li data-reveal>Resumes that include <strong>graphics, photos, or word art</strong>.</li>
+        <li data-reveal>Resumes that are <strong>uploaded as an image</strong>, rather than a document such as a .docx or .pdf.</li>
+        <li data-reveal><strong>Complex resumes with tables, headers, and footers.</strong></li>
+        <li data-reveal>Resumes with the <strong>name and contact information in the header, footer, or text box</strong>.</li>
+        <li data-reveal>Resumes that have a <strong>columned layout</strong>.</li>
+        <li data-reveal>Resumes <strong>without clear sections and differing formats throughout each section</strong>.</li>
+        <li data-reveal><strong>Company names that don't include identifying words</strong> such as Inc., Co., LTD, or LLC.</li>
+        <li data-reveal>Resumes with <strong>incomplete job titles</strong>, such as "Sr. Account Exec" instead of "Senior Account Executive".</li>
+      </ul>
+      <p>Greenhouse is explicit that these "may result in a partial resume parse that will need to be manually corrected and verified." A partial parse is the outcome to plan for: some fields filled, some blank, and no error shown to the candidate.</p>
+
+      <h2 class="gp-h2">The placeholder-data rule</h2>
+      <p>Greenhouse also documents that it discards data it judges to be fake, and the list is specific enough to be worth reading before you anonymise a resume.</p>
+      <blockquote class="gp-quote">
+        <p>"The phone number and the first line of the address will parse correctly, since that information can't be definitively proven as real or fake. However, the name First Last or the Town name won't be recognized as real data and will be automatically skipped by the parser."</p>
+        <p>"Other incorrect data might include fake company names (such as Company 1, Client 1, Any Company), job titles (such as employee 1), school names, or other poorly designed data."</p>
+        <cite>Greenhouse Support, <a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a></cite>
+      </blockquote>
+      <div class="gp-note gp-note--warn">
+        <div class="gp-note__body">
+          <p class="gp-note__title">If you are anonymising for a blind application</p>
+          <p class="gp-note__text">A resume full of placeholders is, according to this documentation, the most likely resume you can hand Greenhouse and have it partially discarded. If an employer offers a blind process, use theirs. Greenhouse has its own <a href="https://support.greenhouse.io/hc/en-us/articles/19864880540827-Anonymize-resumes">Anonymize resumes</a> feature; the vendor's answer to "how do I anonymise" is not "replace everything with Company 1".</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">Languages Greenhouse can parse</h2>
+      <p>Greenhouse states that "full parsing capabilities are available" in the following languages, with support for regional differences such as Canadian French:</p>
+      <p class="gp-mono gp-langlist">Arabic &middot; Chinese (Simplified) &middot; Croatian &middot; Czech &middot; Danish &middot; Dutch &middot; English &middot; Finnish &middot; French &middot; German &middot; Greek &middot; Hebrew &middot; Hungarian &middot; Italian &middot; Japanese &middot; Korean &middot; Norwegian &middot; Polish &middot; Portuguese &middot; Romanian &middot; Russian &middot; Serbian &middot; Simplified Chinese &middot; Slovak &middot; Spanish &middot; Swedish &middot; Ukrainian &middot; Vietnamese</p>
+      <p class="gp-small">Source: <a href="https://support.greenhouse.io/hc/en-us/articles/205019689-Resume-parsing-with-non-English-languages">Resume parsing with non-English languages</a>. If your resume is in a language on this list, a language mismatch is not your problem. If it is not, expect a worse parse than the same layout would get in English.</p>
+
+      <h2 class="gp-h2">What Greenhouse does not document</h2>
+      <ul>
+        <li data-reveal><strong>No field-by-field mapping.</strong> Greenhouse lists which failure modes break a parse, but not the order in which it looks for a name, or what it does with a line it cannot classify.</li>
+        <li data-reveal><strong>No keyword list and no ranking rule.</strong> There is no published set of terms that improve a match. The Talent Matching FAQ is about data minimisation, not matching logic.</li>
+        <li data-reveal><strong>No accuracy figures.</strong> Greenhouse documents that parsing "can make mistakes" and that a parse can be partial, but publishes no rate.</li>
+        <li data-reveal><strong>No per-employer configuration.</strong> Whether a particular company has parsing switched on for external candidates, or which fields are hidden, is not visible from outside.</li>
+      </ul>
+
+      <h2 class="gp-h2">The version of this that fits on a checklist</h2>
+      <ol>
+        <li data-reveal>Export a text-based PDF. Keep it under 2.5&nbsp;MB.</li>
+        <li data-reveal>No photo, no icon next to your email address, no skill rating bars, no word art.</li>
+        <li data-reveal>Your name and contact details are in the body of the document, in ordinary paragraphs. Not a header, not a footer, not a text box.</li>
+        <li data-reveal>One column. No sidebar, no parallel skills column.</li>
+        <li data-reveal>No tables used for layout. Section headings in the same place in every section.</li>
+        <li data-reveal>Employers written out with their suffix where they have one: <span class="gp-hash">Northwind Labs Inc.</span>, not <span class="gp-hash">Northwind</span>.</li>
+        <li data-reveal>Titles spelled out: <span class="gp-hash">Senior Product Designer</span>, not <span class="gp-hash">Sr. PD</span>.</li>
+      </ol>
+      <p>Everything above is a restatement of a rule Greenhouse published. The <a href="../templates/print-safe.html">print-safe template</a> in the gallery satisfies all seven, and the <a href="../templates/minimal.html">minimal template</a> satisfies all seven but is harder to scan by eye.</p>
+
+      <ul class="gp-src">
+        <li data-reveal>
+          <span class="gp-src-label">Greenhouse sources, all linked above</span>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse">Unsuccessful resume parse</a> &mdash; the 2.5MB limit, the failure modes, the placeholder-data rule<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/43418495049499-MyGreenhouse-FAQ-for-Candidates">MyGreenhouse FAQ for Candidates</a> &mdash; PDF guidance and the candidate review warning<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/205019689-Resume-parsing-with-non-English-languages">Resume parsing with non-English languages</a> &mdash; the supported language list<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/41131616864283-Talent-Matching-Data-Processing-FAQ">Talent Matching Data Processing FAQ</a> &mdash; the fields Talent Matching extracts<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/115002195063-Manually-add-a-candidate-or-prospect">Manually add a candidate or prospect</a> &mdash; where parsing is triggered<br>
+          <a href="https://support.greenhouse.io/hc/en-us/articles/19864880540827-Anonymize-resumes">Anonymize resumes</a> &mdash; the supported way to blind a resume
+        </li>
+      </ul>
+    </div>
+
+    <div class="gp-cta gp-cta--primary">
+      <div class="gp-cta__body">
+        <p class="gp-cta__title">Check your resume against Greenhouse's rules</p>
+        <p class="gp-cta__text">Resumeboard's ATS check flags columns, text boxes, image-only output, oversized files and placeholder-looking data, then tells you which page each one is on.</p>
+        <p class="gp-small gp-mt-4">Opens the builder. The check is under <span class="gp-hash">Check</span>, on the <span class="gp-hash">ATS</span> tab.</p>
+      </div>
+      <div class="gp-cta__actions">
+        <a class="gp-btn gp-btn--primary" href="../editor.html#start">Open the Greenhouse check</a>
+        <a class="gp-btn gp-btn--secondary" href="lever-and-greenhouse-comparison.html">Compare with Lever</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="gp-foot">
+  <div class="gp-wrap">
+    <div class="gp-foot__grid">
+      <div>
+        <h2>Builder</h2>
+        <ul>
+          <li data-reveal><a href="../editor.html#start">Open Resumeboard</a></li>
+          <li data-reveal><a href="../editor.html#start">ATS check</a></li>
+          <li data-reveal><a href="../templates/index.html">Template gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>ATS guide</h2>
+        <ul>
+          <li data-reveal><a href="greenhouse.html">Greenhouse</a></li>
+          <li data-reveal><a href="workday.html">Workday</a></li>
+          <li data-reveal><a href="taleo.html">Oracle Taleo</a></li>
+          <li data-reveal><a href="lever.html">Lever</a></li>
+          <li data-reveal><a href="icims.html">iCIMS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Templates</h2>
+        <ul>
+          <li data-reveal><a href="../templates/print-safe.html">Print-safe</a></li>
+          <li data-reveal><a href="../templates/minimal.html">Minimal</a></li>
+          <li data-reveal><a href="../templates/classic.html">Classic</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="gp-foot__legal"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> · <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a> · Resumeboard is a static site with no analytics and no backend. Quotes are taken from the Greenhouse Support articles linked above; Greenhouse changes its documentation, so check the source before relying on a detail. Resumeboard is not affiliated with Greenhouse.</p>
+  </div>
+<p class="rb-foot__contact"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> <span aria-hidden="true">&middot;</span> <a href="../contact.html">Contact</a></p>
+</footer>
+
+<script src="../assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="../assets/js/motion.js?v=d639f64b7f"></script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+/* Resumeboard — auto-build dialog
+ * The front door. Must feel like the first thirty seconds of a good product,
+ * not a file picker.
+ */
+
+.rb-af { display: flex; flex-direction: column; gap: var(--rb-space-4); }
+
+.rb-af__tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--rb-space-1);
+  padding: var(--rb-space-1);
+  background: var(--rb-bg-sunken);
+  border-radius: var(--rb-radius-lg);
+}
+.rb-af__tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--rb-space-1);
+  padding: var(--rb-space-2) var(--rb-space-2);
+  border-radius: var(--rb-radius-md);
+  font-size: var(--rb-text-xs);
+  font-weight: 550;
+  color: var(--rb-text-muted);
+  text-align: center;
+  line-height: 1.25;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out), color var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-af__tab:hover { color: var(--rb-text); background: var(--rb-bg-hover); }
+.rb-af__tab[aria-selected="true"] {
+  background: var(--rb-bg-elevated);
+  color: var(--rb-text-accent);
+  box-shadow: var(--rb-shadow-sm);
+}
+
+.rb-af__pane { display: flex; flex-direction: column; gap: var(--rb-space-3); }
+.rb-af__pane[hidden] { display: none; }
+
+.rb-af__paste {
+  min-height: 220px;
+  font-family: var(--rb-font-mono);
+  font-size: var(--rb-text-sm);
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.rb-af__actions {
+  display: flex; align-items: center; gap: var(--rb-space-2);
+  flex-wrap: wrap;
+}
+
+.rb-af__note {
+  font-size: var(--rb-text-sm);
+  color: var(--rb-text-muted);
+  line-height: 1.5;
+  padding: var(--rb-space-2) var(--rb-space-3);
+  border-radius: var(--rb-radius-sm);
+  background: var(--rb-bg-inset);
+}
+.rb-af__note:empty { display: none; }
+.rb-af__note.is-bad { background: var(--rb-red-50); color: var(--rb-red-700); }
+.rb-af__note.is-warn { background: var(--rb-amber-50); color: var(--rb-amber-700); }
+.rb-af__note.is-ok { background: var(--rb-green-50); color: var(--rb-green-700); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-af__note.is-bad { background: rgba(217,45,32,.16); color: #fca5a5; }
+  html:not([data-theme="light"]) .rb-af__note.is-warn { background: rgba(181,71,8,.18); color: #fcd34d; }
+  html:not([data-theme="light"]) .rb-af__note.is-ok { background: rgba(4,120,87,.18); color: #6ee7b7; }
+}
+html[data-theme="dark"] .rb-af__note.is-bad { background: rgba(217,45,32,.16); color: #fca5a5; }
+html[data-theme="dark"] .rb-af__note.is-warn { background: rgba(181,71,8,.18); color: #fcd34d; }
+html[data-theme="dark"] .rb-af__note.is-ok { background: rgba(4,120,87,.18); color: #6ee7b7; }
+
+.rb-linkish {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+}
+.rb-linkish:hover { text-decoration-thickness: 2px; }
+
+.rb-af__drop {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--rb-space-2);
+  padding: var(--rb-space-8) var(--rb-space-4);
+  border: 1.5px dashed var(--rb-border-strong);
+  border-radius: var(--rb-radius-lg);
+  background: var(--rb-bg-inset);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--rb-dur-base) var(--rb-ease-out), background var(--rb-dur-base) var(--rb-ease-out);
+}
+.rb-af__drop:hover, .rb-af__drop.is-over {
+  border-color: var(--rb-accent-500);
+  background: var(--rb-accent-50);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-af__drop:hover,
+  html:not([data-theme="light"]) .rb-af__drop.is-over { background: var(--rb-accent-900); }
+}
+html[data-theme="dark"] .rb-af__drop:hover,
+html[data-theme="dark"] .rb-af__drop.is-over { background: var(--rb-accent-900); }
+.rb-af__drop-icon { color: var(--rb-text-faint); }
+.rb-af__drop strong { font-size: var(--rb-text-md); font-weight: 600; }
+
+.rb-af__steps {
+  counter-reset: step;
+  display: flex; flex-direction: column; gap: var(--rb-space-2);
+  font-size: var(--rb-text-sm);
+  color: var(--rb-text-secondary);
+  line-height: 1.55;
+}
+.rb-af__steps li {
+  counter-increment: step;
+  display: flex; gap: var(--rb-space-3);
+  align-items: baseline;
+}
+.rb-af__steps li::before {
+  content: counter(step);
+  flex: none;
+  width: 20px; height: 20px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--rb-bg-sunken);
+  color: var(--rb-text-muted);
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  transform: translateY(2px);
+}
+
+.rb-af__progress {
+  display: flex; flex-direction: column; gap: var(--rb-space-2);
+  padding: var(--rb-space-3);
+  background: var(--rb-bg-inset);
+  border-radius: var(--rb-radius-md);
+}
+
+.rb-af__review { display: flex; flex-direction: column; gap: 1px; }
+.rb-af__review-head { display: flex; flex-direction: column; gap: var(--rb-space-2); margin-bottom: var(--rb-space-1); }
+.rb-af__review-head h3 { font-size: var(--rb-text-lg); font-weight: 650; }
+
+.rb-af__row {
+  display: flex; align-items: center; gap: var(--rb-space-3);
+  padding: var(--rb-space-2) var(--rb-space-2);
+  border-radius: var(--rb-radius-sm);
+  cursor: pointer;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-af__row:hover { background: var(--rb-bg-hover); }
+.rb-af__row input { flex: none; width: 16px; height: 16px; accent-color: var(--rb-accent-600); cursor: pointer; }
+.rb-af__row-label {
+  flex: none; width: 92px;
+  font-size: var(--rb-text-sm); font-weight: 600; color: var(--rb-text-secondary);
+}
+.rb-af__row-value { flex: 1; font-size: var(--rb-text-sm); color: var(--rb-text-muted); }
+
+.rb-af__privacy {
+  display: flex; align-items: flex-start; gap: var(--rb-space-2);
+  margin-top: var(--rb-space-1);
+  padding-top: var(--rb-space-3);
+  border-top: 1px solid var(--rb-border-subtle);
+  font-size: var(--rb-text-xs);
+  color: var(--rb-text-muted);
+  line-height: 1.5;
+}
+.rb-af__privacy .rb-i { flex: none; margin-top: 1px; color: var(--rb-green-600); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-af__privacy .rb-i { color: #6ee7b7; }
+}
+html[data-theme="dark"] .rb-af__privacy .rb-i { color: #6ee7b7; }
+
+@media (max-width: 620px) {
+  .rb-af__tabs { grid-template-columns: repeat(2, 1fr); }
+  .rb-af__row-label { width: auto; }
+}
+
+/* Universal text size ---------------------------------------------------
+ * One control that scales every piece of text in the resume at once, the way
+ * a reader's own browser zoom does. This is deliberately separate from the
+ * design panel's fine-grained type scale: this is the control people reach for
+ * when the resume is "too small to read" and they want it bigger, full stop.
+ */
+.rb-typectl {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 2px;
+  background: var(--rb-bg-elevated);
+  border: 1px solid var(--rb-border-strong);
+  border-radius: var(--rb-radius-md);
+  box-shadow: var(--rb-shadow-xs);
+}
+.rb-typectl__btn {
+  display: grid; place-items: center;
+  width: 30px; height: 26px;
+  border-radius: var(--rb-radius-sm);
+  color: var(--rb-text-secondary);
+  font-weight: 700;
+  line-height: 1;
+  transition: background var(--rb-dur-fast) var(--rb-ease-out), color var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-typectl__btn:hover:not(:disabled) { background: var(--rb-bg-hover); color: var(--rb-text); }
+.rb-typectl__btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.rb-typectl__btn--sm { font-size: 11px; }
+.rb-typectl__btn--lg { font-size: 16px; }
+.rb-typectl__value {
+  min-width: 46px;
+  /* The readout is a slider, so it is a pointer target and not just a number.
+   * 24px is the minimum under SC 2.5.8; the group is 26px tall, so this fits
+   * without the bar growing. Coarse pointers get 44px from app.css. */
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: var(--rb-text-xs);
+  font-weight: 600;
+  color: var(--rb-text-muted);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+}
+.rb-typectl__value:hover { color: var(--rb-text-accent); }
+
+/* Bookmarklet — the drag-to-bookmarks control */
+.rb-af__bmwrap { display: flex; align-items: center; gap: var(--rb-space-3); flex-wrap: wrap; }
+.rb-af__bm {
+  display: inline-flex; align-items: center; gap: var(--rb-space-2);
+  padding: var(--rb-space-2) var(--rb-space-3);
+  border: 1px solid var(--rb-accent-400);
+  border-radius: var(--rb-radius-md);
+  background: var(--rb-accent-50);
+  color: var(--rb-accent-800);
+  text-decoration: none;
+  cursor: grab;
+  user-select: none;
+  box-shadow: var(--rb-shadow-xs);
+  transition: transform var(--rb-dur-fast) var(--rb-ease-out), box-shadow var(--rb-dur-fast) var(--rb-ease-out);
+}
+.rb-af__bm:hover { transform: translateY(-1px); box-shadow: var(--rb-shadow-md); }
+.rb-af__bm:active { cursor: grabbing; }
+.rb-af__bm strong { font-size: var(--rb-text-sm); font-weight: 650; }
+.rb-af__bm-hint {
+  font-size: var(--rb-text-2xs);
+  opacity: 0.72;
+  padding-left: var(--rb-space-2);
+  border-left: 1px solid currentColor;
+  border-left-color: color-mix(in srgb, currentColor 25%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-af__bm { background: var(--rb-accent-900); color: var(--rb-accent-100); border-color: var(--rb-accent-600); }
+}
+html[data-theme="dark"] .rb-af__bm { background: var(--rb-accent-900); color: var(--rb-accent-100); border-color: var(--rb-accent-600); }
+
+.rb-af__steps--tight { gap: var(--rb-space-1); font-size: var(--rb-text-xs); }
+.rb-af__steps--tight li { gap: var(--rb-space-2); }
+.rb-af__steps--tight .rb-kbd { margin-inline: 1px; }
+
+/* The bookmarklet reads as a link but behaves as a button. Say so. */
+.rb-af__bm { position: relative; }
+.rb-af__bm::after {
+  content: attr(data-bm-help);
+  position: absolute;
+  top: calc(100% + 6px); left: 0;
+  width: max-content; max-width: 18rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(16,18,24,.92);
+  color: #fff;
+  font-size: 11px; font-weight: 500; line-height: 1.35;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--rb-dur-fast) var(--rb-ease-out);
+  z-index: 2;
+}
+.rb-af__bm:hover::after, .rb-af__bm:focus-visible::after { opacity: 1; }

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workday resume parsing: the vendor's own rules</title>
+<meta name="description" content="Workday publishes real parsing guidelines. Here they are: DOCX and text-based PDF only, no columns, no tables, name in capitals at the top, contact hints.">
+<link rel="canonical" href="https://resumeboard.app/ats/workday.html">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Workday resume parsing: the vendor's own rules">
+<meta property="og:description" content="Workday publishes real parsing guidelines. Here they are: DOCX and text-based PDF only, no columns, no tables, name in capitals at the top, contact hints.">
+<meta property="og:url" content="https://resumeboard.app/ats/workday.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard - a resume builder that keeps your work on your machine">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Workday resume parsing: the vendor's own rules">
+<meta name="twitter:description" content="Workday publishes real parsing guidelines. Here they are: DOCX and text-based PDF only, no columns, no tables, name in capitals at the top, contact hints.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/ats/workday.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/ats/workday.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#4743e0">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/gallery.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Workday resume parsing: the vendor's own guidelines",
+  "description": "Workday publishes real parsing guidelines. Here they are verbatim: DOCX and text-based PDF only, no columns, no tables, name in capitals at the top, and labelled contact hints.",
+  "url": "https://resumeboard.app/ats/workday.html",
+  "inLanguage": "en",
+  "isPartOf": { "@type": "WebSite", "name": "Resumeboard", "url": "https://resumeboard.app/" },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Resumeboard", "item": "https://resumeboard.app/" },
+      { "@type": "ListItem", "position": 2, "name": "ATS guide", "item": "https://resumeboard.app/ats/" },
+      { "@type": "ListItem", "position": 3, "name": "Workday", "item": "https://resumeboard.app/ats/workday.html" }
+    ]
+  }
+}
+</script>
+<script src="../assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="../assets/css/motion.css">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/icon-192.png">
+<link rel="manifest" href="../manifest.webmanifest">
+</head>
+<body>
+<a class="gp-skiplink" href="#main">Skip to content</a>
+
+<header class="gp-top">
+  <div class="gp-top__in">
+    <a class="gp-brand" href="../index.html">
+      <svg class="gp-brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" focusable="false">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" stroke-linejoin="round"/>
+        <path d="M14 2v5h5" stroke-linejoin="round"/>
+        <path d="M8 13h8M8 17h5" stroke-linecap="round"/>
+      </svg>
+      Resumeboard
+    </a>
+    <nav class="gp-nav" aria-label="Main">
+      <span class="rb-sz-host" data-site-size></span>
+      <a href="../editor.html#start">Builder</a>
+      <a href="../templates/index.html">Templates</a>
+      <a href="index.html" aria-current="page">ATS guide</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="gp-main" id="main" tabindex="-1">
+  <div class="gp-wrap">
+
+    <nav class="gp-crumbs" aria-label="Breadcrumb">
+      <a href="../index.html">Resumeboard</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <a href="index.html">ATS guide</a>
+      <span class="gp-crumbs__sep" aria-hidden="true">/</span>
+      <span aria-current="page">Workday</span>
+    </nav>
+
+    <div class="gp-prose">
+      <h1 class="gp-h1">Workday resume parsing, quoted from Workday</h1>
+      <p class="gp-lead">Workday is the only major vendor on this site that publishes parsing guidelines in full. Its developer documentation tells you, in writing, how to write a resume its parser reads cleanly. Below is that text, in full.</p>
+
+      <div class="gp-note gp-note--ok">
+        <div class="gp-note__body">
+          <p class="gp-note__title">The only real spec on this site</p>
+          <p class="gp-note__text">If you want one page to design against, this is it. Everything in the next two sections is Word-for-word from Workday's <a href="https://developer.workday.com/documentation/GUID-f07adb7f-630e-42a2-9de9-a39652e34ec5-enHYPHENus">Resume REST API documentation</a> and the recruiting admin guide. Where Workday does not say something, this page says so.</p>
+        </div>
+      </div>
+
+      <h2 class="gp-h2">What Workday's parser returns</h2>
+      <p>Workday's Resume REST API scans a file and returns a fixed set of sections. Workday lists them as <span class="gp-hash">contact</span>, <span class="gp-hash">education</span>, <span class="gp-hash">experience</span>, <span class="gp-hash">references</span> and <span class="gp-hash">summary</span>.</p>
+      <p>That list is the whole surface. If your experience is in a section called "Where I've Made an Impact", Workday has no field for it. If your languages are in a section called "Sprachen", there is no field for that either &mdash; see the next section, which says so explicitly.</p>
+
+      <h2 class="gp-h2">The two fields Workday will not fill for you</h2>
+      <blockquote class="gp-quote">
+        <p>"Resume parsing populates fields from a resume, and Workday enables you to review the resume data. Workday doesn't auto-fill fields you configure as hidden or these fields: <strong>Languages, Skills</strong>."</p>
+        <cite>Workday Documentation, <a href="https://doc.workday.com/admin-guide/en-us/human-capital-management/recruiting/candidates/set-up-prospects-and-candidates/hdc1552497830785.html">Concept: Resume Parsing</a></cite>
+      </blockquote>
+      <p>Read that again, because it is unusual and it is frequently misunderstood. In Workday, <strong>your skills are not extracted from your resume</strong>. Neither are your languages. Whatever a recruiter sees in those fields, they typed, imported, or selected. It also means any field the employer has configured as hidden never gets filled, silently.</p>
+
+      <h2 class="gp-h2">What Workday says about quality</h2>
+      <p>The admin guide is blunt about the limits:</p>
+      <ul>
+        <li data-reveal>"Resume parsing results can vary based on resume format and order of words."</li>
+        <li data-reveal>"For best results, use resumes that don't have images or image-based styles."</li>
+        <li data-reveal>Employers can "configure job application templates to hide resume parsing for external candidates", in which case nothing is parsed at all.</li>
+      </ul>
+      <p>That last point deserves emphasis. On some Workday careers sites there is no parse, and a well-formatted resume will make no measurable difference. You cannot tell from the outside which configuration you are in.</p>
+
+      <h2 class="gp-h2">The published parsing guidelines, in full</h2>
+      <p>Workday's Resume REST API documentation includes a section titled "Resume Guidelines for Improved Parsing Results". It opens with the reason the guidelines exist, then lists the rules. Both parts are below.</p>
+
+      <blockquote class="gp-quote">
+        <p>"Unstructured resumes with inconsistent layout and format can lead to inconsistent results from the resume parser. Consider these guidelines when using the Resume REST API:"</p>
+      </blockquote>
+
+      <h3 class="gp-h3">Layout</h3>
+      <ul>
+        <li data-reveal>"Avoid personal information in the header and footer sections, such as name, phone and address."</li>
+        <li data-reveal>"Avoid visual objects such as images, text boxes, clip arts, logos, and annotations."</li>
+        <li data-reveal>"Avoid tabular and column formats."</li>
+      </ul>
+
+      <h3 class="gp-h3">Structure</h3>
+      <ul>
+        <li data-reveal>"Provide proper headings for resume sections, such as <strong>EDUCATION</strong> and <strong>EXPERIENCE</strong>."</li>
+        <li data-reveal>"Don't combine multiple sections under a single heading such as <strong>EDUCATION and EXPERIENCE</strong>."</li>
+        <li data-reveal>"Insert additional new lines between work history job profiles or education."</li>
+        <li data-reveal>"To clearly separate job profiles and school sections, add bullets or numbers at the start of each job profile or education."</li>
+        <li data-reveal>"Write the description for each job in a single paragraph."</li>
+        <li data-reveal>"Avoid combining positions based on employers. Separate each job for better parsing."</li>
+      </ul>
+
+      <h3 class="gp-h3">Name</h3>
+      <ul>
+        <li data-reveal>"For better name parsing, always start writing names with the hint 'Name: Xxxx Yyyy'."</li>
+        <li data-reveal>"Always mention names in separate lines."</li>
+        <li data-reveal>"Place the candidate's name at the top of the document, which enables the resume parser to quickly identify the candidate."</li>
+        <li data-reveal>"Multi-word names should always start with either Initial Capital letters or FULL CAPITAL letters."</li>
+        <li data-reveal>"Avoid writing names in all lower case letters."</li>
+        <li data-reveal>"Writing contact information at the starting of resumes results in better identification."</li>
+      </ul>
+
+      <h3 class="gp-h3">Labelled hints</h3>
+      <p>Workday gives literal examples of the labels it looks for:</p>
+      <ul>
+        <li data-reveal><span class="gp-hash">Name: Xxxx Yyyy</span></li>
+        <li data-reveal><span class="gp-hash">Address: xxxx yyyy zzzz, abcd, efgh, 00000.</span></li>
+        <li data-reveal><span class="gp-hash">Mobile Phone: 123 456 7890</span></li>
+        <li data-reveal><span class="gp-hash">Email: xxxx@yyyy.com</span></li>
+        <li data-reveal><span class="gp-hash">Date: Jan 2015 &ndash; Present</span></li>
+      </ul>
+      <p>And for the last section: "Write the reference section at the end of the document with the proper hint <strong>REFERENCE:</strong>."</p>
+
+      <h2 class="gp-h2">Accepted file formats</h2>
+      <div class="gp-table-scroll">
+        <table class="gp-table">
+          <caption>File types Workday's resume scanner accepts</caption>
+          <thead>
+            <tr>
+              <th scope="col">Format</th>
+              <th scope="col">Accepted</th>
+              <th scope="col">Workday's condition</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">DOCX</th>
+              <td><span class="gp-tag gp-tag--pass">Yes</span></td>
+              <td>Listed with no additional condition.</td>
+            </tr>
+            <tr>
+              <th scope="row">PDF</th>
+              <td><span class="gp-tag gp-tag--pass">Yes</span></td>
+              <td>"Must contain text that's not image-based." A scan or a flattened image-only export does not qualify.</td>
+            </tr>
+            <tr>
+              <th scope="row">Image (PNG, JPG)</th>
+              <td><span class="gp-tag gp-tag--fail">No</span></td>
+              <td>Not in the supported list for the resume endpoint, even though the same product family describes using OCR on images elsewhere.</td>
+            </tr>
+            <tr>
+              <th scope="row">RTF, TXT, HTML</th>
+              <td><span class="gp-tag gp-tag--fail">Not listed</span></td>
+              <td>Absent from the documented supported types. Absence is not a guarantee of rejection, but do not rely on it.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="gp-small">Source: <a href="https://developer.workday.com/documentation/GUID-f07adb7f-630e-42a2-9de9-a39652e34ec5-enHYPHENus">Workday Developers &mdash; Resume REST API</a>, "Scanning Resumes".</p>
+
+      <h2 class="gp-h2">What Workday does not document</h2>
+      <ul>
+        <li data-reveal><strong>No size limit.</strong> The Resume REST API documentation states formats and conditions but no maximum file size. The 2.5&nbsp;MB number people attribute to Workday belongs to <a href="greenhouse.html">Greenhouse</a>.</li>
+        <li data-reveal><strong>No accuracy figures, and no guarantee.</strong> "Results can vary" is the whole of it.</li>
+        <li data-reveal><strong>No ordering rule.</strong> "Order of words" affects results, but Workday does not say which order.</li>
+        <li data-reveal><strong>Nothing about the careers site you are actually on.</strong> Each employer configures which fields are hidden and whether external candidates see the parse at all.</li>
+      </ul>
+
+      <h2 class="gp-h2">The version of this that fits on a checklist</h2>
+      <ol>
+        <li data-reveal>Export a DOCX or a text-based PDF. Never an image-only PDF.</li>
+        <li data-reveal>No images, logos, text boxes, clip art, annotations, columns or tables &mdash; anywhere, including header and footer.</li>
+        <li data-reveal>Your name on the first line, in initial capitals, on its own line, followed by your contact details on the lines below it.</li>
+        <li data-reveal>Standard headings. <span class="gp-hash">EXPERIENCE</span> on one line, <span class="gp-hash">EDUCATION</span> on another. Never <span class="gp-hash">EDUCATION AND EXPERIENCE</span>.</li>
+        <li data-reveal>Each job a separate block, separated by a blank line, and each block written as one paragraph rather than a series of fragments.</li>
+        <li data-reveal>One position per block, even if you held two jobs at the same employer. Workday explicitly says not to combine them.</li>
+        <li data-reveal>Do not expect your skills to be read out of the document. On Workday that field is filled by a person.</li>
+      </ol>
+      <p>Every template in the <a href="../templates/index.html">gallery</a> satisfies items 1 to 6. The <a href="../templates/classic.html">classic template</a> and the <a href="../templates/print-safe.html">print-safe template</a> come closest to the literal Workday guidelines, because both use plain upper-case section headings and a name at the top of the body.</p>
+
+      <ul class="gp-src">
+        <li data-reveal>
+          <span class="gp-src-label">Workday sources</span>
+          <a href="https://developer.workday.com/documentation/GUID-f07adb7f-630e-42a2-9de9-a39652e34ec5-enHYPHENus">Resume REST API</a> &mdash; accepted formats, returned sections, and the full "Resume Guidelines for Improved Parsing Results" list<br>
+          <a href="https://doc.workday.com/admin-guide/en-us/human-capital-management/recruiting/candidates/set-up-prospects-and-candidates/hdc1552497830785.html">Concept: Resume Parsing</a> &mdash; the Languages and Skills exclusion, and the image guidance
+        </li>
+      </ul>
+    </div>
+
+    <div class="gp-cta gp-cta--primary">
+      <div class="gp-cta__body">
+        <p class="gp-cta__title">Check your resume against Workday's guidelines</p>
+        <p class="gp-cta__text">Every rule on this page is a check Resumeboard can run against your own file: text-layer presence, columns, tables, header and footer content, heading names, and the capitalisation of your name.</p>
+        <p class="gp-small gp-mt-4">Opens the builder. The check is under <span class="gp-hash">Check</span>, on the <span class="gp-hash">ATS</span> tab.</p>
+      </div>
+      <div class="gp-cta__actions">
+        <a class="gp-btn gp-btn--primary" href="../editor.html#start">Open the Workday check</a>
+        <a class="gp-btn gp-btn--secondary" href="../templates/classic.html">See the classic template</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="gp-foot">
+  <div class="gp-wrap">
+    <div class="gp-foot__grid">
+      <div>
+        <h2>Builder</h2>
+        <ul>
+          <li data-reveal><a href="../editor.html#start">Open Resumeboard</a></li>
+          <li data-reveal><a href="../editor.html#start">ATS check</a></li>
+          <li data-reveal><a href="../templates/index.html">Template gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>ATS guide</h2>
+        <ul>
+          <li data-reveal><a href="greenhouse.html">Greenhouse</a></li>
+          <li data-reveal><a href="workday.html">Workday</a></li>
+          <li data-reveal><a href="taleo.html">Oracle Taleo</a></li>
+          <li data-reveal><a href="lever.html">Lever</a></li>
+          <li data-reveal><a href="icims.html">iCIMS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Templates</h2>
+        <ul>
+          <li data-reveal><a href="../templates/classic.html">Classic</a></li>
+          <li data-reveal><a href="../templates/print-safe.html">Print-safe</a></li>
+          <li data-reveal><a href="../templates/academic.html">Academic</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="gp-foot__legal"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> · <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a> · Resumeboard is a static site with no analytics and no backend. Quotes are taken from the Workday documentation linked above; Workday changes its documentation, so check the source before relying on a detail. Resumeboard is not affiliated with Workday.</p>
+  </div>
+<p class="rb-foot__contact"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> <span aria-hidden="true">&middot;</span> <a href="../contact.html">Contact</a></p>
+</footer>
+
+<script src="../assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="../assets/js/motion.js?v=d639f64b7f"></script>
+</body>
+</html>

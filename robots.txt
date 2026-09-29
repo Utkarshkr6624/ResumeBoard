@@ -1,0 +1,13 @@
+# Resumeboard — https://resumeboard.app
+#
+# Every URL on this host is public and every page is meant to be indexed, so
+# nothing is blocked. Pages that should stay out of search results carry a
+# noindex tag instead: 404.html and test/smoke.html. A robots.txt Disallow
+# would be the wrong tool for those, because a URL that is blocked is never
+# fetched, so the crawler never sees the noindex and the page can still
+# appear in results as a bare link.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://resumeboard.app/sitemap.xml

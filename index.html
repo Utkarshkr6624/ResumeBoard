@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Free Resume Builder From LinkedIn | Resumeboard</title>
+<meta name="description" content="Paste your LinkedIn profile and get a complete, professional resume in seconds. Then edit every word. Free, no account, nothing ever leaves your browser.">
+<link rel="canonical" href="https://resumeboard.app/">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="theme-color" content="#4743e0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c1017" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Build your resume from your LinkedIn — free, in seconds">
+<meta property="og:description" content="Paste a profile, get a finished resume. Edit every word, export to PDF free, and nothing ever leaves your browser.">
+<meta property="og:url" content="https://resumeboard.app/">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard — a resume builder that runs in your browser">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Build your resume from your LinkedIn — free, in seconds">
+<meta name="twitter:description" content="Paste a profile, get a finished resume. Edit every word, export to PDF free, and nothing ever leaves your browser.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta name="twitter:image:alt" content="Resumeboard — a resume builder that runs in your browser">
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+
+<link rel="stylesheet" href="assets/css/tokens.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/base.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/site.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/motion.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/home.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/autofill.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/onboarding.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/a11y-fixes.css?v=d639f64b7f">
+<script>
+/* Build guard. A refresh can be served a cached copy of the page itself, which
+ * would leave the tab running assets from an older build. A literal here cannot
+ * be cached separately from this document, so a mismatch is a reliable signal
+ * that a reload is the right move. */
+(function(){
+  try {
+    var ID = 'd639f64b7f';
+    var prev = sessionStorage.getItem('rb:build');
+    if (prev === ID) return;
+    if (prev && !sessionStorage.getItem('rb:build-reloaded')) {
+      sessionStorage.setItem('rb:build-reloaded', '1');
+      sessionStorage.setItem('rb:build', ID);
+      location.reload();
+      return;
+    }
+    sessionStorage.setItem('rb:build', ID);
+  } catch (e) {}
+})();
+</script>
+<script src="assets/js/reset-guard.js?v=d639f64b7f"></script>
+</head>
+<body class="rb-home">
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="rb-nav" id="rb-nav">
+  <div class="rb-nav__inner">
+    <a class="rb-nav__brand" href="index.html" aria-label="Resumeboard, home">
+      <span class="rb-nav__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg>
+      </span>
+      <span class="rb-nav__word">Resumeboard</span>
+    </a>
+
+    <nav class="rb-nav__links" aria-label="Main">
+      <a href="templates/index.html">Templates</a>
+      <a href="examples/index.html">Examples</a>
+      <a href="guides/index.html">Guides</a>
+      <a href="ats/index.html">ATS guide</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <div class="rb-nav__end">
+      <div class="rb-sz-host" data-site-size></div>
+      <button class="rb-btn rb-btn--ghost rb-btn--icon" type="button" id="rb-theme-toggle" aria-label="Switch theme" data-tip="Switch theme"></button>
+      <a class="rb-btn rb-btn--secondary" href="editor.html#start">Editor</a>
+      <button class="rb-btn rb-btn--primary" type="button" data-build>Build my resume</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="rb-hero" aria-labelledby="rb-hero-title">
+    <div class="rb-hero__inner">
+      <div class="rb-hero__copy" data-reveal>
+        <p class="rb-eyebrow">
+          <span class="rb-eyebrow__dot" aria-hidden="true"></span>
+          Nothing is uploaded. There is no account.
+        </p>
+        <h1 class="rb-hero__title" id="rb-hero-title">
+          Paste your LinkedIn.<br>
+          Get a finished resume.
+        </h1>
+        <p class="rb-hero__lede">
+          Hand it a profile and Resumeboard writes the whole thing for you — name, contact, every job, every
+          school, every skill — then hands you an editor where you can rewrite any word of it.
+          Exports to PDF, Word, Markdown and plain text are free and never watermarked.
+        </p>
+
+        <div class="rb-hero__cta">
+          <button class="rb-btn rb-btn--primary rb-btn--lg rb-cta-main" type="button" data-build>
+            <svg class="rb-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"/></svg>
+            <span>Build my resume</span>
+          </button>
+          <a class="rb-btn rb-btn--secondary rb-btn--lg" href="editor.html#start">Open the editor</a>
+        </div>
+
+        <ul class="rb-hero__points">
+          <li data-reveal><svg class="rb-i rb-i--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Works from your LinkedIn data export</li>
+          <li data-reveal><svg class="rb-i rb-i--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Every word stays editable</li>
+          <li data-reveal><svg class="rb-i rb-i--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> PDF and Word export, free, no watermark</li>
+        </ul>
+      </div>
+
+      <div data-reveal aria-hidden="true">
+        <div class="rb-mock">
+          <div class="rb-mock__bar">
+            <span class="rb-mock__dots"><i></i><i></i><i></i></span>
+            <span class="rb-mock__file">Alex Rivera — Resume</span>
+            <span class="rb-mock__pill">Saved to this browser</span>
+          </div>
+          <div class="rb-mock__body">
+            <div class="rb-mock__rail">
+              <span class="is-on"></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="rb-mock__page">
+              <div class="rb-mock__name">Alex Rivera</div>
+              <div class="rb-mock__role">Senior Product Designer</div>
+              <div class="rb-mock__meta">alex.rivera@example.com · San Francisco, CA</div>
+              <div class="rb-mock__h">EXPERIENCE</div>
+              <div class="rb-mock__row"><b>Senior Product Designer</b><em>2021 – Present</em></div>
+              <div class="rb-mock__org">Northwind Labs</div>
+              <div class="rb-mock__li"></div><div class="rb-mock__li"></div><div class="rb-mock__li short"></div>
+              <div class="rb-mock__row"><b>Product Designer</b><em>2018 – 2021</em></div>
+              <div class="rb-mock__org">Cobalt Health</div>
+              <div class="rb-mock__li"></div><div class="rb-mock__li short"></div>
+              <div class="rb-mock__h">EDUCATION</div>
+              <div class="rb-mock__org">Rhode Island School of Design</div>
+            </div>
+            <div class="rb-mock__panel">
+              <div class="rb-mock__ptab is-on">Edit</div>
+              <div class="rb-mock__ptab">Design</div>
+              <div class="rb-mock__ptab">Check</div>
+              <div class="rb-mock__field"><span>Full name</span><b>Alex Rivera</b></div>
+              <div class="rb-mock__field"><span>Email</span><b>alex.rivera@example.com</b></div>
+              <div class="rb-mock__field is-focus"><span>Current role</span><b>Senior Product Designer</b></div>
+            </div>
+          </div>
+        </div>
+        <div class="rb-hero__glow" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rb-section" aria-labelledby="rb-how-title">
+    <div class="rb-wrap">
+      <h2 class="rb-h2" id="rb-how-title">Three steps, about a minute</h2>
+      <ol class="rb-steps" data-reveal-stagger>
+        <li data-reveal>
+          <span class="rb-steps__n">1</span>
+          <h3>Bring what you already wrote</h3>
+          <p>Paste your LinkedIn profile, drop in the data archive LinkedIn gives you, or upload a resume you already have. All of it is read in your browser.</p>
+        </li>
+        <li data-reveal>
+          <span class="rb-steps__n">2</span>
+          <h3>It writes the resume for you</h3>
+          <p>Every job, date, school and skill is pulled out and laid out properly. You get a review screen listing exactly what it found, and you can drop anything you do not want.</p>
+        </li>
+        <li data-reveal>
+          <span class="rb-steps__n">3</span>
+          <h3>Make it sound like you</h3>
+          <p>A profile page is not a resume. Click any line on the page and rewrite it. The coach flags weak bullets, missing numbers and clichés, and fixes them with one click.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="rb-section rb-section--sunken" aria-labelledby="rb-feat-title">
+    <div class="rb-wrap">
+      <h2 class="rb-h2" id="rb-feat-title">What you get</h2>
+      <p class="rb-sub">Everything below is free and unlimited. There is no pro tier to unlock and nothing to pay for.</p>
+
+      <div class="rb-cards" data-reveal-stagger>
+        <article class="rb-card2" data-reveal>
+          <h3>Auto-build from your profile</h3>
+          <p>The LinkedIn data export, a pasted profile, a link, or an old resume in Word, PDF, JSON or plain text. Whichever you have, it becomes a structured resume in one pass.</p>
+        </article>
+        <article class="rb-card2" data-reveal>
+          <h3>Edit the page itself</h3>
+          <p>Click any line in the preview and type. There is no form to fill in first, because that is the tedious part. A structured form view sits alongside it for anyone who prefers one.</p>
+        </article>
+        <article class="rb-card2" data-reveal>
+          <h3>Export everything, free</h3>
+          <p>PDF, Word, Markdown, plain text and JSON. No watermark, no page cap, no account. Plain text matters more than it sounds: it is what applicant tracking systems parse most reliably.</p>
+        </article>
+        <article class="rb-card2" data-reveal>
+          <h3>An honest ATS check</h3>
+          <p>Not a made-up percentage. A checklist of the things that actually break parsers, each with the line of your resume that triggered it, plus what Greenhouse, Workday, Taleo, Lever and iCIMS publicly document.</p>
+        </article>
+        <article class="rb-card2" data-reveal>
+          <h3>Match the job you are applying to</h3>
+          <p>Paste the posting. You get the terms it is searching for, split into ones you have, ones you have hidden, and ones you are missing — with a one-click fix for each.</p>
+        </article>
+        <article class="rb-card2" data-reveal>
+          <h3>It stays on your machine</h3>
+          <p>There is no server. Your resume lives in your browser's own storage. Clearing your browser data clears the resume, which is exactly why the JSON export exists.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="rb-section" aria-labelledby="rb-tpl-title">
+    <div class="rb-wrap">
+      <div class="rb-section__head">
+        <div>
+          <h2 class="rb-h2" id="rb-tpl-title">Templates that print well</h2>
+          <p class="rb-sub">Every template is built from the same design tokens, so they all stay readable at small sizes and all survive a photocopier. Pick one, change the colour, keep everything editable.</p>
+        </div>
+        <a class="rb-btn rb-btn--secondary" href="templates/index.html">See all templates</a>
+      </div>
+      <ul class="rb-tplrow" data-reveal-stagger>
+        <li data-reveal><a href="templates/classic.html"><span class="rb-tplrow__t">Classic</span><span class="rb-tplrow__d">One column, ruled headings. The safest choice there is.</span></a></li>
+        <li data-reveal><a href="templates/modern.html"><span class="rb-tplrow__t">Modern</span><span class="rb-tplrow__d">A little more air, a little more type.</span></a></li>
+        <li data-reveal><a href="templates/compact.html"><span class="rb-tplrow__t">Compact</span><span class="rb-tplrow__d">Fits more on one page without shrinking to nothing.</span></a></li>
+        <li data-reveal><a href="templates/executive.html"><span class="rb-tplrow__t">Executive</span><span class="rb-tplrow__d">Calmer spacing for senior roles.</span></a></li>
+        <li data-reveal><a href="templates/academic.html"><span class="rb-tplrow__t">Academic</span><span class="rb-tplrow__d">Built for CVs, with publications and grants.</span></a></li>
+        <li data-reveal><a href="templates/two-column.html"><span class="rb-tplrow__t">Two column</span><span class="rb-tplrow__d">Looks good, reads worse. Here is why.</span></a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="rb-section rb-section--sunken" id="faq" aria-labelledby="rb-faq-title">
+    <div class="rb-wrap rb-wrap--narrow">
+      <h2 class="rb-h2" id="rb-faq-title">Questions people actually ask</h2>
+
+      <details class="rb-faq">
+        <summary>Can it really read my LinkedIn?</summary>
+        <p>It reads your <em>data export</em>, not your profile page. LinkedIn's export is a file they email you after you request it from Settings, and we parse it in your browser. A profile page itself cannot be read by any website without being signed in, which is a deliberate choice on LinkedIn's part — so we do not pretend otherwise, and the export path is better anyway because it has every date and every entry.</p>
+      </details>
+      <details class="rb-faq">
+        <summary>How do I get the LinkedIn export?</summary>
+        <p>LinkedIn &rarr; Settings &amp; privacy &rarr; Data privacy &rarr; Get a copy of your data. Tick <em>Include profile data</em>, request the archive, and they email a download link. It arrives as a ZIP. Open the editor, choose <em>LinkedIn export</em>, and drop the file in.</p>
+      </details>
+      <details class="rb-faq">
+        <summary>Will it get past the filters?</summary>
+        <p>Nobody can promise that, including us. What we can do is tell you the failure modes that are actually documented — contact details sitting in a header, two-column layouts that scramble reading order, icon glyphs used as bullets, ambiguous dates, fonts a parser will not recognise — and show you the exact line that caused each one. The templates that are safest are marked as safest.</p>
+      </details>
+      <details class="rb-faq">
+        <summary>Is it really free?</summary>
+        <p>Yes, and not as a trial. PDF, Word, Markdown, plain text and JSON export have no watermark, no page limit and no account. There is no pro tier. That is a deliberate position: the export is the thing you already made, so charging for it would be charging you for your own work.</p>
+      </details>
+      <details class="rb-faq">
+        <summary>Where is my data?</summary>
+        <p>In your browser, in IndexedDB, and nowhere else. There is no server to send it to. If you clear browsing data you will lose it, so export a JSON backup before you do, or use a share link, which encodes the whole resume into the URL itself.</p>
+      </details>
+      <details class="rb-faq">
+        <summary>Can I move it to another computer?</summary>
+        <p>Export to JSON and import it there. It contains everything, it is plain text you can read and diff, and it round-trips losslessly. That is also the answer to being locked into any tool.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="rb-closer" aria-labelledby="rb-closer-title">
+    <div class="rb-wrap rb-wrap--narrow rb-closer__inner" data-reveal>
+      <h2 class="rb-h2" id="rb-closer-title">Go on, then</h2>
+      <p>You are two minutes from a finished resume.</p>
+      <button class="rb-btn rb-btn--primary rb-btn--lg" type="button" data-build>
+        <svg class="rb-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"/></svg>
+        <span>Build my resume</span>
+      </button>
+    </div>
+  </section>
+</main>
+
+<footer class="rb-foot">
+  <div class="rb-wrap rb-foot__inner">
+    <div class="rb-foot__brand">
+      <span class="rb-nav__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5M8 13h8M8 17h5"/></svg>
+      </span>
+      <a class="rb-nav__word" href="index.html">Resumeboard</a>
+    </div>
+    <nav class="rb-foot__links" aria-label="Footer">
+      <div>
+        <h2>Build</h2>
+        <a href="editor.html#start">Editor</a>
+        <a href="templates/index.html">Templates</a>
+        <a href="examples/index.html">Examples</a>
+      </div>
+      <div>
+        <h2>Learn</h2>
+        <a href="guides/index.html">Writing guides</a>
+        <a href="guides/action-verbs.html">Action verbs</a>
+        <a href="guides/quantifying-impact.html">Adding numbers</a>
+        <a href="guides/ats-formatting.html">ATS formatting</a>
+      </div>
+      <div>
+        <h2>ATS</h2>
+        <a href="ats/index.html">How they read resumes</a>
+        <a href="ats/greenhouse.html">Greenhouse</a>
+        <a href="ats/workday.html">Workday</a>
+        <a href="ats/taleo.html">Taleo</a>
+        <a href="ats/lever-and-greenhouse-comparison.html">Greenhouse vs Lever</a>
+      </div>
+      <div>
+        <h2>About</h2>
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </nav>
+    <p class="rb-foot__legal"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> · <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a> · 
+      Runs entirely in your browser. No account, no analytics, no cookies, no server.
+    </p>
+  </div>
+</footer>
+
+<div id="rb-overlay-root"></div>
+<div id="rb-toasts" class="rb-toasts" aria-live="polite"></div>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://resumeboard.app/#website",
+      "url": "https://resumeboard.app/",
+      "name": "Resumeboard",
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://resumeboard.app/#app",
+      "name": "Resumeboard",
+      "url": "https://resumeboard.app/editor.html",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Resume Builder",
+      "operatingSystem": "Any (web browser)",
+      "description": "A free resume builder that builds a complete resume from a pasted LinkedIn profile or data export, then lets you edit every word. Runs entirely in the browser; resumes are never uploaded. Export to PDF, DOCX, Markdown, plain text and JSON is free and unlimited.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "isAccessibleForFree": true
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://resumeboard.app/#faq",
+      "@comment": "Every name/text below is the verbatim rendered text of a <details> in the #faq section. Keep them in step: Google requires marked-up FAQ content to be visible on the page, and test/audit-final.js fails the build if it drifts.",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can it really read my LinkedIn?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It reads your data export, not your profile page. LinkedIn's export is a file they email you after you request it from Settings, and we parse it in your browser. A profile page itself cannot be read by any website without being signed in, which is a deliberate choice on LinkedIn's part — so we do not pretend otherwise, and the export path is better anyway because it has every date and every entry." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I get the LinkedIn export?",
+          "acceptedAnswer": { "@type": "Answer", "text": "LinkedIn → Settings & privacy → Data privacy → Get a copy of your data. Tick Include profile data, request the archive, and they email a download link. It arrives as a ZIP. Open the editor, choose LinkedIn export, and drop the file in." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will it get past the filters?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Nobody can promise that, including us. What we can do is tell you the failure modes that are actually documented — contact details sitting in a header, two-column layouts that scramble reading order, icon glyphs used as bullets, ambiguous dates, fonts a parser will not recognise — and show you the exact line that caused each one. The templates that are safest are marked as safest." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it really free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, and not as a trial. PDF, Word, Markdown, plain text and JSON export have no watermark, no page limit and no account. There is no pro tier. That is a deliberate position: the export is the thing you already made, so charging for it would be charging you for your own work." }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is my data?",
+          "acceptedAnswer": { "@type": "Answer", "text": "In your browser, in IndexedDB, and nowhere else. There is no server to send it to. If you clear browsing data you will lose it, so export a JSON backup before you do, or use a share link, which encodes the whole resume into the URL itself." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I move it to another computer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Export to JSON and import it there. It contains everything, it is plain text you can read and diff, and it round-trips losslessly. That is also the answer to being locked into any tool." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<script src="assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="assets/js/core/events.js?v=d639f64b7f"></script>
+<script src="assets/js/core/idb.js?v=d639f64b7f"></script>
+<script src="assets/js/core/model.js?v=d639f64b7f"></script>
+<script src="assets/js/core/store.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/icons.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/registry.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/ui.js?v=d639f64b7f"></script>
+<script src="assets/js/import/text.js?v=d639f64b7f"></script>
+<script src="assets/js/import/docx.js?v=d639f64b7f"></script>
+<script src="assets/js/export/json.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/autofill.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/onboarding.js?v=d639f64b7f"></script>
+<script src="assets/js/home.js?v=d639f64b7f"></script>
+<script src="assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="assets/js/motion.js?v=d639f64b7f"></script>
+  <div class="rb-contact" role="contentinfo" aria-label="Contact">
+    <span class="rb-contact__label">Built by</span>
+    <strong class="rb-contact__name">Utkarsh</strong>
+    <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>
+    <span class="rb-contact__dot" aria-hidden="true">&middot;</span>
+    <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </div>
+</body>
+</html>

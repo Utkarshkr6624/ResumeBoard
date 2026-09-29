@@ -1,0 +1,1722 @@
+/* Resumeboard — the resume document (assets/css/templates.css)
+ *
+ * This is the only stylesheet that touches #rb-doc. base.css owns the app
+ * chrome; nothing here may leak outside `.rb-doc`.
+ *
+ * ── UNITS ──────────────────────────────────────────────────────────────────
+ * Every measurement that lands inside the rendered page is pt or in. That is
+ * the whole point: 1pt in the preview must be 1pt on the printed sheet, so
+ * the export never reflows. The only px in this file is in viewport media
+ * query breakpoints, which describe the *window*, not the document.
+ *
+ * ── TOKENS (set by RB.templates.paint on #rb-doc, defaulted here) ──────────
+ * --rb-doc-font --rb-doc-size --rb-doc-leading --rb-doc-accent --rb-doc-rule
+ * --rb-doc-section-gap --rb-doc-entry-gap --rb-doc-margin --rb-doc-bullet
+ * --rb-doc-tracking --rb-doc-measure --rb-doc-columns --rb-doc-sidebar-width
+ * --rb-doc-page-size --rb-doc-photo-slot --rb-doc-print-safe
+ * --rb-doc-frame-pad --rb-doc-band-pad --rb-doc-bar-w --rb-doc-rail-col
+ * --rb-doc-date-col --rb-doc-card-gap --rb-doc-rail-pad
+ * (all consumed with var(x, fallback) so a partially configured document still
+ * renders)
+ *
+ * ── CLASS CONTRACT (emitted by assets/js/render/renderer.js) ───────────────
+ * #rb-doc.rb-doc
+ *   [data-template]     template id, e.g. "classic"
+ *   [data-pages]        number of .rb-page-sheet children
+ *   [data-cols]         "1" (default) | "2" — sidebar body
+ *   [data-heading]      "uppercase" (default) | "title" | "rule"
+ *   [data-bullet]       "disc" (default) | "square" | "circle" | "dash" | "none"
+ *   [data-page-size]    "Letter" (default) | "A4"
+ *   [data-print-safe]   "true" — strip every fill, for black-and-white output
+ *   [data-photo]        "on" — header carries a photo
+ *   [data-struct-*]     the shape axes: head, head-band, head-rules, sec,
+ *                       sec-head, number, entry, cards, body, side, ledger.
+ *                       Also written by RB.templates.paint, one attribute per
+ *                       axis, every one of them always present. §14 is the only
+ *                       thing in this file that reads them, and it never reads
+ *                       [data-template] — a template is a set of these values,
+ *                       never a selector.
+ *
+ *   div.rb-page-sheet[data-page]        one printed page
+ *     header.rb-doc__head
+ *     .rb-doc__id  > h1.rb-doc__name, p.rb-doc__label
+ *     .rb-doc__photo                     (photo slot, when [data-photo="on"])
+ *     ul.rb-doc__contact > li.rb-doc__contact-item > span.rb-doc__sep
+ *     ul.rb-doc__contact > li.rb-doc__contact-item > .rb-doc__place
+ *   .rb-doc__body
+ *     .rb-doc__side                      (sidebar column; display:contents in 1-col)
+ *     .rb-doc__main                      (primary column; display:contents in 1-col)
+ *       section.rb-section[data-section-id][data-section-type][data-cols]
+ *         h2.rb-section__head > span.rb-section__title
+ *         p.rb-prose__text                summary / prose paragraphs
+ *         .rb-entry.rb-entry--<type>[data-entry-id]
+ *             .rb-entry__head              (one baseline: title + dates)
+ *               .rb-entry__main
+ *                 h3.rb-entry__org[.rb-entry__org--position|--institution]
+ *                 span.rb-entry__role
+ *               span.rb-entry__when > .rb-dates > time.rb-doc-date
+ *             p.rb-entry__sub[.rb-entry__org-line]   company, issuer, url
+ *             .rb-role[data-role-id]                 nested role block
+ *             p.rb-entry__text.rb-prose__text
+ *             ul.rb-bullets > li.rb-bullets__item > span.rb-bullets__text
+ *             .rb-skill-group
+ *               h3.rb-skill-group__label
+ *               ul.rb-inline-list.rb-tags > li.rb-inline-list__item
+ *             ul.rb-bullets--plain > li.rb-doc-li[--pair]
+ *     .rb-doc__blank / p.rb-doc__blank-text / .rb-doc__error
+ *   Any editable node also carries .rb-field[data-bind] and may carry
+ *   [data-empty="true"][data-placeholder] and [data-invalid="true"].
+ *
+ *   A section's entries are its DIRECT children. A wrapper box there costs
+ *   RB.paginator one level of its descent, and with the two column
+ *   containers already in the way that level is what decides whether a
+ *   section taller than a page can be broken at an entry or has to be pushed
+ *   whole onto the next one.
+ *
+ *   NOTE ON uppercase: text-transform only changes pixels. An ATS reads text,
+ *   so the renderer must upper-case the heading *string* too. This stylesheet
+ *   guarantees it looks uppercase in every case; the renderer guarantees it
+ *   parses as uppercase.
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. DOCUMENT DEFAULTS
+   Re-declared locally so the page renders correctly on the very first paint,
+   before the renderer has written the design tokens.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-doc {
+  --rb-doc-size:         10.5pt;
+  --rb-doc-leading:      1.32;
+  --rb-doc-accent:       var(--rb-gray-900);
+  --rb-doc-section-gap:  14pt;
+  --rb-doc-entry-gap:    7pt;
+  --rb-doc-margin:       0.6in;
+  --rb-doc-bullet:       "•";
+  --rb-doc-rule:         0.6pt;
+  --rb-doc-tracking:     0em;
+  --rb-doc-font:         var(--rb-font-sans);
+
+  --rb-doc-page-w: 8.5in;
+  --rb-doc-page-h: 11in;
+
+  /* ── The type scale ──────────────────────────────────────────────────────
+   * Four tiers, all expressed as a multiple of --rb-doc-size so one slider
+   * rescales the whole document without breaking the hierarchy:
+   *
+   *   name     1.95x   the only thing on the page allowed to be large
+   *   heading  1.20x   a tier of its own — never body size with a bold face
+   *   title    1.04x   the entry's own line, the reader's next stop
+   *   body     1.00x   prose, bullets, skills
+   *
+   * The heading sits 15% clear of the entry title on purpose. At 1.10x the
+   * two were 6% apart: both bold, both dark, and a reader scanning the page
+   * saw one undifferentiated run of bold lines. The section heads are the
+   * only thing telling the reader where one block ends and the next begins,
+   * so they have to be the largest thing after the name.
+   *
+   * The tiers below body (0.90x, 0.86x) are metadata: dates, locations,
+   * contact. Metadata is small but never lighter than --_ink-soft, so it
+   * survives a grayscale print. */
+  --_name-size:  calc(var(--rb-doc-size) * 1.95);
+  --_label-size: calc(var(--rb-doc-size) * 1.12);
+  --_head-size:  calc(var(--rb-doc-size) * 1.20);
+  --_title-size: calc(var(--rb-doc-size) * 1.04);
+  --_body-size:  var(--rb-doc-size);
+  --_small:      calc(var(--rb-doc-size) * 0.90);
+  --_tiny:       calc(var(--rb-doc-size) * 0.84);
+
+  /* Uppercase caps want air around them; 0.1em is the least that still reads
+   * as a word rather than a row of letters. */
+  --_track-caps: calc(var(--rb-doc-tracking, 0em) + 0.1em);
+  --_track-mid:  calc(var(--rb-doc-tracking, 0em) + 0.045em);
+  --_track-name: calc(var(--rb-doc-tracking, 0em) - 0.018em);
+
+  --_hair:   max(var(--rb-doc-rule, 0.6pt), 0.6pt);
+  --_rule:   var(--_hair);
+  --_indent: calc(var(--rb-doc-size) * 1.05);
+  --_col-gap: calc(var(--rb-doc-size) * 1.5);
+
+  /* ── The two vertical rhythms ────────────────────────────────────────────
+   * The page is read as a list of sections made of entries made of lines.
+   * Three gaps carry that, and they have to stay in that ratio or the page
+   * stops being scannable:
+   *
+   *   entry gap    what separates one job from the next
+   *   section gap  what separates one kind of work from another
+   *   bullet gap   what separates one claim from the next  (fixed in §9)
+   *
+   * Both of the first two have a floor, for the same reason: they are
+   * relative to the type size, so a template that asks for a 4pt entry gap at
+   * 9.6pt would otherwise get one narrower than its own bullets and the
+   * reader would stop being able to tell where a job ends. The section floor
+   * is expressed as a multiple of the entry gap rather than of the type size,
+   * because "a new kind of work" has to read as a bigger jump than "a new job"
+   * by the same amount at every density. */
+  --_entry-gap:   max(var(--rb-doc-entry-gap, 7pt), calc(var(--rb-doc-size, 10.5pt) * 0.5));
+  --_section-gap: max(var(--rb-doc-section-gap, 14pt), calc(var(--_entry-gap) * 1.7));
+
+  /* ── The measure ─────────────────────────────────────────────────────────
+   * Set in em, not inches, so the character count per line holds steady as
+   * the reader changes the base size: 38em of Inter is about 78 characters at
+   * any point size, from 8pt to 13pt. 40em was 83 and a dense template was
+   * running past 90 — a line the eye cannot find the start of the next one
+   * on. The cap is a length, not a percentage, so a generous margin clamps it
+   * and a tight one does not: the column is always centred in the sheet, so
+   * narrowing the measure widens both margins evenly instead of leaving a
+   * lopsided gutter down the right edge.
+   *
+   * The em cap is only the ceiling. --rb-doc-measure lets a template ask for
+   * its own — Compact trades characters per line for a page that fits, and
+   * Minimal gives them up for air — without the stylesheet needing to know
+   * what any particular template is. */
+  --_measure: var(--rb-doc-measure, 38em);
+
+  --_photo-size: calc(var(--rb-doc-size) * 6.4);
+
+  /* Paper stays paper. The document is an artifact that gets exported and
+   * printed, so it does not invert with the app theme. The chrome around it
+   * is what adapts. */
+  --_paper:    var(--rb-gray-0);
+  --_ink:      var(--rb-gray-900);
+  --_ink-soft: var(--rb-gray-700);
+  --_ink-mute: var(--rb-gray-600);
+  --_ink-faint:var(--rb-gray-400);
+  --_accent:   var(--rb-doc-accent, var(--rb-gray-900));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. SCREEN PRESENTATION — stage, page frame, zoom
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-stage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: calc(var(--rb-doc-margin, 0.6in) / 2);
+}
+
+/* The frame is the viewport onto the sheets, not a sheet itself: it holds the
+ * whole stack, so the paper, the hairline and the shadow belong to the pages.
+ * Matched on `body #rb-page-frame` because base.css sets the frame's border at
+ * that specificity, and a hairline around a stack of pages would draw one box
+ * around all of them. */
+body #rb-page-frame {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.rb-page-frame {
+  position: relative;
+  width: var(--rb-doc-page-w, 8.5in);
+  min-height: 0;
+  /* zoom, not transform: it reflows the page box so multi-page previews and
+   * scroll extents stay honest. The zoom controller owns --rb-doc-zoom. */
+  zoom: var(--rb-doc-zoom, 1);
+}
+
+/* The gap between sheets exists only on screen. Print gets no gap, so the
+ * sheets stack edge to edge and each one lands on exactly one sheet of paper. */
+@media screen {
+  .rb-doc > .rb-page-sheet { margin-bottom: var(--_page-gap); }
+  .rb-doc > .rb-page-sheet:last-child { margin-bottom: 0; }
+}
+
+/* Narrow viewports: give up the literal sheet and reflow, so the app is
+ * usable at 360px. Physical page width is meaningless on a phone.
+ *
+ * Scoped to `screen` because an 8.5in sheet of paper is 816px wide and would
+ * match this query while printing: letting the phone measure rule into the
+ * printed page widens the column past the document measure, reflows every
+ * line, and moves every page break the preview just settled. Paper keeps the
+ * measure the screen showed.
+ *
+ * Every selector below is qualified with `body` on purpose. This block sits
+ * near the top of the file and the rules it has to cancel — the two-column
+ * grid, the measure on the head and the body — are further down at the same
+ * specificity, so at equal weight the later rule wins and the reflow never
+ * happened: a 360px screen kept two columns and set "EXPERIENCE" one letter
+ * per line. The extra element is what makes the reflow beat them wherever it
+ * ends up in the file. */
+@media screen and (max-width: 900px) {
+  .rb-stage { padding: var(--rb-space-4, 1rem); }
+  .rb-page-frame {
+    width: 100%;
+    min-height: 0;
+    zoom: 1;
+  }
+  body .rb-doc { min-height: 0; }
+  body .rb-doc[data-cols="2"] .rb-doc__body { display: block; }
+  body .rb-doc[data-cols="2"] .rb-doc__side {
+    display: block;
+    padding-right: 0;
+    border-right: 0;
+    margin-bottom: var(--_section-gap);
+  }
+  body .rb-doc[data-cols="2"] .rb-doc__main { display: block; }
+  body .rb-doc__head { max-width: none; margin-inline: 0; }
+  body .rb-doc__body { max-width: none; margin-inline: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. RESET + BASE TYPE
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-doc,
+.rb-doc *,
+.rb-doc *::before,
+.rb-doc *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rb-doc {
+  /* The air between two sheets of paper. Screen only — see the gap rule below. */
+  --_page-gap: 16pt;
+  display: block;
+  width: 100%;
+  min-height: 0;
+  /* The page box lives on the sheet, not on the flow root: the document is a
+   * stack of pages, so the margin, the paper and the page height all belong
+   * to the page. */
+  padding: 0;
+  background: transparent;
+  color: var(--_ink);
+  font-family: var(--rb-doc-font, var(--rb-font-sans));
+  font-size: var(--rb-doc-size, 10.5pt);
+  line-height: var(--rb-doc-leading, 1.32);
+  letter-spacing: var(--rb-doc-tracking, 0em);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Long URLs and long org names must not punch a hole in the column. */
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+  /* The document is a canvas, not a page of app: no accidental selection
+   * drag while the user is trying to click an entry. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3b. THE SHEET
+   One sheet is one page of paper: the full page height, the design margin as
+   its padding, and a page break after it. The height is a *minimum*, not a
+   cap, and nothing clips — a page that cannot be made to fit is taller than
+   a page, which is visible, rather than shorter with its tail cut off.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.rb-doc > .rb-page-sheet {
+  box-sizing: border-box;
+  /* The sheet is the page: its width is the page size, not the pane. Clamped
+   * to the pane so a narrow stage still fits, exactly as the frame is. */
+  width: min(100%, var(--rb-doc-page-w, 8.5in));
+  min-height: var(--rb-doc-page-h, 11in);
+  padding: var(--rb-doc-margin, 0.6in);
+  background: var(--_paper);
+  color: var(--_ink);
+  overflow: visible;
+  /* A hairline drawn as a shadow rather than a border: a border would eat
+   * into the page box and the content would no longer line up with the page
+   * geometry the paginator measured against. */
+  box-shadow: 0 0 0 1px var(--rb-gray-200), var(--rb-shadow-doc);
+  break-inside: avoid;
+  break-after: always;
+  page-break-after: always;
+}
+.rb-doc > .rb-page-sheet:last-child {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+/* A fitted preview. The renderer measures what ended up on each sheet and
+ * hands the number back as --rb-sheet-min-h, so a resume a fifth of a page
+ * long is drawn as the short page it is instead of a sheet of paper with a
+ * paragraph at the top. A sheet the renderer did not fit (a full page, or a
+ * phone preview) keeps the page height.
+ *
+ * Screen only, and only above the sheet breakpoint. Paper takes its geometry
+ * from @page — print.css clears the minimum outright, and nothing below this
+ * line should hand a print job a fraction of an inch of paper. Below 900px the
+ * sheet is already a continuous column with no paper edge, so a minimum is
+ * the wrong thing to be setting at all. */
+@media screen and (min-width: 901px) {
+  .rb-doc > .rb-page-sheet {
+    min-height: var(--rb-sheet-min-h, var(--rb-doc-page-h, 11in));
+  }
+}
+
+/* Below the sheet breakpoint the sheet reflows to the pane, so the printed
+ * 11in no longer means anything. It still has to read as a page, though: the
+ * renderer sets --rb-sheet-min-h to the page's own proportions at the width
+ * the sheet is actually rendered, and that is the floor. Dropping it to 0
+ * left a small white block floating in a tall dark stage. */
+@media screen and (max-width: 900px) {
+  .rb-doc > .rb-page-sheet {
+    /* Page proportions at the width the sheet is actually rendered, which is
+     * the same ratio the printed page has. Solved in CSS rather than measured
+     * in JS so it cannot miss on a slow frame. Content taller than the ratio
+     * overflows visibly instead of being clipped, so nothing is ever lost. */
+    min-height: 0;
+    aspect-ratio: 17 / 22;
+  }
+  .rb-doc[data-page-size="A4"] > .rb-page-sheet {
+    aspect-ratio: 210 / 297;
+    box-shadow: 0 0 0 1px var(--rb-gray-200), var(--rb-shadow-doc);
+  }
+}
+
+/* Text the user is allowed to select (a URL, a company name they are copying)
+ * opts back in. */
+.rb-doc .rb-selectable,
+.rb-doc a,
+.rb-doc .rb-field {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.rb-doc a {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 0.05em;
+}
+.rb-doc a:hover { text-decoration: underline; }
+
+.rb-doc strong, .rb-doc b { font-weight: 700; }
+.rb-doc em, .rb-doc i { font-style: italic; }
+.rb-doc small { font-size: var(--_small); }
+
+.rb-doc ul, .rb-doc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The renderer maps a glyph name onto --rb-doc-bullet. These are the fallback
+ * mappings for when it has not run yet. */
+.rb-doc[data-bullet="square"] { --rb-doc-bullet: "▪"; }
+.rb-doc[data-bullet="circle"] { --rb-doc-bullet: "○"; }
+.rb-doc[data-bullet="dash"]   { --rb-doc-bullet: "–"; }
+.rb-doc[data-bullet="none"]   { --rb-doc-bullet: none; --_indent: 0; }
+
+.rb-doc[data-page-size="Letter"] { --rb-doc-page-w: 8.5in;  --rb-doc-page-h: 11in; }
+.rb-doc[data-page-size="A4"]     { --rb-doc-page-w: 8.27in; --rb-doc-page-h: 11.69in; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. EDITING SURFACE
+   Inline editing is the primary interaction, so the affordance has to be
+   discoverable without being loud. Hover reveals, focus commits.
+   ═══════════════════════════════════════════════════════════════════════ */
+/* An editable node is a block when the renderer made it a block and inline
+ * when it made it a span: a field is often half of a sentence ("Bachelor of
+ * Fine Arts" + " in Graphic Design", or "Northwind Labs" + ", Inc."), and a
+ * blanket display:block turns those into one-field-per-line stacks. The
+ * element is the only signal for which it is, so the element is the selector.
+ */
+.rb-doc .rb-field {
+  min-height: 1em;
+  border-radius: 1pt;
+  outline: 0 solid transparent;
+  outline-offset: 0;
+  transition: background-color 120ms var(--rb-ease-out, ease),
+              outline-color 120ms var(--rb-ease-out, ease);
+}
+.rb-doc :is(div, p, h1, h2, h3, h4, h5, h6).rb-field { display: block; }
+.rb-doc :is(span, a, time, em, strong, b, i).rb-field { display: inline; }
+
+.rb-doc .rb-field:hover:not([contenteditable="false"]) {
+  background: var(--rb-gray-50);
+  outline: var(--_hair) dashed var(--rb-gray-300);
+}
+
+.rb-doc .rb-field:focus,
+.rb-doc .rb-field:focus-visible {
+  background: var(--rb-accent-50);
+  outline: var(--_hair) solid var(--rb-accent-400);
+}
+
+/* Placeholder. Suppressed in print — a printed hint is fabricated content. */
+.rb-doc .rb-field[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: var(--_ink-faint);
+  pointer-events: none;
+  font-style: italic;
+}
+.rb-doc .rb-field[data-empty="true"] { color: var(--_ink-mute); }
+.rb-doc .rb-field[data-empty="true"]:focus::before { color: var(--rb-accent-400); }
+
+.rb-doc .rb-field[data-invalid="true"] {
+  background: var(--rb-red-50);
+  outline-color: var(--rb-red-500);
+  text-decoration: underline wavy var(--rb-red-500) 0.5pt;
+  text-underline-offset: 0.18em;
+}
+.rb-doc .rb-field[contenteditable="false"] { cursor: default; }
+.rb-doc .rb-field[contenteditable]:not([contenteditable="false"]) { cursor: text; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-doc .rb-field { transition: none; }
+}
+
+/* Selection + focus echo from the rail / panel. */
+.rb-doc .rb-section[data-active="true"] { position: relative; }
+.rb-doc .rb-section[data-active="true"]::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--_section-gap) * -0.35) 0 auto 0;
+  height: var(--_hair);
+  background: var(--rb-accent-500);
+}
+.rb-doc [data-selected="true"] {
+  background: var(--rb-accent-50);
+  outline: var(--_hair) solid var(--rb-accent-300);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. HEADER BLOCK
+   Three things, three tiers, three different gaps: the name crowds its
+   headline, the headline breathes before the contact line, and the contact
+   line gets the most room before the rule. A single uniform gap flattens the
+   block into a list of unrelated strings.
+   ═══════════════════════════════════════════════════════════════════════ */
+/* Two rows, not one: name and headline on the first, the contact run on a
+ * full-width second row. Sharing a row starves the name — a 20pt name and a
+ * five-item contact line do not fit side by side on a 6in column, and flex
+ * resolves that by wrapping the name. flex-basis 100% on the contact list is
+ * what forces the break; the photo, ordered before it, keeps row one. */
+.rb-doc__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: var(--_col-gap);
+  row-gap: 0;
+  max-width: var(--_measure);
+  margin-inline: auto;
+  padding-bottom: calc(var(--rb-doc-size, 10.5pt) * 0.95);
+  margin-bottom: var(--_section-gap);
+  border-bottom: calc(var(--_hair) * 1.8) solid var(--_accent);
+}
+
+.rb-doc__id { flex: 1 1 auto; min-width: 0; order: 1; }
+
+.rb-doc__name {
+  font-size: var(--_name-size);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: var(--_track-name);
+  color: var(--_accent);
+  text-wrap: balance;
+}
+
+.rb-doc__label {
+  margin-top: 0.3em;
+  font-size: var(--_label-size);
+  line-height: 1.25;
+  font-weight: 400;
+  color: var(--_ink-soft);
+  letter-spacing: var(--_track-mid);
+  text-wrap: balance;
+}
+
+/* One clean line of contact: an inline run, not a row of boxes. The list takes
+ * a whole row of the header so the line runs the full measure under the name,
+ * and the items are inline so it breaks between facts rather than after each
+ * one. */
+/* The list itself is flex, though, and the items are plain flex items rather
+ * than an inline run: every item is nowrap (a phone number and a bare URL must
+ * not break), and nowrap on an inline run welds the whole line into one box
+ * that overflows the measure. Flex items stay atomic while the line still
+ * breaks *between* facts. */
+.rb-doc__contact {
+  order: 3;
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  row-gap: 0.12em;
+  margin-top: calc(var(--rb-doc-size, 10.5pt) * 1.05);
+  font-size: var(--_small);
+  line-height: 1.4;
+  color: var(--_ink-soft);
+}
+
+.rb-doc__contact-item { white-space: nowrap; }
+/* The separator is a text node inside the item it introduces, not a ::after
+ * rule: a text extractor then reads "email · phone" instead of one run-on
+ * string, and the non-breaking spaces bind the middot to the fact beside it so
+ * it can never be split off onto a line of its own. Do not add a ::after rule
+ * as well — the two together print two separators. */
+.rb-doc__sep { white-space: nowrap; }
+/* A contact item that opens a line has nothing on its left to be separated
+ * from. The renderer marks those items once the line boxes are known; the
+ * separator itself stays in the text, so extraction is unchanged. Do not add a
+ * ::after rule as well — the two together print two separators.
+ *
+ * Screen only. Those line boxes were measured against the preview, and the
+ * sheet re-wraps on paper: a sheet is 8.5in wide with no design margin once
+ * printed, so the preview's answer is not the sheet's. Hiding a mark the paper
+ * disagrees with is the worse error of the two — it turns
+ * "alex@example.com · +1 415 555 0142" into "alex@example.com+1 415 555 0142",
+ * which is both ugly and a corrupted line in the PDF text layer an ATS reads.
+ * On paper every separator shows, and the worst case is a middot opening a
+ * continuation line. The marks belong to the preview layout, so re-measuring
+ * them at print time belongs to the renderer that wrote them. */
+@media screen {
+  .rb-doc__sep[data-lead="true"] { display: none; }
+}
+.rb-doc__contact-item a { color: inherit; }
+.rb-doc__contact-item a:hover { color: var(--_accent); }
+.rb-doc__place { white-space: nowrap; }
+
+/* Scoped to `screen` for the same reason the 900px reflow is: these describe
+ * the window, not the paper. A letter sheet is 8.5in — 816px — so an unscoped
+ * 560px query would never fire on print, but an A4 sheet measured against a
+ * zoomed stage could, and the rule it fires changes the entry head. */
+@media screen and (max-width: 560px) {
+  /* A phone-width column cannot hold a title and a date range on one
+   * baseline: the title ends up one word per line. The range drops to its own
+   * line, left aligned, and the row stops competing for the measure. */
+  .rb-doc .rb-entry__head { flex-wrap: wrap; row-gap: 0; }
+  .rb-doc .rb-entry__when {
+    flex: 1 0 100%;
+    margin-left: 0;
+    text-align: left;
+  }
+}
+
+@media screen and (max-width: 460px) {
+  /* A bare URL has no space to break at, so nowrap alone runs it off the
+   * edge of a phone screen. */
+  .rb-doc__contact-item { white-space: normal; overflow-wrap: anywhere; }
+}
+
+/* Photo slot. Square, cropped, hairline-framed — present but never loud. */
+.rb-doc__photo,
+.rb-doc__photo img {
+  flex: 0 0 auto;
+  display: block;
+}
+.rb-doc__photo {
+  width: var(--_photo-size);
+  height: var(--_photo-size);
+  overflow: hidden;
+  background: var(--rb-gray-100);
+  border: var(--_hair) solid var(--rb-gray-200);
+  border-radius: 1pt;
+  object-fit: cover;
+  order: 2;
+}
+.rb-doc[data-photo-size="sm"] { --_photo-size: calc(var(--rb-doc-size) * 4.8); }
+.rb-doc[data-photo-size="lg"] { --_photo-size: calc(var(--rb-doc-size) * 7.6); }
+.rb-doc__photo--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--_small);
+  color: var(--_ink-faint);
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. SECTIONS + HEADINGS
+   The house heading is a bold, uppercase, standalone line over a hairline.
+   That is not a style preference — ATS parsers segment a resume on exactly
+   that signal, so it is the one treatment that must never be softened.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-doc__body {
+  display: block;
+  max-width: var(--_measure);
+  margin-inline: auto;
+}
+
+.rb-doc__side,
+.rb-doc__main { display: contents; }
+
+.rb-section { display: block; }
+.rb-section:not(:first-child) {
+  margin-top: var(--_section-gap);
+}
+
+.rb-section__head {
+  display: block;
+  margin: 0 0 calc(var(--rb-doc-size, 10.5pt) * 0.5);
+  font-size: var(--_head-size);
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--_accent);
+  /* Standalone line: never shares a row with the first entry, never floats
+   * next to it, so the text extractor sees heading-then-content. */
+  text-transform: uppercase;
+  letter-spacing: var(--_track-caps);
+  /* The rule is the other half of the treatment. It spans the full column and
+   * sits a fixed distance under the cap baseline so every section in the
+   * document lands on the same optical line. */
+  padding-bottom: calc(var(--rb-doc-size, 10.5pt) * 0.32);
+  border-bottom: var(--_rule) solid var(--_accent);
+  /* Orphan control: a heading is never the last thing on a page. */
+  break-after: avoid;
+  page-break-after: avoid;
+  break-inside: avoid;
+}
+/* The heading label is an inline editable run inside its own h2 — the
+ * heading is the block, the text is the content. */
+.rb-section__title { display: inline; }
+
+/* A section that ran out of room and continues on the next page. The heading
+ * is repeated — an entries block with nothing above it reads as a mistake —
+ * and it is inert, so the model still holds exactly one label per section. */
+.rb-section--continued .rb-section__head { cursor: default; }
+.rb-section--continued .rb-section__title { color: inherit; }
+
+/* Variant: title case — the heading stands on its own size and weight, with
+ * no rule. Modern documents read as one column of text broken by quiet lines;
+ * a rule here would put the page back in wireframe.
+ *
+ * `capitalize`, not `none`: the model seeds every section label with the
+ * upper-case SECTION_TYPE default, so `none` was rendering "PROFESSIONAL
+ * SUMMARY" on a template whose whole promise is a title-case heading. The
+ * transform is what puts the caps back to how the label was written. */
+.rb-doc[data-heading="title"] .rb-section__head {
+  text-transform: capitalize;
+  letter-spacing: var(--_track-mid);
+  font-size: calc(var(--_head-size) * 1.14);
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: calc(var(--rb-doc-size, 10.5pt) * 0.42);
+}
+
+/* Variant: a heavier rule under a title-case heading, for documents that want
+ * the section structure visible at a distance. Title case, not caps: the rule
+ * is already carrying the structure, and a title-case head over a rule is what
+ * keeps this treatment distinct from the plain uppercase one. */
+.rb-doc[data-heading="rule"] .rb-section__head {
+  text-transform: capitalize;
+  letter-spacing: var(--_track-mid);
+  font-size: calc(var(--_head-size) * 1.04);
+  border-bottom: calc(var(--_rule) * 1.8) solid var(--_accent);
+}
+
+/* Minimal wants neither the rule nor the shout: the smallest heading on the
+ * page, in the same quiet uppercase as a skill label. */
+.rb-doc[data-heading="title"][data-template="minimal"] .rb-section__head {
+  color: var(--_ink-soft);
+  font-size: var(--_label-size);
+  letter-spacing: var(--_track-caps);
+  text-transform: uppercase;
+}
+
+.rb-prose__text,
+.rb-entry__text {
+  font-size: var(--_body-size);
+  color: var(--_ink);
+  text-align: left;
+  hyphens: none;
+  orphans: 2;
+  widows: 2;
+}
+.rb-entry__text { margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.3); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. TWO-COLUMN SIDEBAR BODY
+   The DOM is identical in both modes: .rb-doc__side and .rb-doc__main are
+   display:contents, so switching templates is a single attribute flip.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-doc[data-cols="2"] {
+  /* Two columns halve the measure already; capping the whole sheet at the
+   * single-column em cap as well would leave a sidebar too narrow to hold a
+   * word. So the two-column body takes the full sheet and lets the column
+   * split do the measuring — the header above it spans the same width, which
+   * is what keeps the rule under the contact line aligned with the divider. */
+  --_measure: 100%;
+  --_side-w: max(var(--rb-doc-sidebar-width, 32%), 2.5in);
+}
+
+.rb-doc[data-cols="2"] .rb-doc__body {
+  display: grid;
+  /* max() guards the case where a two-column design is applied to a template
+   * that never declared a sidebar width (the token then reads "0%"). */
+  grid-template-columns: var(--_side-w) minmax(0, 1fr);
+  column-gap: var(--_col-gap);
+  /* Deliberately NOT align-items:start. The sidebar's hairline is a border on
+   * the grid item, so a start-aligned box ends the rule wherever the shorter
+   * column's content stops and leaves a stub hanging in the middle of the
+   * page. Stretching both items to the row height runs the divider the full
+   * way down, which is the convention every two-column layout uses. */
+  align-items: stretch;
+}
+
+/* A two-column design with nothing routed into the sidebar must not leave a
+ * dead sidebar-width gutter down the left. */
+.rb-doc[data-cols="2"] .rb-doc__body:not(:has(.rb-doc__side > *)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.rb-doc[data-cols="2"] .rb-doc__side:empty { display: none; }
+
+.rb-doc[data-cols="2"] .rb-doc__side,
+.rb-doc[data-cols="2"] .rb-doc__main {
+  display: block;
+  min-width: 0;
+}
+
+.rb-doc[data-cols="2"] .rb-doc__side {
+  padding-right: calc(var(--_col-gap) * 0.75);
+  border-right: var(--_hair) solid var(--rb-gray-200);
+}
+
+.rb-doc[data-cols="2"] .rb-doc__side .rb-doc__photo {
+  width: 100%;
+  aspect-ratio: 1;
+  height: auto;
+  margin-bottom: var(--_section-gap);
+  order: 0;
+}
+
+.rb-doc[data-cols="2"] .rb-doc__side > .rb-section:first-child,
+.rb-doc[data-cols="2"] .rb-doc__main > .rb-section:first-child { margin-top: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. ENTRIES
+   One line carries the title and the dates; both sit on the same baseline and
+   the dates are pinned to the right margin. The title wraps rather than
+   pushing the date, so a long job title can never collide with a date.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-entry {
+  display: block;
+  /* An entry is atomic. Splitting "Company / 2019 – 2022" across a page
+   * boundary is the single most common resume layout failure. */
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* The inter-entry gap must be *visibly* larger than the inter-bullet line
+ * gap, or the page reads as one undifferentiated block. Bullets get almost no
+ * extra spacing, so the --_entry-gap floor is the whole guarantee — it holds
+ * even if a user drags the gap slider to zero. */
+.rb-entry + .rb-entry,
+.rb-section > .rb-entry + .rb-entry,
+.rb-section > * + .rb-entry {
+  margin-top: var(--_entry-gap);
+}
+
+.rb-entry__head {
+  display: flex;
+  align-items: baseline;
+  column-gap: var(--_col-gap);
+  row-gap: 0;
+  min-width: 0;
+}
+
+.rb-entry__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.45em;
+}
+
+/* Organization, institution, award name, project name, position. */
+.rb-entry__org {
+  font-size: var(--_title-size);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--_ink);
+}
+
+/* Position, degree, issuer, study area. A qualifier under the title. */
+.rb-entry__role {
+  font-size: var(--_small);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--_ink-soft);
+}
+
+/* Dates. tabular-nums is set on .rb-doc, so a column of date ranges has its
+ * digits on the same vertical line. nowrap plus flex:0 0 auto means a long
+ * date range is never broken across two lines. */
+.rb-entry__when {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: var(--_small);
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--_ink-mute);
+  white-space: nowrap;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.rb-doc-present { font-style: italic; }
+.rb-date-sep { color: var(--_ink-faint); }
+
+.rb-entry__sub {
+  margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.12);
+  font-size: var(--_small);
+  line-height: 1.35;
+  color: var(--_ink-mute);
+}
+.rb-entry__org-line { font-size: var(--_small); }
+.rb-doc-mute { color: var(--_ink-mute); }
+.rb-doc-emphasis { color: var(--_ink-soft); font-weight: 600; }
+.rb-entry__org .rb-doc-emphasis { color: inherit; font-weight: 700; }
+
+.rb-role { display: block; }
+.rb-role + .rb-role {
+  margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.55);
+  padding-top: calc(var(--rb-doc-size, 10.5pt) * 0.45);
+  border-top: var(--_hair) dotted var(--rb-gray-200);
+}
+.rb-role > .rb-bullets,
+.rb-role > .rb-entry__text { margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.34); }
+
+.rb-entry--skills,
+.rb-entry--languages,
+.rb-entry--interests { break-inside: avoid; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. BULLETS
+   Hanging indent driven by --rb-doc-bullet: the marker is out of the text
+   flow, so a wrapped line returns to the text edge and not to the bullet.
+   Inter-bullet spacing is almost nothing — the line box alone separates them,
+   which is what makes the entry gap above read as a break.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-bullets { display: block; margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.34); }
+.rb-bullets + .rb-bullets { margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.3); }
+
+.rb-bullets__item {
+  position: relative;
+  padding-left: var(--_indent);
+  orphans: 2;
+  widows: 2;
+  break-inside: avoid;
+}
+/* Enough to tell two bullets apart without opening a paragraph between them. */
+.rb-bullets__item + .rb-bullets__item {
+  margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.16);
+}
+
+/* With the marker gone there is nothing left to tell one item from the next,
+ * so the spacing has to do the work the bullet was doing. */
+.rb-doc[data-bullet="none"] .rb-bullets__item + .rb-bullets__item {
+  margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.5);
+}
+
+.rb-bullets__item::before {
+  content: var(--rb-doc-bullet);
+  position: absolute;
+  left: 0;
+  top: 0.08em;
+  width: calc(var(--_indent) - 0.5em);
+  text-align: left;
+  color: var(--_accent);
+  font-weight: 400;
+}
+
+.rb-bullets--nested .rb-bullets__item { --_indent: calc(var(--_indent) - var(--rb-doc-size)); }
+.rb-bullets--nested { margin-left: var(--rb-doc-size); }
+
+/* A plain list (languages) is a definition row: label left, value right, no
+ * marker. A one-child item (interests) is a plain line and keeps its bullet. */
+.rb-bullets--plain { margin-top: 0; }
+.rb-bullets--plain > li + li { margin-top: 0; }
+.rb-bullets--plain > li:not(:has(> :only-child)) {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 0.6em;
+  padding-left: 0;
+  color: var(--_ink-mute);
+  font-size: var(--_small);
+}
+.rb-bullets--plain > li:not(:has(> :only-child)) .rb-doc-emphasis {
+  color: var(--_ink);
+  font-weight: 600;
+}
+.rb-bullets--plain > li:not(:has(> :only-child))::before { content: none; }
+
+/* An empty bullet still needs a line to click, but must not print. The
+ * renderer marks the placeholder with a class, not [data-empty]: nothing in the
+ * app sets that attribute, so a rule keyed on it never fires. */
+.rb-bullets__item[data-empty="true"]::before,
+.rb-bullets__item--empty::before { color: var(--rb-gray-300); }
+.rb-inline-list__item--empty { opacity: 0.6; }
+
+/* Inline comma-separated lists (keywords, courses). */
+.rb-inline-list {
+  display: block;
+  margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.16);
+  font-size: var(--_small);
+  color: var(--_ink-soft);
+}
+.rb-inline-list > li { display: inline; }
+.rb-inline-list > li:not(:last-child):not([data-empty="true"])::after { content: ", "; color: var(--_ink-faint); }
+/* Languages pair a term with a level; a middot separates the pairs so the
+ * comma inside "English — Native, Spanish — Professional" is not ambiguous. */
+.rb-lang-list > li:not(:last-child)::after { content: " \00B7 "; }
+
+/* A row inside a custom section is an entry of its own. */
+.rb-custom-row { display: block; break-inside: avoid; }
+.rb-custom-row + .rb-custom-row { margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.5); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10. SKILL GROUPS + TAGS
+   A skill group is a caption and a list, not a heading and a paragraph: the
+   caption is set in the same uppercase treatment as a section heading, one
+   step down, so the eye reads "Tools: Figma, FigJam…" as a unit.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-skill-group {
+  display: block;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+/* Consecutive skill groups sit inside one entry, so they take a step less
+ * than two separate entries do — the third step in the same rhythm. */
+.rb-skill-group + .rb-skill-group {
+  margin-top: calc(var(--_entry-gap) * 0.8);
+}
+
+.rb-skill-group__label {
+  display: block;
+  font-size: var(--_tiny);
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: var(--_track-caps);
+  color: var(--_accent);
+}
+
+.rb-badge {
+  display: inline-block;
+  margin-left: 0.5em;
+  padding: 0 0.4em;
+  border: var(--_hair) solid currentColor;
+  border-radius: 2pt;
+  font-size: var(--_tiny);
+  font-weight: 400;
+  letter-spacing: var(--_track-mid);
+  text-transform: none;
+  vertical-align: 0.08em;
+}
+
+/* Inline flow, not flex: a flex row of nowrap items wraps raggedly in the
+ * narrow sidebar column, because every item claims a whole flex line. */
+.rb-tags {
+  display: block;
+  margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.14);
+  font-size: var(--_body-size);
+  color: var(--_ink-soft);
+}
+
+.rb-tag,
+.rb-inline-list__item { display: inline; font-size: inherit; color: inherit; }
+.rb-tag:not(:last-child):not([data-empty="true"])::after {
+  content: ", ";
+  color: var(--_ink-faint);
+}
+
+/* A skill level meter, if the renderer draws one. Outline only, no fill, so
+ * it survives a black-and-white print. */
+.rb-skill-meter {
+  display: inline-block;
+  width: calc(var(--rb-doc-size) * 2.6);
+  height: calc(var(--rb-doc-size) * 0.42);
+  margin-left: 0.4em;
+  border: var(--_hair) solid var(--rb-gray-300);
+  vertical-align: baseline;
+  overflow: hidden;
+}
+.rb-skill-meter > i {
+  display: block;
+  height: 100%;
+  background: var(--_accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11. EMPTY + ERROR STATES
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-doc__blank {
+  max-width: var(--_measure);
+  margin: calc(var(--rb-doc-size, 10.5pt) * 1.6) auto 0;
+  padding: calc(var(--rb-doc-size, 10.5pt) * 1.4) 0;
+  border-top: var(--_hair) solid var(--rb-gray-200);
+  text-align: center;
+}
+.rb-doc__blank-text {
+  max-width: 34em;
+  margin-inline: auto;
+  color: var(--_ink-mute);
+  font-size: var(--_label-size);
+  line-height: 1.5;
+}
+.rb-doc__blank-action { margin-top: calc(var(--rb-doc-size, 10.5pt) * 0.9); }
+.rb-doc__error { color: var(--rb-red-700); font-size: var(--_small); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   12. PRINT-SAFE VARIANT
+   Strips every fill, hue and editor affordance. The rules are the structure,
+   so they are kept — and thickened, because a rule that is legible on screen
+   at 0.6pt is a hairline that vanishes on a laser printer. Applies live so
+   the preview matches the sheet, and is re-asserted under @media print.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-doc[data-print-safe="true"] {
+  --_paper:    var(--rb-gray-0);
+  --_ink:      var(--rb-gray-950);
+  --_ink-soft: var(--rb-gray-800);
+  --_ink-mute: var(--rb-gray-700);
+  --_ink-faint:var(--rb-gray-500);
+  --_accent:   var(--rb-gray-950);
+  --_hair:     max(var(--rb-doc-rule, 0.6pt), 0.9pt);
+  --_rule:     max(var(--rb-doc-rule, 0.6pt), 0.9pt);
+  print-color-adjust: economy;
+  -webkit-print-color-adjust: economy;
+}
+
+.rb-doc[data-print-safe="true"] .rb-doc__photo {
+  background: none;
+  border: 0;
+}
+.rb-doc[data-print-safe="true"] .rb-field,
+.rb-doc[data-print-safe="true"] [data-selected="true"],
+.rb-doc[data-print-safe="true"] .rb-bullets__item[data-empty="true"]::before {
+  background: none !important;
+  outline: 0 !important;
+  text-decoration: none;
+}
+.rb-doc[data-print-safe="true"] .rb-field[data-empty="true"]::before { content: none; }
+.rb-doc[data-print-safe="true"] .rb-field:empty::before { content: none !important; }
+.rb-doc[data-print-safe="true"] .rb-bullets__item::before { color: var(--_ink-soft); }
+.rb-doc[data-print-safe="true"] .rb-badge { border-color: var(--_ink-soft); }
+.rb-doc[data-print-safe="true"] .rb-skill-meter { border-color: currentColor; }
+.rb-doc[data-print-safe="true"] .rb-skill-meter > i { background: currentColor; }
+.rb-doc[data-print-safe="true"] .rb-section[data-active="true"]::before { display: none; }
+.rb-doc[data-print-safe="true"] .rb-doc__side { border-right-color: var(--_ink-soft); }
+/* A placeholder bullet and the empty-state prompt are editing furniture. On
+ * paper they are content nobody wrote. */
+.rb-doc[data-print-safe="true"] .rb-bullets__item--empty { display: none; }
+.rb-doc[data-print-safe="true"] .rb-doc__blank { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   13. PRINT
+   @page cannot read custom properties, so the two sheet sizes are named pages
+   selected by the `page` property on the document root.
+   ═══════════════════════════════════════════════════════════════════════ */
+@page {
+  margin: 0;
+}
+@page rb-letter {
+  size: 8.5in 11in;
+}
+@page rb-a4 {
+  size: 8.27in 11.69in;
+}
+
+/* A named page is established by the ROOT box, not by a descendant, so these
+ * alone are not enough — the sheet size is read from the page the root lands
+ * on. These hoist the choice up to <html>; the rules on .rb-doc above stay so
+ * the size still tracks the document when it is rendered in isolation. */
+@media print {
+  html:has(.rb-doc[data-page-size="A4"])     { page: rb-a4; }
+  html:has(.rb-doc[data-page-size="Letter"]) { page: rb-letter; }
+}
+
+@media print {
+  /* body's background propagates to the print canvas, so a dark theme would
+   * otherwise burn a full sheet of toner on every page. */
+  html, body {
+    background: var(--rb-gray-0) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  /* On screen the page box lives on the sheet; on paper it has to move to
+   * @page, which is where the design margin already is. The flow root is left
+   * as a plain block either way, so print.css's "the margin is padding on
+   * #rb-doc" rule cannot add a second one. Matched on `body #rb-doc` so it
+   * outranks print.css. */
+  body #rb-doc {
+    display: block !important;
+    width: auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  body #rb-doc > .rb-page-sheet {
+    width: auto !important;
+    /* The page break is carried by break-after, so a sheet is exactly as tall
+     * as the content it was measured to hold. Nothing here can round a sheet
+     * up onto a page of its own. */
+    min-height: 0 !important;
+    height: auto !important;
+    border-radius: 0;
+    box-shadow: none !important;
+    break-inside: auto;
+  }
+  /* The PDF exporter writes `@page { size; margin }` and that stylesheet is in
+   * the document from boot, so a sheet that carried its own margin would print
+   * it twice and every page would spill onto a second sheet of paper. */
+  body #rb-doc > .rb-page-sheet { padding: 0 !important; }
+  /* Only the document should reach paper. `#rb-app` is the editor's own
+   * wrapper and has to survive this filter, or the whole app — the document
+   * included — is display:none on paper and every print comes out blank. The
+   * pitch that lives inside it is still chrome, so it is named here rather
+   * than left to reach the page. */
+  body > *:not(#rb-app):not(#rb-shell):not(#rb-toasts):not(#rb-overlay-root) { display: none !important; }
+  .rb-intro { display: none !important; }
+  #rb-shell > *:not(#rb-main) { display: none !important; }
+  #rb-main { display: block !important; overflow: visible !important; height: auto !important; }
+  #rb-toolstrip, #rb-statusbar { display: none !important; }
+  #rb-stage {
+    display: block !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: none !important;
+  }
+  .rb-page-frame {
+    width: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    /* Any leftover preview zoom would shrink the printed sheet. */
+    zoom: 1 !important;
+    transform: none !important;
+  }
+
+  .rb-doc {
+    min-height: 0;
+    box-shadow: none;
+    background: var(--_paper, var(--rb-gray-0));
+    color: var(--rb-gray-950);
+    /* Editing affordances are chrome, not content. */
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* The name and the headline are content, and print.css lists .rb-doc__id
+   * among the machine-readable blocks it suppresses — it is not one. Without
+   * this the printed sheet and the exported PDF both open on a contact line
+   * with no name above it. Matched on `body #rb-doc` to outrank that
+   * `#rb-doc .rb-doc__id` rule; the fix belongs in print.css, which owns the
+   * suppression list, but the document stylesheet is what has to keep its own
+   * header on the paper. */
+  body #rb-doc .rb-doc__id { display: block !important; }
+
+  /* The paper is 8.5in — 816px — so a letter print job falls inside the 900px
+   * phone rules that app.css keys on to stack the contact line one fact per
+   * line. On screen that reflow is right; on paper it is five extra lines in
+   * the middle of the header and separators stripped from the text layer,
+   * which is how a resume ends up printing as
+   * "alex@example.com+1 415 555 0142". The rules those two files key on are
+   * about the window, so the document hands its own contact line back for
+   * print. `[data-lead]` still wins: the renderer marks a separator that opens
+   * a line, and the paper wraps on its own terms. */
+  body #rb-doc .rb-doc__contact {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    row-gap: 0.12em !important;
+  }
+  body #rb-doc .rb-doc__contact-item {
+    display: inline !important;
+    white-space: nowrap !important;
+  }
+  /* Every separator, not just the unmarked ones. At a phone-width preview the
+   * renderer marks all of them, and a `:not([data-lead])` guard would restore
+   * none on a paper that re-wraps them anyway. */
+  body #rb-doc .rb-doc__sep { display: inline !important; }
+
+  .rb-doc .rb-field,
+  .rb-doc .rb-bullets__item[data-empty="true"],
+  .rb-doc [data-selected="true"] {
+    background: none !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    text-decoration: none;
+  }
+  .rb-doc .rb-field[data-invalid="true"] { text-decoration: none; }
+  /* The binder injects `[data-placeholder]:empty::before { content: … }` into
+   * the document at runtime, so suppressing placeholders has to key on :empty
+   * and win on importance — a printed "Achievement" hint is fabricated content. */
+  .rb-doc .rb-field:empty::before { content: none !important; }
+  .rb-doc .rb-bullets__item--empty,
+  .rb-doc .rb-inline-list__item--empty,
+  .rb-doc .rb-doc__blank { display: none; }
+  .rb-doc .rb-section[data-active="true"]::before { display: none !important; }
+  .rb-doc a { text-decoration: none; color: inherit; }
+  .rb-doc a[href]::after { content: none; }
+  /* No blue underlined links on a printed page. */
+  .rb-doc a:link, .rb-doc a:visited { color: inherit; }
+
+  /* No widows, no orphans, no split entries, no orphaned headings. */
+  .rb-doc p, .rb-doc li, .rb-doc .rb-entry__sub { orphans: 2; widows: 2; }
+  .rb-doc .rb-entry,
+  .rb-doc .rb-role,
+  .rb-doc .rb-skill-group,
+  .rb-doc .rb-skill-meter,
+  .rb-doc .rb-bullets__item { break-inside: avoid; page-break-inside: avoid; }
+
+  .rb-doc .rb-section__head {
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+  }
+  /* ...but the last heading must not force a trailing blank page. */
+  .rb-doc .rb-section:last-child .rb-section__head { break-after: auto; page-break-after: auto; }
+  .rb-doc__main > :last-child { break-after: auto; page-break-after: auto; }
+  .rb-doc__head { break-inside: avoid; page-break-inside: avoid; }
+  .rb-doc__photo { break-inside: avoid; page-break-inside: avoid; }
+
+  /* Keep the grid rows from splitting a column across a page break. */
+  .rb-doc[data-cols="2"] .rb-doc__body { display: grid; align-items: stretch; }
+  .rb-doc[data-cols="2"] .rb-doc__side,
+  .rb-doc[data-cols="2"] .rb-doc__main { display: block; }
+
+  .rb-doc .rb-field { transition: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   14. TEMPLATE STRUCTURE
+   A template is a token preset. Everything above this line is a number —
+   a point size, a measure, a gap — and the nine original templates are all
+   made of numbers. A layout is not a number. A rail down the left, a line
+   through the entries, cards instead of a stack: those are arrangements, and
+   an arrangement has to be named.
+
+   So each axis is a small closed set of shapes, declared once in
+   assets/js/render/templates.js and painted onto #rb-doc as data-struct-head,
+   -head-band, -head-rules, -sec, -number, -entry, -cards, -body, -side and
+   -ledger. Everything below is ONE generic rule per axis, keyed on the shape
+   and never on [data-template]. A template nobody has seen cannot grow a
+   selector of its own: adding one is adding an object to the registry and
+   nothing else.
+
+   Every axis defaults to the plain single-column treatment, so the nine
+   original templates render exactly as they did — which is why the defaults
+   below are written as the shipped values rather than as `none`.
+
+   The house rules hold through all of them: a section heading is a standalone
+   line, the DOM order is the reading order, there is no table and no text box,
+   and the gap between two jobs stays visibly wider than the gap between two
+   bullets. A card grid and a two-column body are the only shapes that put more
+   than one column of text on the sheet.
+   ═══════════════════════════════════════════════════════════════════════ */
+.rb-doc {
+  /* Lengths a shape needs but a shape name cannot carry. */
+  --_frame-pad: var(--rb-doc-frame-pad, 6pt);
+  --_band-pad:  var(--rb-doc-band-pad, 11pt);
+  --_bar-w:     var(--rb-doc-bar-w, 3pt);
+  --_rail-col:  var(--rb-doc-rail-col, 9em);
+  --_date-col:  var(--rb-doc-date-col, 9.5em);
+  --_card-gap:  var(--rb-doc-card-gap, 8pt);
+  --_rail-pad:  var(--rb-doc-rail-pad, 1.2em);
+
+  /* Derived from the accent, never hardcoded: a template changes its accent in
+   * the Design panel and every band, tint and bar follows it. The fill is mixed
+   * toward the darkest neutral so light type on it stays legible whatever hue
+   * the user picks — the band is a ground, not a colour statement. */
+  --_band-fill: color-mix(in srgb, var(--_accent, var(--rb-gray-900)) 76%, var(--rb-gray-950));
+  --_tint:      color-mix(in srgb, var(--_accent, var(--rb-gray-900)) 8%, var(--_paper));
+  --_on-band:   var(--_paper);
+  --_on-band-soft: color-mix(in srgb, var(--_paper) 78%, var(--_band-fill));
+}
+
+/* ── 14a. The rules around the header ───────────────────────────────────── */
+.rb-doc[data-struct-head-rules="none"] .rb-doc__head {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.rb-doc[data-struct-head-rules="double"] .rb-doc__head {
+  border-bottom: calc(var(--_hair) * 3) double var(--_accent);
+}
+.rb-doc[data-struct-head-rules="heavy"] .rb-doc__head {
+  border-bottom: calc(var(--_hair) * 2.6) solid var(--_accent);
+}
+
+/* A band across the head. The negative margin is the page margin, so the band
+   runs the full width of the sheet while its text still lines up with the
+   measure — that alignment is the whole reason it is a band and not a box. */
+.rb-doc[data-struct-head-band="fill"] .rb-doc__head,
+.rb-doc[data-struct-head-band="tint"] .rb-doc__head {
+  margin-inline: calc(-1 * var(--rb-doc-margin, 0.6in));
+  padding: var(--_band-pad) var(--rb-doc-margin, 0.6in);
+  max-width: none;
+  border-bottom: 0;
+  padding-bottom: var(--_band-pad);
+}
+.rb-doc[data-struct-head-band="tint"] .rb-doc__head { background: var(--_tint); }
+.rb-doc[data-struct-head-band="fill"] .rb-doc__head {
+  background: var(--_band-fill);
+  color: var(--_on-band);
+}
+/* Everything in a filled band is set in reverse out. The name takes its colour
+   from the accent, which on a filled band is the band itself, so it has to be
+   handed the band's ink explicitly rather than inheriting. */
+.rb-doc[data-struct-head-band="fill"] .rb-doc__name { color: var(--_on-band); }
+.rb-doc[data-struct-head-band="fill"] .rb-doc__label,
+.rb-doc[data-struct-head-band="fill"] .rb-doc__contact {
+  color: var(--_on-band-soft);
+}
+.rb-doc[data-struct-head-band="fill"] .rb-doc__contact-item,
+.rb-doc[data-struct-head-band="fill"] .rb-doc__sep,
+.rb-doc[data-struct-head-band="fill"] .rb-doc__place,
+.rb-doc[data-struct-head-band="fill"] .rb-doc__contact-item a {
+  color: inherit;
+}
+
+/* ── 14b. Header arrangements ───────────────────────────────────────────── */
+/* Centred: one column, everything centred on the measure. The contact list
+   stays a flex row so it still breaks between facts, it just centres. */
+.rb-doc[data-struct-head="center"] .rb-doc__head {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.rb-doc[data-struct-head="center"] .rb-doc__id,
+.rb-doc[data-struct-head="center"] .rb-doc__contact { align-self: center; }
+.rb-doc[data-struct-head="center"] .rb-doc__contact { justify-content: center; }
+.rb-doc[data-struct-head="center"] .rb-doc__name,
+.rb-doc[data-struct-head="center"] .rb-doc__label {
+  text-align: center;
+  text-wrap: balance;
+}
+.rb-doc[data-struct-head="center"] .rb-doc__photo {
+  order: -1;
+  align-self: center;
+  margin-bottom: calc(var(--rb-doc-size) * 0.6);
+}
+
+/* Inline: the name and the headline share one baseline, separated by a
+   middot drawn by the stylesheet. The label is a sibling of the name in the
+   DOM either way, so nothing about the reading order changes; what changes is
+   that a reader gets the qualification in the same glance as the name, which
+   is the whole point on a trade or agency page where that is the first
+   question. Baseline alignment rather than top alignment, so a 2x name and a
+   1.1x headline still sit on one line instead of drifting apart. */
+.rb-doc[data-struct-head="inline"] .rb-doc__id {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.55em;
+  row-gap: 0.1em;
+}
+.rb-doc[data-struct-head="inline"] .rb-doc__label { margin-top: 0; }
+.rb-doc[data-struct-head="inline"] .rb-doc__label::before {
+  content: " · ";
+  color: var(--_ink-faint);
+}
+
+/* Caps: the name set in capitals. Tracking stays at the document's own value
+   rather than being opened up here — a tracked name is a leaf run of text, and
+   an extractor reads a tracked run as separate glyphs. */
+.rb-doc[data-struct-head="caps"] .rb-doc__name {
+  text-transform: uppercase;
+  letter-spacing: calc(var(--rb-doc-tracking, 0em) + 0.01em);
+}
+
+/* Triptych: the identity block cut into three bands — the name, the headline
+   under a rule, the contact run under another. `display: contents` on the id
+   block is what makes the name and the headline grid items in their own right,
+   so the rules can land between the two. */
+.rb-doc[data-struct-head="triptych"] .rb-doc__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--_col-gap);
+  row-gap: 0;
+  align-items: start;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.rb-doc[data-struct-head="triptych"] .rb-doc__id { display: contents; }
+.rb-doc[data-struct-head="triptych"] .rb-doc__name { grid-column: 1; grid-row: 1; }
+.rb-doc[data-struct-head="triptych"] .rb-doc__label {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: 0.2em;
+  padding-top: 0.32em;
+  border-top: var(--_rule) solid var(--_accent);
+}
+.rb-doc[data-struct-head="triptych"] .rb-doc__photo {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  order: 0;
+}
+.rb-doc[data-struct-head="triptych"] .rb-doc__contact {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  align-self: stretch;
+  margin-top: 0;
+  padding: 0.42em 0 0.5em;
+  border-top: var(--_rule) solid var(--_accent);
+  border-bottom: var(--_rule) solid var(--_accent);
+}
+
+/* ── 14c. Section shapes ────────────────────────────────────────────────── */
+/* A bar down the left of each section. The section is inset by the bar's width
+   so the heading and the entries it introduces still share an edge. */
+.rb-doc[data-struct-sec="bar"] .rb-section {
+  padding-left: var(--_bar-w);
+  border-left: var(--_bar-w) solid var(--_accent);
+}
+.rb-doc[data-struct-sec="bar"] .rb-section__head {
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: calc(var(--rb-doc-size) * 0.42);
+}
+
+/* A panel per section. The heading is still the first line inside the panel —
+   a box drawn around a section puts nothing on the heading's own row. */
+.rb-doc[data-struct-sec="box"] .rb-section,
+.rb-doc[data-struct-sec="tint"] .rb-section {
+  padding: var(--_frame-pad);
+  border-radius: 2pt;
+}
+.rb-doc[data-struct-sec="box"] .rb-section {
+  border: var(--_rule) solid var(--rb-gray-200);
+  background: var(--rb-gray-25);
+}
+.rb-doc[data-struct-sec="tint"] .rb-section {
+  border-left: calc(var(--_hair) * 2.2) solid var(--_accent);
+  background: var(--_tint);
+}
+.rb-doc[data-struct-sec="box"] .rb-section:first-child,
+.rb-doc[data-struct-sec="tint"] .rb-section:first-child { margin-top: 0; }
+
+/* Numbered sections. The counter is drawn, not typed, so it is decoration: it
+   never reaches the text layer, which is why the template's own description
+   says so. The heading keeps its own line and its own rule. */
+.rb-doc[data-struct-number="decimal"] .rb-doc__body { counter-reset: rb-sec; }
+.rb-doc[data-struct-number="decimal"] .rb-section__head { counter-increment: rb-sec; }
+.rb-doc[data-struct-number="decimal"] .rb-section__head::before {
+  content: counter(rb-sec, decimal-leading-zero);
+  display: inline-block;
+  min-width: 1.9em;
+  margin-right: 0.1em;
+  color: var(--_ink-faint);
+  font-weight: 400;
+  font-size: 0.8em;
+  vertical-align: 0.15em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Quiet: a section heading set as one line of label sitting on top of its
+   content — body size, muted, no rule, almost no space between it and what it
+   introduces. The heading keeps its own line and its own weight, so the signal
+   a parser segments on survives; only the size that made it a second tier of
+   the type scale is given up. A heading is a label here, not a banner. */
+.rb-doc[data-struct-sec-head="quiet"] .rb-section__head {
+  font-size: var(--_label-size);
+  font-weight: 700;
+  color: var(--_ink-soft);
+  text-transform: uppercase;
+  letter-spacing: var(--_track-caps);
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: calc(var(--rb-doc-size, 10.5pt) * 0.2);
+}
+/* The title-case variant in §6 is one selector and one rule behind this one at
+   the same weight, so `capitalize` there is corrected here rather than fought:
+   the quiet heading is a caps label whatever the heading style says. */
+.rb-doc[data-struct-sec-head="quiet"][data-heading="title"] .rb-section__head { text-transform: uppercase; }
+
+/* ── 14d. Entry shapes ──────────────────────────────────────────────────── */
+/* A hairline between jobs and nothing else. The gap moves into the padding so
+   a divider can never collapse the space a reader needs to see where one job
+   ends — the --_entry-gap floor still applies to it. */
+.rb-doc[data-struct-entry="hair"] .rb-section > .rb-entry + .rb-entry,
+.rb-doc[data-struct-entry="hair"] .rb-section > * + .rb-entry {
+  margin-top: 0;
+  padding-top: var(--_entry-gap);
+  border-top: var(--_hair) solid var(--rb-gray-200);
+}
+
+/* A box per entry — a card, and with cards:'on', two to a row. */
+.rb-doc[data-struct-entry="box"] .rb-section > .rb-entry {
+  padding: var(--_frame-pad);
+  border: var(--_rule) solid var(--rb-gray-200);
+  border-radius: 2pt;
+  background: var(--rb-gray-25);
+}
+
+/* A timeline: a hairline down the section and a node at every job. The line is
+   a border on the section and the node a drawn disc on the entry head, so
+   neither is a character and neither reaches the text layer. Only sections that
+   hold entries get a line — a rule hanging beside a summary paragraph is a
+   rule for nothing. */
+.rb-doc[data-struct-entry="rail"] .rb-section:has(> .rb-entry) {
+  position: relative;
+  padding-left: var(--_rail-pad);
+  border-left: var(--_hair) solid var(--rb-gray-200);
+}
+.rb-doc[data-struct-entry="rail"] .rb-section > .rb-entry { position: relative; }
+.rb-doc[data-struct-entry="rail"] .rb-section > .rb-entry__head::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--_rail-pad) - var(--rb-doc-size) * 0.21);
+  top: 0.4em;
+  width: calc(var(--rb-doc-size) * 0.42);
+  height: calc(var(--rb-doc-size) * 0.42);
+  border-radius: 50%;
+  background: var(--_accent);
+}
+
+/* A hanging date gutter: the dates sit in a fixed column on the left of the
+   entry and everything else is set against them. Grid placement does the work,
+   so the DOM order — title, then dates — is untouched and a parser still reads
+   the title before the range. */
+@media screen and (min-width: 561px) {
+  .rb-doc[data-struct-entry="dates"] .rb-entry__head {
+    display: grid;
+    grid-template-columns: var(--_date-col) minmax(0, 1fr);
+    column-gap: var(--_col-gap);
+    align-items: baseline;
+  }
+  .rb-doc[data-struct-entry="dates"] .rb-entry__when {
+    grid-column: 1;
+    grid-row: 1;
+    margin-left: 0;
+    text-align: left;
+  }
+  .rb-doc[data-struct-entry="dates"] .rb-entry__main { grid-column: 2; grid-row: 1; }
+  /* The rest of the entry hangs off the same edge as the title, or the
+     sub-line runs back under the dates and the gutter stops reading. */
+  .rb-doc[data-struct-entry="dates"] .rb-entry > :not(.rb-entry__head) {
+    margin-left: calc(var(--_date-col) + var(--_col-gap));
+  }
+}
+
+/* A docket: the range stamped on the line above the title. column-reverse puts
+   the dates first on the page without moving them in the DOM. */
+.rb-doc[data-struct-entry="stamp"] .rb-entry__head {
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  row-gap: 0.1em;
+}
+.rb-doc[data-struct-entry="stamp"] .rb-entry__when {
+  margin-left: 0;
+  text-align: left;
+  letter-spacing: var(--_track-caps);
+  text-transform: uppercase;
+  font-size: var(--_tiny);
+}
+
+/* ── 14e. The card grid ─────────────────────────────────────────────────── */
+@media screen and (min-width: 901px) {
+  .rb-doc[data-struct-cards="on"] .rb-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--_card-gap);
+    row-gap: var(--_card-gap);
+    align-items: stretch;
+  }
+  .rb-doc[data-struct-cards="on"] .rb-section__head {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+  /* Prose is not a card. A summary left in the first cell of a two-column grid
+     is a summary measured at half the page's measure, which is the one thing
+     the grid must never do to it. */
+  .rb-doc[data-struct-cards="on"] .rb-section > :not(.rb-entry) { grid-column: 1 / -1; }
+  /* The inter-entry margin is a grid row's job here: left in place it would
+     push the second column down a row and break the pairing. */
+  .rb-doc[data-struct-cards="on"] .rb-section > * { margin-top: 0; }
+  /* One entry is not a pair. A grid asked to hold a single card fills the first
+     cell and leaves the second one empty, which is the lone ribbon a short
+     resume can least afford: half the row is white and the one box on it reads
+     as something that failed to load. A section that cannot fill a row is set
+     as one column, and the card gets the measure it was promised. */
+  .rb-doc[data-struct-cards="on"] .rb-section:not(:has(.rb-entry ~ .rb-entry)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── 14f. The body: a margin column for the section headings ────────────── */
+/* The heading moves out of the flow of its own entries and into a margin
+   column. The DOM order is untouched — the heading is still the first child of
+   its section and still a line of its own — so an extractor sees the same
+   stream either way. Gated on the same breakpoint as the card grid: at 360px a
+   9em margin column is a column of one word per line. */
+@media screen and (min-width: 901px) {
+  .rb-doc[data-struct-body="marginalia"] .rb-section {
+    display: grid;
+    grid-template-columns: var(--_rail-col) minmax(0, 1fr);
+    column-gap: var(--_col-gap);
+    align-items: start;
+  }
+  .rb-doc[data-struct-body="marginalia"] .rb-section__head {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    padding-bottom: 0;
+    text-align: left;
+  }
+  .rb-doc[data-struct-body="marginalia"] .rb-section > *:not(.rb-section__head) { grid-column: 2; }
+}
+
+/* ── 14g. The two-column body: where the rail sits ──────────────────────── */
+/* Keel: the rail is anchored to the foot of the column instead of the top. The
+   rail box itself stays stretched, so its hairline still runs the height of the
+   page; only its contents move.
+
+   Qualified on #rb-doc, not .rb-doc: app.css pins `.rb-doc__side` to
+   `display: block` with an id in the selector so the paginator has a box to
+   measure, and an id outranks every class this file can spend on it. */
+@media screen and (min-width: 901px) {
+  #rb-doc[data-struct-side="bottom"][data-cols="2"] .rb-doc__side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+}
+
+/* ── 14h. The ledger: a rule under everything ───────────────────────────── */
+.rb-doc[data-struct-ledger="lines"] .rb-section__head {
+  border-bottom-width: var(--_hair);
+  letter-spacing: var(--_track-caps);
+}
+.rb-doc[data-struct-ledger="lines"] .rb-entry__head {
+  padding-bottom: calc(var(--rb-doc-size) * 0.22);
+  border-bottom: var(--_hair) solid var(--rb-gray-150);
+}
+.rb-doc[data-struct-ledger="lines"] .rb-bullets__item,
+.rb-doc[data-struct-ledger="lines"] .rb-inline-list,
+.rb-doc[data-struct-ledger="lines"] .rb-skill-group {
+  border-top: var(--_hair) solid var(--rb-gray-150);
+  padding-top: calc(var(--rb-doc-size) * 0.14);
+}
+.rb-doc[data-struct-ledger="lines"] .rb-bullets { margin-top: calc(var(--rb-doc-size) * 0.4); }
+.rb-doc[data-struct-ledger="lines"] .rb-bullets__item + .rb-bullets__item { margin-top: calc(var(--rb-doc-size) * 0.2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   15. STRUCTURE ON PAPER
+   The header band is the only shape that reaches outside the measure: it hangs
+   into the page margin so it can run the full width of the sheet. On paper
+   the margin lives on #rb-doc instead of on the sheet, so the same overhang
+   would run off the edge of the paper and into the printer's unprintable
+   area. Zeroing the horizontal margin is the whole of the print adaptation —
+   the padding stays, so the band keeps its own air, and a filled band keeps
+   its fill, which is what a colour printer wants. print.css already forces
+   every run in the document to the ink colour, so nothing inside a band can
+   end up as light type on light paper.
+
+   A card grid is NOT collapsed here. Paper is the same width as the preview
+   and the browser re-flows the sheets, so keeping the grid is what makes the
+   sheet on paper the sheet on screen.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media print {
+  .rb-doc[data-struct-head-band="fill"] .rb-doc__head,
+  .rb-doc[data-struct-head-band="tint"] .rb-doc__head {
+    margin-inline: 0;
+    max-width: none;
+  }
+}
+/* touch */
+
+/* The editable inside a contact link: it is a span, so it inherits the link's
+ * colour and underline but never the hyperlink behaviour. */
+.rb-doc-link > .rb-doc-link__text {
+  color: inherit;
+  text-decoration: inherit;
+  cursor: text;
+}

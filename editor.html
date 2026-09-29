@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Resumeboard — Resume Builder That Never Uploads</title>
+<meta name="description" content="Build a resume in your browser. Export to PDF, DOCX, Markdown and plain text, with real ATS checks and job-description matching. No account, no upload.">
+<link rel="canonical" href="https://resumeboard.app/editor.html">
+<meta name="robots" content="noindex,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Resumeboard — Resume Builder That Never Uploads">
+<meta property="og:description" content="Build a resume in your browser. Export to PDF, DOCX, Markdown and plain text, with real ATS checks and job-description matching. No account, no upload.">
+<meta property="og:url" content="https://resumeboard.app/editor.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard — a resume builder that runs in your browser">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Resumeboard — Resume Builder That Never Uploads">
+<meta name="twitter:description" content="Build a resume in your browser. Export to PDF, DOCX, Markdown and plain text, with real ATS checks and job-description matching. No account, no upload.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/editor.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/editor.html">
+<meta name="theme-color" content="#4743e0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c1017" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png?v=d639f64b7f">
+<link rel="manifest" href="manifest.webmanifest">
+
+<link rel="stylesheet" href="assets/css/tokens.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/base.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/app.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/editor.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/templates.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/home.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/autofill.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/onboarding.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/a11y-fixes.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/polish-fixes.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/documents.css?v=d639f64b7f">
+<link rel="stylesheet" href="assets/css/print.css?v=d639f64b7f" media="print">
+<script>
+/* Build guard. A refresh can be served a cached copy of the page itself, which
+ * would leave the tab running assets from an older build. A literal here cannot
+ * be cached separately from this document, so a mismatch is a reliable signal
+ * that a reload is the right move. */
+(function(){
+  try {
+    var ID = 'd639f64b7f';
+    var prev = sessionStorage.getItem('rb:build');
+    if (prev === ID) return;
+    if (prev && !sessionStorage.getItem('rb:build-reloaded')) {
+      sessionStorage.setItem('rb:build-reloaded', '1');
+      sessionStorage.setItem('rb:build', ID);
+      location.reload();
+      return;
+    }
+    sessionStorage.setItem('rb:build', ID);
+  } catch (e) {}
+})();
+</script>
+<script src="assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="assets/css/motion.css">
+</head>
+<body class="rb-body rb-body--app rb-body--editor">
+
+<a class="skip-link" href="#rb-main">Skip to resume</a>
+
+<header id="rb-topbar" class="rb-topbar"></header>
+
+<div id="rb-app" class="rb-app">
+    <div id="rb-shell" class="rb-shell">
+  <aside id="rb-rail" class="rb-rail" aria-label="Resume sections"></aside>
+
+  <main id="rb-main" class="rb-main" tabindex="-1">
+    <div id="rb-toolstrip" class="rb-toolstrip">
+      <div id="rb-typescale-host" class="rb-toolstrip__slot"></div>
+    </div>
+    <div id="rb-stage" class="rb-stage">
+      <div id="rb-page-frame" class="rb-page-frame">
+        <div id="rb-doc" class="rb-doc" data-template="classic"></div>
+      </div>
+    </div>
+    <div id="rb-statusbar" class="rb-statusbar"></div>
+  </main>
+
+  <aside id="rb-panel" class="rb-panel" aria-label="Editing panel"></aside>
+</div>
+</div>   <!-- /rb-app: intro + editor only -->
+
+<noscript>
+  <div class="noscript-note">
+    <h2>Resumeboard needs JavaScript</h2>
+    <p>The builder runs entirely in your browser, so it needs JavaScript to work. Nothing is sent to a server either way &mdash; enabling JavaScript does not upload your resume.</p>
+    <p>If you only need to read, the <a href="guides/index.html">writing guides</a>, the <a href="ats/index.html">ATS reference</a>, and the <a href="examples/index.html">worked examples</a> are all static pages and work without it.</p>
+  </div>
+</noscript>
+
+
+<div id="rb-overlay-root"></div>
+<div id="rb-toasts" class="rb-toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://resumeboard.app/#website",
+      "url": "https://resumeboard.app/",
+      "name": "Resumeboard",
+      "inLanguage": "en-US",
+      "publisher": { "@id": "https://resumeboard.app/#org" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://resumeboard.app/#org",
+      "name": "Resumeboard",
+      "url": "https://resumeboard.app/"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://resumeboard.app/#app",
+      "name": "Resumeboard",
+      "url": "https://resumeboard.app/editor.html",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Resume Builder",
+      "operatingSystem": "Any (web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "description": "A resume builder that runs entirely in the browser. Resumes are stored locally and are never uploaded. Exports to PDF, DOCX, Markdown, plain text and JSON are free and unlimited.",
+      "featureList": [
+        "Edit the resume directly on the page",
+        "Local-only storage, no account required",
+        "ATS parse-safety checklist with named ATS simulators",
+        "Job description keyword matching",
+        "Writing coach with one-click fixes",
+        "Live page count and fit-to-one-page",
+        "Unlimited free export to PDF, DOCX, Markdown, plain text and JSON",
+        "Undo and redo",
+        "Shareable links that encode the resume in the URL"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "isAccessibleForFree": true
+    }
+  ]
+}
+</script>
+
+<!-- core: order matters, plain scripts, no modules -->
+<script src="assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="assets/js/core/events.js?v=d639f64b7f"></script>
+<script src="assets/js/core/idb.js?v=d639f64b7f"></script>
+<script src="assets/js/core/model.js?v=d639f64b7f"></script>
+<script src="assets/js/core/store.js?v=d639f64b7f"></script>
+
+<!-- ui primitives -->
+<script src="assets/js/ui/icons.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/registry.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/ui.js?v=d639f64b7f"></script>
+
+<!-- analysis (pure, no DOM) -->
+<script src="assets/js/analysis/linter.js?v=d639f64b7f"></script>
+<script src="assets/js/analysis/ats.js?v=d639f64b7f"></script>
+<script src="assets/js/analysis/jdmatch.js?v=d639f64b7f"></script>
+<script src="assets/js/analysis/score.js?v=d639f64b7f"></script>
+<script src="assets/js/analysis/merge.js?v=d639f64b7f"></script>
+<script src="assets/js/analysis/proof.js?v=d639f64b7f"></script>
+
+<!-- render -->
+<script src="assets/js/render/templates.js?v=d639f64b7f"></script>
+<script src="assets/js/render/paginator.js?v=d639f64b7f"></script>
+<script src="assets/js/render/renderer.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/validate.js?v=d639f64b7f"></script>
+<script src="assets/js/render/binder.js?v=d639f64b7f"></script>
+
+<!-- export + import -->
+<script src="assets/js/export/txt.js?v=d639f64b7f"></script>
+<script src="assets/js/export/markdown.js?v=d639f64b7f"></script>
+<script src="assets/js/export/json.js?v=d639f64b7f"></script>
+<script src="assets/js/export/docx.js?v=d639f64b7f"></script>
+<script src="assets/js/export/pdf.js?v=d639f64b7f"></script>
+<script src="assets/js/import/docx.js?v=d639f64b7f"></script>
+<script src="assets/js/import/text.js?v=d639f64b7f"></script>
+<script src="assets/js/share.js?v=d639f64b7f"></script>
+
+<!-- panels + chrome -->
+<script src="assets/js/ui/forms.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/design.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/analysis-panel.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/panel.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/rail.js?v=d639f64b7f"></script>
+<!-- autofill must register before chrome and onboarding can call it -->
+<script src="assets/js/ui/autofill.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/chrome.js?v=d639f64b7f"></script>
+<!-- after chrome.js: the drawer control goes inside the bar chrome builds -->
+<script src="assets/js/ui/responsive.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/commandbar.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/importer.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/typescale.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/onboarding.js?v=d639f64b7f"></script>
+
+<!-- documents workspace: cover letter + interview prep, on top of the resume -->
+<script src="assets/js/documents/letter.js?v=d639f64b7f"></script>
+<script src="assets/js/documents/prep.js?v=d639f64b7f"></script>
+<script src="assets/js/documents/workspace.js?v=d639f64b7f"></script>
+
+<!-- import comparison + the proof pass. Both need the analysis modules and
+     the ui kit above them; proof registers a panel, merge-step is called from
+     autofill once a store exists. -->
+<script src="assets/js/ui/merge-step.js?v=d639f64b7f"></script>
+<script src="assets/js/ui/proof.js?v=d639f64b7f"></script>
+
+<script src="assets/js/pwa.js?v=d639f64b7f"></script>
+<script src="assets/js/boot.js?v=d639f64b7f"></script>
+  <div class="rb-contact" role="contentinfo" aria-label="Contact">
+    <span class="rb-contact__label">Built by</span>
+    <strong class="rb-contact__name">Utkarsh</strong>
+    <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>
+    <span class="rb-contact__dot" aria-hidden="true">&middot;</span>
+    <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </div>
+</body>
+</html>

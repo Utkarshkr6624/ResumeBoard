@@ -1,0 +1,573 @@
+/* Resumeboard — print stylesheet
+ *
+ * Loaded after tokens.css, base.css and templates.css. Print is an output
+ * format, not a screen mode: the app chrome is removed, the page is the
+ * sheet, and every colour is reduced to what a greyscale laser can hold.
+ *
+ * ---------------------------------------------------------------------------
+ * HOOKS THIS FILE RELIES ON (set by the renderer / print-exporter modules)
+ * ---------------------------------------------------------------------------
+ *   #rb-doc[data-template]                 resume document, document tokens
+ *   --rb-doc-margin                        page margin, set on #rb-doc
+ *   --rb-doc-accent                        accent token, set inline by the renderer
+ *   #rb-doc[data-page-size="Letter"|"A4"]  or [data-page-size] on <html>
+ *   #rb-doc[data-print-safe]               user opted into printing the real accent
+ *   #rb-doc [data-entry]                   a resume entry (kept whole)
+ *   #rb-doc [data-section-type="..."]      a section wrapper
+ *   #rb-doc [data-print-break]             "avoid" | "allow" — per-node override
+ *   html[data-print-cover]                 emit the cover letter page
+ *   html[data-print-references]            emit the references page
+ *   html[data-print-pages~="cover"]        token-list form of the two flags above
+ *   .rb-print-cover / .rb-print-references the extra pages themselves
+ *
+ * Document tokens are read at #rb-doc, not at :root: --rb-doc-margin is
+ * declared on the resume root, and a var() inside a custom property would be
+ * substituted where that custom property is *declared*, losing the override.
+ * For the same reason --rb-doc-accent needs !important — the renderer sets it
+ * inline, and an inline custom property outranks any selector.
+ * ---------------------------------------------------------------------------
+ */
+
+@page {
+  size: auto;
+  margin: 0;
+}
+
+@page rb-letter {
+  size: 8.5in 11in;
+  margin: 0;
+}
+
+@page rb-a4 {
+  size: 210mm 297mm;
+  margin: 0;
+}
+
+/* ===========================================================================
+ * 1. Print tokens
+ * Greyscale laser output: paper white, ink true black, every tint promoted to
+ * a mid-dark grey. Defined once here so nothing below hardcodes a colour.
+ * =========================================================================== */
+
+@media print {
+  /* html[data-theme]:root outranks the two dark-theme blocks in tokens.css
+   * ((0,1,1) each) regardless of stylesheet order — dark mode must never win
+   * here, or light text prints as invisible grey on white paper. */
+  html:root,
+  html[data-theme]:root {
+    color-scheme: light;
+
+    --rb-print-paper: #ffffff;
+    --rb-print-ink: #000000;
+    --rb-print-strong: #1a1a1a;
+    --rb-print-muted: #3d3d3d;
+    --rb-print-rule: #6b6b6b;
+    --rb-print-accent: #333333;
+
+    --rb-bg: var(--rb-print-paper);
+    --rb-bg-elevated: var(--rb-print-paper);
+    --rb-bg-sunken: var(--rb-print-paper);
+    --rb-bg-inset: var(--rb-print-paper);
+    --rb-bg-hover: var(--rb-print-paper);
+    --rb-bg-active: var(--rb-print-paper);
+    --rb-bg-inverse: var(--rb-print-ink);
+
+    --rb-text: var(--rb-print-ink);
+    --rb-text-secondary: var(--rb-print-strong);
+    --rb-text-muted: var(--rb-print-muted);
+    --rb-text-faint: var(--rb-print-muted);
+    --rb-text-inverse: var(--rb-print-ink);
+    --rb-text-accent: var(--rb-print-ink);
+
+    --rb-border: var(--rb-print-rule);
+    --rb-border-strong: var(--rb-print-muted);
+    --rb-border-subtle: var(--rb-print-rule);
+
+    --rb-accent-400: var(--rb-print-accent);
+    --rb-accent-500: var(--rb-print-accent);
+    --rb-accent-600: var(--rb-print-accent);
+    --rb-accent-700: var(--rb-print-accent);
+    --rb-accent-800: var(--rb-print-accent);
+    --rb-accent-900: var(--rb-print-accent);
+    --rb-accent-50: var(--rb-print-paper);
+    --rb-accent-100: var(--rb-print-paper);
+    --rb-accent-200: var(--rb-print-paper);
+    --rb-accent-300: var(--rb-print-rule);
+
+    --rb-focus-ring: none;
+    --rb-shadow-xs: none;
+    --rb-shadow-sm: none;
+    --rb-shadow-md: none;
+    --rb-shadow-lg: none;
+    --rb-shadow-xl: none;
+    --rb-shadow-doc: none;
+  }
+
+  /* Keep tints: rules, level meters, chips and tinted sidebar blocks are the
+   * only things the accent was carrying, and all of them print as flat grey
+   * otherwise. print-color-adjust is inherited, so :root covers the document
+   * and every node under it. */
+  :root,
+  #rb-doc,
+  #rb-doc * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ===========================================================================
+ * 2. Chrome suppression
+ * =========================================================================== */
+
+@media print {
+  #rb-topbar,
+  #rb-rail,
+  #rb-panel,
+  #rb-toolstrip,
+  #rb-statusbar,
+  #rb-marquee,
+  #rb-overlay-root,
+  #rb-toasts,
+  #rb-shell > :not(#rb-main),
+  #rb-main > :not(#rb-stage),
+  .skip-link,
+  .rb-modal-backdrop,
+  .rb-modal,
+  .rb-pop,
+  .rb-toast,
+  .rb-toasts,
+  .rb-btn,
+  .rb-empty,
+  .rb-kbd,
+  .rb-seg,
+  .rb-tabs,
+  .rb-progress,
+  .rb-switch,
+  .rb-range,
+  .rb-select,
+  .rb-input,
+  .rb-textarea,
+  dialog,
+  [data-rb-print-hide],
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* Editing affordances that live inside the document. */
+  #rb-doc [contenteditable] {
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  #rb-doc [data-placeholder]::before,
+  #rb-doc .rb-doc__placeholder,
+  #rb-doc .rb-doc__add,
+  #rb-doc [data-rb-doc-control] {
+    content: none !important;
+    display: none !important;
+  }
+}
+
+/* ===========================================================================
+ * 3. Layout reset and page geometry
+ * The on-screen shell is a scroll container with fit-to-width scaling; all of
+ * that has to collapse to a plain block flow for the page box to be the sheet.
+ * =========================================================================== */
+
+@media print {
+  html,
+  body,
+  #rb-app,
+  #rb-shell,
+  #rb-main,
+  #rb-stage,
+  .rb-scroll,
+  [data-rb-scroll] {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: var(--rb-print-paper) !important;
+    color: var(--rb-print-ink) !important;
+    /* fit-to-width previews scale the stage; unscaled pt measurements would
+     * otherwise land on the page smaller than the layout was computed for */
+    transform: none !important;
+    zoom: 1 !important;
+  }
+
+  /* margins live on @page, not on the body, so the sheet is filled edge to
+   * edge and the design margin is emulated as padding (which also keeps the
+   * browser's page-scaling from clipping into the printer's unprintable
+   * area — hence the 0.3in floor) */
+  #rb-app,
+  #rb-shell,
+  #rb-main,
+  #rb-stage,
+  #rb-page-frame {
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--rb-print-paper) !important;
+  }
+
+  /* `page` is declared on the frame only. It is not an inherited property —
+   * `auto` on a descendant continues the ancestor's page context, so naming a
+   * page on #rb-doc as well would either be redundant or, when the two
+   * disagree, force a page break in the middle of the resume. */
+  #rb-page-frame {
+    page: rb-letter;
+    padding: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  #rb-page-frame[data-page-size="A4"],
+  html[data-page-size="A4"] #rb-page-frame,
+  #rb-page-frame:has(#rb-doc[data-page-size="A4"]) {
+    page: rb-a4;
+  }
+
+  #rb-doc {
+    padding: max(var(--rb-print-margin, var(--rb-doc-margin, 0.6in)), 0.3in) !important;
+    width: auto !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    background: var(--rb-print-paper) !important;
+    color: var(--rb-print-ink) !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    orphans: 3;
+    widows: 3;
+  }
+}
+
+/* ===========================================================================
+ * 4. Colour normalisation
+ * =========================================================================== */
+
+@media print {
+  /* An accent tint is the one colour that reliably disappears on a mono
+   * printer, so it is promoted to a dark grey.
+   *
+   * `data-print-safe` is the user's explicit opt-out: they have accepted the
+   * template's own colours, so the greysafe clamps below are scoped away from
+   * a flagged document rather than fighting it. What printSafe never relaxes
+   * is the theme inversion in section 1 — light text on white paper is a
+   * printing bug, not a style choice. */
+  #rb-doc:not([data-print-safe]) {
+    --rb-doc-accent: var(--rb-print-accent) !important;
+    --rb-doc-rule: 0.8pt !important;
+  }
+
+  /* Tinted fills, gradients and shadows become paper. Kept as `transparent`
+   * rather than white so a template's own background colour still wins where
+   * it matters (e.g. a cover letter sheet). */
+  #rb-doc,
+  #rb-doc:not([data-print-safe]) :is(section, article, aside, header, footer, div, p, span, ul, ol, li,
+                                      dl, dt, dd, table, tr, th, td, h1, h2, h3, h4, h5, h6) {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Any border in the document is a rule or a divider: mid-grey survives,
+   * a 6%-opacity tint does not. */
+  #rb-doc:not([data-print-safe]) :is(*, *::before, *::after) {
+    border-color: var(--rb-print-rule) !important;
+    outline-color: transparent !important;
+  }
+
+  #rb-doc,
+  #rb-doc :is(p, li, dd, dt, span, div, td, th, figcaption, blockquote) {
+    color: var(--rb-print-ink) !important;
+  }
+
+  #rb-doc:not([data-print-safe]) :is(h1, h2, h3, h4, h5, h6, strong, b, th) {
+    color: var(--rb-print-strong) !important;
+  }
+
+  #rb-doc:not([data-print-safe]) :is(a, a:visited) {
+    color: var(--rb-print-ink) !important;
+  }
+
+  /* A printed URL is noise regardless of the colour decision. */
+  #rb-doc a,
+  #rb-doc a:visited {
+    text-decoration: none !important;
+  }
+
+  /* Secondary text is usually a 500-weight grey that prints as a smudge. */
+  #rb-doc :is(.rb-doc__meta, .rb-doc__muted, [data-role="meta"], time) {
+    color: var(--rb-print-muted) !important;
+  }
+
+  #rb-doc img,
+  #rb-doc svg,
+  #rb-doc video,
+  #rb-doc canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* A colour photo on a mono laser prints as mud. */
+  #rb-doc:not([data-print-safe]) img[src^="data:image/"],
+  #rb-doc:not([data-print-safe]) .rb-doc__photo img {
+    -webkit-filter: grayscale(1) contrast(1.05);
+    filter: grayscale(1) contrast(1.05);
+  }
+}
+
+/* ===========================================================================
+ * 5. Pagination
+ * Headings never end a page, an entry stays whole when it fits, and anything
+ * the caller knows to be taller than a page opts out with data-print-break.
+ * =========================================================================== */
+
+@media print {
+  #rb-doc :is(h1, h2, h3, h4, h5, h6),
+  #rb-doc [data-role="section-title"],
+  #rb-doc [data-section-title],
+  #rb-doc .rb-section__title,
+  #rb-doc .rb-sec__title {
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Heading and its first line are one unit. */
+  #rb-doc :is(h1, h2, h3, h4, h5, h6) + *,
+  #rb-doc [data-role="section-title"] + * {
+    break-before: avoid;
+    page-break-before: avoid;
+  }
+
+  /* An entry that fits is never split. Entries that overflow the page are
+   * marked data-print-break="allow" by the renderer (it measures them) or by
+   * the exporter, and fall through to a natural break. */
+  #rb-doc [data-entry],
+  #rb-doc [data-role="entry"],
+  #rb-doc .rb-entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #rb-doc :is(li, dd, figure, blockquote, pre) {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #rb-doc :is(p, li, dd, dt) {
+    orphans: 2;
+    widows: 2;
+  }
+
+  #rb-doc table {
+    break-inside: auto;
+  }
+
+  #rb-doc thead {
+    display: table-header-group;
+  }
+
+  #rb-doc tfoot {
+    display: table-footer-group;
+  }
+
+  #rb-doc tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #rb-doc [data-section-type] {
+    break-before: auto;
+    page-break-before: auto;
+  }
+
+  /* Per-node override, last so it wins the specificity tie against the rules
+   * above. */
+  #rb-doc [data-print-break="avoid"] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  #rb-doc [data-print-break="allow"],
+  #rb-doc [data-print-break="flow"] {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  #rb-doc [data-print-break="allow"] :is(li, p, dd),
+  #rb-doc [data-print-break="flow"] :is(li, p, dd) {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* ===========================================================================
+ * 6. Links, URLs and dates
+ * A printed resume should not grow a column of hrefs. Note that the *browser's*
+ * own header/footer (title / URL / date) is a print-dialog setting with no CSS
+ * equivalent — this only suppresses URLs and dates carried by the document.
+ * =========================================================================== */
+
+@media print {
+  #rb-doc a[href]::after,
+  #rb-doc a[href]:visited::after,
+  #rb-doc a::after,
+  #rb-doc a::before,
+  #rb-doc abbr[title]::after,
+  #rb-doc [title]::after,
+  #rb-doc [data-url]::after {
+    content: none !important;
+  }
+
+  #rb-doc a[href] {
+    text-decoration: none !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Blocks the renderer marks as machine-readable: share links, "last saved",
+   * schema versions, ids. */
+  #rb-doc [data-print-suppress],
+  #rb-doc .rb-doc__share,
+  #rb-doc .rb-doc__generated,
+  #rb-doc .rb-doc__id,
+  #rb-doc .rb-updated {
+    display: none !important;
+  }
+}
+
+/* ===========================================================================
+ * 7. Print-only pages — cover letter and references
+ * Hidden on screen. In print they render only when the corresponding flag is
+ * set on <html>, so an unenabled page can never leak into a print job.
+ * =========================================================================== */
+
+@media print {
+  .rb-print-cover,
+  .rb-print-references {
+    display: none !important;
+  }
+
+  html[data-print-cover] .rb-print-cover,
+  html[data-print-pages~="cover"] .rb-print-cover,
+  .rb-print-cover.is-enabled {
+    display: block !important;
+    break-before: page;
+    page-break-before: always;
+  }
+
+  html[data-print-references] .rb-print-references,
+  html[data-print-pages~="references"] .rb-print-references,
+  .rb-print-references.is-enabled {
+    display: block !important;
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* A cover letter placed before the document pushes the resume to page 2. */
+  .rb-print-cover ~ #rb-page-frame,
+  .rb-print-cover ~ #rb-doc,
+  .rb-print-references ~ #rb-page-frame {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* A leading cover letter must not ask for a break before the first box,
+   * which some engines render as a blank sheet. */
+  .rb-print-cover:first-child,
+  #rb-page-frame > .rb-print-cover:first-child,
+  #rb-doc > .rb-print-cover:first-child {
+    break-before: auto;
+    page-break-before: auto;
+  }
+
+  /* References section moved off the resume body onto its own sheet. */
+  html[data-print-references] #rb-doc [data-section-type="references"],
+  html[data-print-pages~="references"] #rb-doc [data-section-type="references"] {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .rb-print-cover,
+  .rb-print-references {
+    font-family: var(--rb-doc-font, var(--rb-font-sans));
+    font-size: var(--rb-doc-size, 10.5pt);
+    line-height: 1.45;
+    color: var(--rb-print-ink);
+    background: var(--rb-print-paper);
+    text-align: left;
+  }
+
+  .rb-print-cover :is(h1, h2, h3, h4),
+  .rb-print-references :is(h1, h2, h3, h4) {
+    color: var(--rb-print-strong);
+    font-weight: 650;
+    letter-spacing: var(--rb-doc-tracking, 0);
+  }
+
+  .rb-print-cover__date,
+  .rb-print-cover__sender,
+  .rb-print-cover__recipient {
+    margin-bottom: var(--rb-doc-entry-gap, 7pt);
+  }
+
+  .rb-print-cover__recipient {
+    line-height: 1.5;
+  }
+
+  .rb-print-cover__body p,
+  .rb-print-cover__body {
+    margin-bottom: var(--rb-doc-entry-gap, 7pt);
+    orphans: 2;
+    widows: 2;
+  }
+
+  .rb-print-cover__signoff {
+    margin-top: var(--rb-doc-section-gap, 14pt);
+  }
+
+  .rb-print-references__entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: var(--rb-doc-entry-gap, 7pt);
+  }
+
+  .rb-print-references__name {
+    font-weight: 650;
+    color: var(--rb-print-strong);
+  }
+
+  .rb-print-references__label,
+  .rb-print-references__contact {
+    color: var(--rb-print-muted);
+  }
+}
+
+/* ===========================================================================
+ * 8. Screen-side utilities
+ * Print-only content must not appear in the app, and a caller should be able
+ * to mark any node as "screen only" without touching the module that built it.
+ * =========================================================================== */
+
+@media screen {
+  .rb-print-only,
+  .rb-print-cover,
+  .rb-print-references {
+    display: none !important;
+  }
+}

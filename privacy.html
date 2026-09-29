@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy: what Resumeboard stores and why</title>
+<meta name="description" content="Every claim here is checkable in the source. What Resumeboard stores in your browser, the one CDN request PDF import makes, and how to export or delete it all.">
+<link rel="canonical" href="https://resumeboard.app/privacy.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Privacy: what Resumeboard stores and why">
+<meta property="og:description" content="Every claim here is checkable in the source. What Resumeboard stores in your browser, the one CDN request PDF import makes, and how to export or delete it all.">
+<meta property="og:url" content="https://resumeboard.app/privacy.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Resumeboard privacy page">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy: what Resumeboard stores and why">
+<meta name="twitter:description" content="Every claim here is checkable in the source. What Resumeboard stores in your browser, the one CDN request PDF import makes, and how to export or delete it all.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/privacy.html">
+<meta name="theme-color" content="#4743e0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c1017" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/examples.css">
+<script>(function(){try{var t=localStorage.getItem('rb:theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://resumeboard.app/privacy.html#webpage",
+      "url": "https://resumeboard.app/privacy.html",
+      "name": "Privacy: what Resumeboard stores and why",
+      "description": "What Resumeboard writes to your browser, the one CDN request PDF import makes, and how to export a backup or delete everything.",
+      "inLanguage": "en-US",
+      "isPartOf": { "@id": "https://resumeboard.app/#website" }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://resumeboard.app/#website",
+      "url": "https://resumeboard.app/",
+      "name": "Resumeboard",
+      "inLanguage": "en-US",
+      "publisher": { "@id": "https://resumeboard.app/#org" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://resumeboard.app/#org",
+      "name": "Resumeboard",
+      "url": "https://resumeboard.app/"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://resumeboard.app/privacy.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is my resume uploaded anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The builder writes your resume into your own browser, in a database called resumeboard, and it never opens a connection that carries it. The one feature that is designed to reach the network is PDF import, which downloads a PDF reader from cdnjs.cloudflare.com after you ask for it and shows you the two exact addresses first. The file you pick is read in your browser and is not uploaded." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can the browser delete my resume without asking me?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, and this is the one real cost of a local-only app. Browsers may reclaim site data when a device is low on space, clearing your browsing data removes it, and a private window throws it away when it closes. At start-up the app asks the browser to mark its storage as persistent, which lowers the risk but does not remove it. If you want a copy that no browser can take from you, export the JSON file and keep it somewhere you control." }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens if I use a shared or work computer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The resume is tied to that browser profile and that address, so the next person to open the builder on the same profile sees what you typed. Do the export first, then use Start a new resume in the overflow menu, and if the machine is not yours delete the database as well, because that reset is an ordinary edit and the previous resume moves into the stored undo history. A private window is the cleaner option, because everything in it is discarded on close." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does a share link send my resume to a server?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. A share link puts the whole resume in the part of the address after the #, which browsers never put in a request. The resume is decoded from the link in your browser. What is true is that anyone holding the link can read the resume, so treat it like a document you handed over. Your photo is left out of links unless you deliberately ask to include it, and only if it is under 60,000 characters." }
+        },
+        {
+          "@type": "Question",
+          "name": "Where do I send a privacy question?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Nowhere, because there is no server to receive it. This page is a plain file served from the same directory as the app, and every claim on it names the source file it comes from, so the fastest answer to a question is usually to read the line it points at." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script src="assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="assets/css/motion.css">
+<link rel="manifest" href="manifest.webmanifest">
+</head>
+<body class="rb-site">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="rb-site-header">
+  <div class="rb-site-header__inner">
+    <a class="rb-site-brand" href="index.html">
+      <span class="rb-site-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" stroke-linejoin="round"/><path d="M14 2v5h5" stroke-linejoin="round"/><path d="M8 13h8M8 17h5" stroke-linecap="round"/></svg></span>
+      <span>Resumeboard</span>
+    </a>
+    <nav class="rb-site-nav" aria-label="Site">
+      <span class="rb-sz-host" data-site-size></span>
+      <a href="editor.html#start">Builder</a>
+      <a href="examples/index.html">Examples</a>
+      <a href="guides/index.html">Guides</a>
+      <a href="ats/index.html">ATS</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html" aria-current="page">Privacy</a>
+    </nav>
+    <button type="button" class="rb-btn rb-btn--ghost rb-btn--sm" data-theme-toggle hidden>Dark</button>
+  </div>
+</header>
+
+<main id="main" class="rb-site-main" tabindex="-1">
+
+  <div class="rbx-wrap">
+    <div class="rb-page-head">
+      <span class="eyebrow">Privacy</span>
+      <h1>There is nowhere for your resume to go.</h1>
+      <p class="lede">
+        Resumeboard is a set of static files with no backend behind them. There is
+        no account system, no database, and no operator reading what you type.
+        What follows is not a policy written to be reassuring. Every claim names
+        the file it comes from, and you can open that file and read the line.
+      </p>
+    </div>
+  </div>
+
+  <section class="rb-section" id="short">
+    <div class="rbx-wrap">
+      <h2>The short version</h2>
+      <ul class="rbx-list rbx-list--check">
+        <li data-reveal>No cookies. The codebase never writes to <span class="rbx-code">document.cookie</span>, for preferences, sessions, or anything else.</li>
+        <li data-reveal>No analytics, no telemetry, no page-view counters, no error-reporting service, no advertising, and no pixels.</li>
+        <li data-reveal>No account, no sign-in, and no email address collected.</li>
+        <li data-reveal>No server. The files your browser downloads are the whole application.</li>
+        <li data-reveal>Your resume is written to storage inside your own browser and is never transmitted.</li>
+        <li data-reveal>Exactly one feature is designed to reach another host: PDF import, which downloads a reader from cdnjs.cloudflare.com after you choose it, and shows you both addresses before it starts.</li>
+      </ul>
+      <p class="rbx-note">
+        The in-app privacy dialog in the topbar overflow menu says the same three
+        things in three sentences. If the two ever disagree, the source files on
+        this page are the ones that decide which of them is right.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="storage">
+    <div class="rbx-wrap">
+      <h2>What is stored, and where</h2>
+      <p>
+        When you type, the app saves your resume locally so it is still there when
+        you come back. That save happens in your browser's own storage, keyed to
+        the address you opened the app from. It is written by your browser, readable
+        by your browser, and removable by your browser. The persistence layer is
+        <a href="assets/js/core/idb.js"><span class="rbx-code">assets/js/core/idb.js</span></a>,
+        and the code that decides what goes in is
+        <a href="assets/js/core/store.js"><span class="rbx-code">assets/js/core/store.js</span></a>.
+      </p>
+
+      <h3 class="rbx-mt-6">IndexedDB: the normal case</h3>
+      <p>
+        IndexedDB is the browser's built-in structured storage. It holds real
+        JavaScript objects rather than text, which is why a full resume, including
+        a photo encoded as a data URL, fits without stuffing a large JSON string
+        into a single key. The app uses exactly one database, with these contents:
+      </p>
+      <ul class="rbx-list">
+        <li data-reveal><span class="rbx-code">resumeboard</span> &mdash; the database name, at version 1, with a single object store called <span class="rbx-code">kv</span>.</li>
+        <li data-reveal><span class="rbx-code">resume:current</span> &mdash; the resume you are editing, as one JSON object.</li>
+        <li data-reveal><span class="rbx-code">resume:undo</span> &mdash; an array of the last 40 states before the current one, so undo survives a closed tab. The app keeps up to 100 in memory during a session and writes the newest 40 to disk.</li>
+      </ul>
+      <p>
+        Those are the literal strings in the source, so you can check them yourself.
+        Open developer tools, go to <strong>Application</strong> in Chrome and Edge or
+        <strong>Storage</strong> in Firefox and Safari, find the
+        <span class="rbx-code">resumeboard</span> database, and open the
+        <span class="rbx-code">kv</span> store. If it is empty, nothing has been
+        saved yet and nothing is being stored.
+      </p>
+
+      <h3 class="rbx-mt-6">localStorage: the fallback, and four small preferences</h3>
+      <p>
+        Some browsers refuse IndexedDB in private windows, in locked-down
+        configurations, or when a profile is out of room. When that happens the app
+        falls back to <span class="rbx-code">localStorage</span> and prefixes every
+        key it writes with <span class="rbx-code">rb:</span>. The fallback exists
+        because a resume you cannot save is worse than a resume stored the wrong
+        way, and because losing the whole document to a storage API that threw would
+        be a silent failure.
+      </p>
+      <p>
+        The trade-off is size. localStorage holds a few megabytes for the entire
+        origin, so a resume with a large photo can hit that ceiling. If the write
+        fails, the app keeps the resume in memory for the life of the tab and tells
+        you so when you press <strong>Save now</strong> in the command bar. Your work
+        is not lost while the tab is open, and it is not on disk either.
+      </p>
+      <p>These are all the localStorage keys the app writes, in every mode:</p>
+      <div class="rbx-table-wrap">
+        <table class="rbx-table">
+          <thead>
+            <tr><th scope="col">Key</th><th scope="col">What it holds</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="rbx-code">rb:resume:current</span></td><td>Your resume, but only in the localStorage fallback. In the normal case this key does not exist.</td></tr>
+            <tr><td><span class="rbx-code">rb:resume:undo</span></td><td>The same undo history, in the fallback only.</td></tr>
+            <tr><td><span class="rbx-code">rb:theme</span></td><td>Whether you chose light or dark, as the word <span class="rbx-code">light</span> or <span class="rbx-code">dark</span>. The guides and the button at the top of this page use it too.</td></tr>
+            <tr><td><span class="rbx-code">resumeboard:theme</span></td><td>The same light or dark choice, written by the topbar switch inside the builder.</td></tr>
+            <tr><td><span class="rbx-code">rb:onboarding.v1</span></td><td>A single <span class="rbx-code">1</span>, set once you have dismissed the first-run dialog. Delete it and the dialog comes back.</td></tr>
+            <tr><td><span class="rbx-code">rb:commands:recents</span></td><td>The few commands you have run recently, so the command bar can suggest them. Command text only; it is never sent anywhere.</td></tr>
+            <tr><td><span class="rbx-code">resumeboard.rail.collapsed</span></td><td>Whether the section rail is collapsed.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        None of these is a cookie. <span class="rbx-code">localStorage</span> is
+        readable only by scripts on this origin, is never attached to a request, and
+        is not sent to a server under any circumstance. The app uses no
+        <span class="rbx-code">sessionStorage</span> at all.
+      </p>
+
+      <h3 class="rbx-mt-6">What is inside the stored resume</h3>
+      <p>
+        One object, and it is the same object the JSON export writes out. It holds
+        your name, contact details, summary, every section and entry, your design
+        choices, and a few internal fields: a generated id, creation and update
+        timestamps, the template you are using, and the language tag the app read
+        from your browser.
+      </p>
+      <p>
+        A photo, if you add one, is stored as a <span class="rbx-code">data:</span>
+        URL inside that object, so the image is part of the local record and is
+        covered by everything on this page. It is not uploaded anywhere and it is
+        not cached by the service worker.
+      </p>
+      <p>
+        The app reads your browser's own locale to pick a date format, a page size,
+        and whether a photo is expected in your region. That comes from
+        <span class="rbx-code">Intl</span> in the browser. It never asks a server
+        where you are, and there is no IP-derived region anywhere in the codebase.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="network">
+    <div class="rbx-wrap">
+      <h2>The network</h2>
+      <p>
+        The builder has no beacon, no <span class="rbx-code">sendBeacon</span>, no
+        <span class="rbx-code">XMLHttpRequest</span>, no <span class="rbx-code">WebSocket</span>,
+        and no first-party endpoint of any kind. Type is set in a system font stack,
+        so there is no web font to download and no third-party font server in your
+        history. The only image loading in the export path refuses to run unless the
+        source is a <span class="rbx-code">data:</span> URL, so a photo can never
+        become a request to someone else's server.
+      </p>
+
+      <h3 class="rbx-mt-6">The requests the app does make</h3>
+      <ul class="rbx-list rbx-list--num">
+        <li data-reveal>Your browser fetches the app's own files: the HTML, the stylesheets, and the scripts. That is the application, and it is the same for everyone.</li>
+        <li data-reveal>Nothing else. The editor lives on its own page, <span class="rbx-code">#start</span>, and the marketing front door on <span class="rbx-code">index.html</span>. Both are ordinary static files served like any other page, so the page you are reading describes every request the app makes.</li>
+        <li data-reveal>PDF import, described next.</li>
+      </ul>
+      <p>
+        There is no advertising network, no data broker, no retargeting pixel, no
+        analytics product, no session replay, no A/B testing tool, and no hosted
+        font or icon font on any page of this site.
+      </p>
+
+      <h3 class="rbx-mt-6">The one exception: PDF import</h3>
+      <p>
+        Reading a PDF needs a real PDF engine, and this project ships none. So when
+        you choose <strong>Import</strong>, then PDF, then pick a file, the app
+        injects a <span class="rbx-code">&lt;script&gt;</span> tag pointing at a
+        pinned version of pdf.js on cdnjs. The import panel shows you both addresses
+        before anything is fetched, and offers a cancel that works for as long as
+        the download is in flight.
+      </p>
+      <p>These are the exact URLs, taken from the constants at the top of <a href="assets/js/ui/importer.js"><span class="rbx-code">assets/js/ui/importer.js</span></a>:</p>
+      <code class="rbx-path">https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js</code>
+      <code class="rbx-path">https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js</code>
+      <p>
+        The version is pinned rather than tracked, so the file you receive today is
+        the file anyone receives today. The script tag is added with
+        <span class="rbx-code">crossorigin="anonymous"</span> and
+        <span class="rbx-code">referrerpolicy="no-referrer"</span>, which means the
+        request carries no cookies and no information about the page you came from.
+        The worker is the second address: it is fetched by the browser when the
+        parser starts working, and it is the only reason there are two URLs.
+      </p>
+      <p>
+        After it loads, the library runs inside your browser and is given the bytes
+        of the file you picked. <strong>Your PDF is not uploaded.</strong> Nothing
+        about the file, its size, its name, or the text inside it is sent to
+        cdnjs or to anyone else. cdnjs sees one request for two public JavaScript
+        files, in the same way it sees a request from any other site. If you never
+        use the PDF option, the request is never made.
+      </p>
+      <p>
+        The other three import routes &mdash; a <span class="rbx-code">.docx</span>
+        file, a <span class="rbx-code">.json</span> file, and pasted text &mdash;
+        are unpacked and parsed locally and make no request at all.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="share">
+    <div class="rbx-wrap">
+      <h2>Share links: the one way your resume can travel</h2>
+      <p>
+        The builder can produce a link that contains your entire resume. It is
+        written into the part of the address after the <span class="rbx-code">#</span>,
+        and browsers never send a URL fragment in a request. There is no server to
+        log it, no referrer header to leak it, and no analytics script to see it.
+        The resume is decoded from the link by <a href="assets/js/share.js"><span class="rbx-code">assets/js/share.js</span></a>,
+        in your browser, and the fragment is then cleared from the address bar.
+      </p>
+      <p>
+        Two honest caveats. Anyone who has the link can read the resume, so treat it
+        like a document you handed to someone. And the encoding is not encryption:
+        it is deflate plus base64, which is a compression format, not a cipher.
+      </p>
+      <p>
+        A photo is left out of the link by default, because a base64 image runs to
+        hundreds of kilobytes and a URL that long stops working in some browsers. It
+        is only included if you explicitly ask, and only when it is under 60,000
+        characters. The reader refuses any payload over one megabyte.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="service-worker">
+    <div class="rbx-wrap">
+      <h2>What the service worker caches</h2>
+      <p>
+        <a href="sw.js"><span class="rbx-code">sw.js</span></a> does two things and
+        nothing else. It makes the app's own static files load from a cache when the
+        network is slow or absent, and it lets a deploy be picked up immediately.
+        The worker only registers when the app is served over http or https; opened
+        from a folder on disk there is no service worker, and the app runs the same
+        way without one.
+      </p>
+
+      <h3 class="rbx-mt-6">What is precached</h3>
+      <p>
+        Both front doors are precached in full: the marketing page on
+        <span class="rbx-code">index.html</span> and the editor on
+        <span class="rbx-code">#start</span>. The list lives at the top of
+        <a href="sw.js"><span class="rbx-code">sw.js</span></a> and holds both
+        documents, every stylesheet and script either one loads, the manifest, and
+        the install icons: 58 paths. With no network at all the editor still opens
+        and still edits, which is the point of the list being that long.
+      </p>
+      <p>
+        Anything outside that list, such as the writing guides or the example
+        pages, is cached the first time you request it rather than up front. A
+        missing precache entry therefore cannot fail the install, and if one ever
+        does go missing the worker names it in the developer console instead of
+        leaving you to discover it somewhere with no signal.
+      </p>
+
+      <h3 class="rbx-mt-6">What it deliberately does not cache</h3>
+      <ul class="rbx-list rbx-list--no">
+        <li data-reveal><strong>Your resume.</strong> It is never in an HTTP response, so it can never be in a cache. The worker only ever sees requests the browser makes for files, and your document travels through IndexedDB instead.</li>
+        <li data-reveal><strong>Anything on another origin.</strong> The fetch listener returns immediately when the request URL is not on this site's origin, which is why the lazy pdf.js is never stored by the worker. The browser's own HTTP cache may still hold it, as it would for any script on any page; the app does not manage that.</li>
+        <li data-reveal><strong>Any fetch or XHR.</strong> A <span class="rbx-code">fetch()</span> has an empty <span class="rbx-code">destination</span>, so it falls outside the list of things the worker will answer and goes straight to the network.</li>
+        <li data-reveal><strong>Range requests and anything marked <span class="rbx-code">no-store</span>.</strong></li>
+        <li data-reveal><strong>Old versions.</strong> The cache name is a hash of the worker's own source combined with the revision stamp written beside it, so a change to the worker or to the list inside it names a new cache, and on activation every older cache is deleted. A deploy that changes a cached <em>file</em> without changing the worker is covered by the stamp, which has to be bumped by hand: a browser only reinstalls a worker whose bytes differ, so without it a corrected stylesheet would keep being served out of the cache. Activation is when the new worker takes over, which is after you accept the offered reload, so until then the old cache is still there and nothing is lost if you never accept.</li>
+      </ul>
+      <p>
+        Navigations are the exception to cache-first: a page request goes to the
+        network first, so you get the current version, and falls back to this
+        browser's own copy of that exact page only if the network fails. It never
+        substitutes one page for another, so opening a page offline that you have
+        never opened before says so plainly rather than quietly handing you the
+        landing page instead. A hard reload skips the cache entirely, so holding
+        Shift while you reload always reaches the network and can never be talked
+        into by a stale copy.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="delete">
+    <div class="rbx-wrap">
+      <h2>How to delete everything</h2>
+      <p>
+        Deleting is not a request you make to us, because there is no us to make it
+        to. You remove the storage directly and it is gone. Export a backup first
+        if you want to keep it.
+      </p>
+
+      <h3 class="rbx-mt-6">From inside the app</h3>
+      <p>
+        The overflow menu in the topbar has <strong>Start a new resume</strong>. It
+        replaces the stored resume with an empty one, which is the right tool for a
+        shared machine. One caveat, stated plainly: the reset is an ordinary edit, so
+        the resume you had is pushed onto the undo stack rather than destroyed, and
+        the app writes that stack to storage. In other words, <strong>Start a new
+        resume empties your document, it does not erase it.</strong> The previous
+        version stays readable in <span class="rbx-code">resume:undo</span> until the
+        stack rolls over, and the console approach below removes it properly.
+      </p>
+
+      <h3 class="rbx-mt-6">From the browser</h3>
+      <ul class="rbx-list rbx-list--num">
+        <li data-reveal>Open developer tools with F12, or by right-clicking and choosing Inspect.</li>
+        <li data-reveal>Go to <strong>Application</strong> in Chrome and Edge, or <strong>Storage</strong> in Firefox and Safari.</li>
+        <li data-reveal>Under <strong>Indexed Databases</strong>, delete the database named <span class="rbx-code">resumeboard</span>.</li>
+        <li data-reveal>Under <strong>Local Storage</strong>, remove every key listed in the table above.</li>
+        <li data-reveal>Under <strong>Cache Storage</strong>, delete the caches whose names start with <span class="rbx-code">rb-static-</span>. These hold the app's files, not your data; deleting them only means the next visit downloads the app again.</li>
+        <li data-reveal>Or use the browser's own controls. In Chrome and Edge, Settings &rarr; Privacy and security &rarr; Third-party cookies &rarr; See all site data and permissions, then search for the site's address and delete it. In Safari, Settings &rarr; Privacy and security &rarr; Manage Website Data, then search for the site.</li>
+      </ul>
+
+      <h3 class="rbx-mt-6">If you opened the app from a folder on disk</h3>
+      <p>
+        Pages opened from <span class="rbx-code">file://</span> sit on a storage
+        origin of their own and browsers handle that inconsistently. The reliable
+        method is the console. Open the app, press F12, choose the Console, and run:
+      </p>
+      <code class="rbx-path">indexedDB.deleteDatabase('resumeboard')</code>
+      <code class="rbx-path">Object.keys(localStorage).filter(k =&gt; k.startsWith('rb:')).forEach(k =&gt; localStorage.removeItem(k))</code>
+      <p>
+        Then reload the page. You will get an empty resume, which is the correct
+        result. That is what deleting means.
+      </p>
+
+      <h3 class="rbx-mt-6">Things that delete it without asking</h3>
+      <ul class="rbx-list rbx-list--no">
+        <li data-reveal>Clearing browsing data, or site data, in your browser settings.</li>
+        <li data-reveal>Using a private or incognito window. Anything stored there is discarded when the window closes.</li>
+        <li data-reveal>Browser eviction under storage pressure. Browsers may reclaim site data when a device is low on space, and there is no notice and no copy kept anywhere else.</li>
+        <li data-reveal>Opening the app in a different browser, a different profile, or at a different address. Each of those is a separate storage bucket, so each starts empty.</li>
+        <li data-reveal>Uninstalling the browser, wiping the profile, or changing the folder the files live in.</li>
+      </ul>
+      <p>
+        That is the cost of a local-only app, without hedging: a deletion is
+        complete, because there is no copy on any server, and an accident is not
+        recoverable by anyone.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="export">
+    <div class="rbx-wrap">
+      <h2>How to export a backup</h2>
+      <p>
+        A backup is a single JSON file containing the same object the app saves
+        locally, including your design settings. It is plain text you can read in
+        any editor, and it is small enough to email to yourself.
+      </p>
+      <ul class="rbx-list rbx-list--num">
+        <li data-reveal>Open the builder and use the export button in the topbar, choosing the JSON format. The file is named after your name &mdash; <span class="rbx-code">alex-morgan.json</span> if your name is Alex Morgan, or <span class="rbx-code">resume.json</span> if you have not set one.</li>
+        <li data-reveal>The file is built in the page as a blob and handed to your browser's own download mechanism. It is not posted anywhere, and there is no upload step to wait for.</li>
+        <li data-reveal>Keep it somewhere you control: a folder, a cloud drive you chose, an email to yourself. The app has no opinion and keeps no copy.</li>
+        <li data-reveal>To restore, open the builder on any device and use <strong>Import</strong> to load the file. It restores your content and your design settings, and it does not restore the undo history.</li>
+      </ul>
+      <p>
+        The example resumes can be downloaded the same way, so you can read the
+        exact shape of the file before writing your own. Start with
+        <a href="examples/software-engineer.html">the software engineer example</a>
+        or <a href="examples/product-designer.html">the product designer example</a>;
+        both have a <strong>Download JSON</strong> button.
+      </p>
+      <p>
+        The exported file is a snapshot. It does not update itself and it is not
+        synced. If you keep editing, export again.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="eviction">
+    <div class="rbx-wrap">
+      <h2>Eviction, and what the app does to reduce it</h2>
+      <p>
+        The resume is written about 400 milliseconds after you stop typing, not on
+        every keystroke, and the app writes once more when the tab is closed or
+        navigated away from, so the last edit before you leave is not the one that
+        gets lost. It also asks the browser, once at start-up, to mark this site's
+        storage as persistent, which is the standard request that stops a browser
+        reclaiming an origin's data when a device runs low on space.
+      </p>
+      <p>
+        All of that is a local write. There is no automatic export file, no second
+        copy in a folder you did not choose, and no mirror on a server. If the
+        browser evicts the data anyway &mdash; and a browser is free to, because the
+        request can be refused &mdash; the only version that survives is the one you
+        exported. The example resumes are a good place to see what a finished file
+        looks like before you trust the process with your own.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="shared">
+    <div class="rbx-wrap">
+      <h2>If you are on a shared computer</h2>
+      <p>
+        The storage belongs to a browser profile at an address, not to you. Anyone
+        who opens the builder in that same profile sees the resume you left there,
+        including your email, phone number, and address. This is the most common way
+        a local-only app leaks, and it has nothing to do with us.
+      </p>
+      <ul class="rbx-list rbx-list--num">
+        <li data-reveal>Export the JSON first. Do this before anything else, because after a reset the file is the only copy.</li>
+        <li data-reveal>Use a private or incognito window for anything you would not leave on screen. Nothing in it survives the window closing.</li>
+        <li data-reveal>When you are done, use <strong>Start a new resume</strong> in the overflow menu, and if the machine is not yours, delete the database as well. The reset is an ordinary edit: the previous resume moves into the stored undo history, which is written to disk like everything else.</li>
+        <li data-reveal>Do not leave a share link in the address bar. The link is a complete copy of the resume, and it is readable by anyone who has the string.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="rb-section" id="third-parties">
+    <div class="rbx-wrap">
+      <h2>Third parties</h2>
+      <p>
+        One, and only on a path you choose. Resumeboard has no advertising network,
+        no data broker, no analytics vendor, no session-replay tool, no customer
+        support platform, no error-reporting service, and no subprocessor, because
+        there is no processor and no data to process. cdnjs, the content delivery
+        network that serves pdf.js, is the single external host the codebase can
+        reach, and it is reached only when you ask for PDF import.
+      </p>
+      <p>
+        Everything this site serves is a file in the same directory tree, from
+        <span class="rbx-code">favicon.svg</span> to
+        <span class="rbx-code">sw.js</span>. There is no build step, no bundler, no
+        package downloaded at runtime, and no web font.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="children">
+    <div class="rbx-wrap">
+      <h2>Children, and changes to this page</h2>
+      <p>
+        The builder is not directed at children, and it collects nothing from
+        anyone, so there is no personal information held about a child. If you are
+        under 16, ask a parent before putting personal details into a resume you
+        plan to share.
+      </p>
+      <p>
+        This page is a plain file in the same tree as the application, which is also
+        why it can be checked. Every claim above names the source file it comes
+        from, and the app is plain HTML, CSS, and JavaScript that you can read in
+        full. If a claim here and a line of code ever disagree, the code is the
+        truth and the claim is the bug.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="questions">
+    <div class="rbx-wrap">
+      <h2>Questions people ask</h2>
+
+      <h3 class="rbx-mt-6">Is my resume uploaded anywhere?</h3>
+      <p>
+        No. The builder writes your resume into your own browser, in a database
+        called <span class="rbx-code">resumeboard</span>, and it never opens a
+        connection that carries it. The one feature that is designed to reach the
+        network is PDF import, which downloads a PDF reader from
+        cdnjs.cloudflare.com after you ask for it and shows you the two exact
+        addresses first. The file you pick is read in your browser and is not
+        uploaded.
+      </p>
+
+      <h3 class="rbx-mt-6">Can the browser delete my resume without asking me?</h3>
+      <p>
+        Yes, and this is the one real cost of a local-only app. Browsers may reclaim
+        site data when a device is low on space, clearing your browsing data removes
+        it, and a private window throws it away when it closes. At start-up the app
+        asks the browser to mark its storage as persistent, which lowers the risk but
+        does not remove it. If you want a copy that no browser can take from you,
+        export the JSON file and keep it somewhere you control.
+      </p>
+
+      <h3 class="rbx-mt-6">What happens if I use a shared or work computer?</h3>
+      <p>
+        The resume is tied to that browser profile and that address, so the next
+        person to open the builder on the same profile sees what you typed. Do the
+        export first, then use <strong>Start a new resume</strong> in the overflow
+        menu, and if the machine is not yours delete the database as well, because
+        that reset is an ordinary edit and the previous resume moves into the stored
+        undo history. A private window is the cleaner option, because everything in
+        it is discarded on close.
+      </p>
+
+      <h3 class="rbx-mt-6">Does a share link send my resume to a server?</h3>
+      <p>
+        No. A share link puts the whole resume in the part of the address after the
+        <span class="rbx-code">#</span>, which browsers never put in a request. The
+        resume is decoded from the link in your browser. What is true is that
+        anyone holding the link can read the resume, so treat it like a document you
+        handed over. Your photo is left out of links unless you deliberately ask to
+        include it, and only if it is under 60,000 characters.
+      </p>
+
+      <h3 class="rbx-mt-6">Where do I send a privacy question?</h3>
+      <p>
+        Nowhere, because there is no server to receive it. This page is a plain file
+        served from the same directory as the app, and every claim on it names the
+        source file it comes from, so the fastest answer to a question is usually to
+        read the line it points at. If you would rather read about the design
+        decisions behind all of this, <a href="about.html">the about page</a> covers
+        the trade-offs, and the <a href="guides/index.html">guides</a> cover the writing.
+      </p>
+
+      <div class="rbx-actions" style="margin-top:var(--rb-space-8)">
+        <a class="rb-btn rb-btn--primary rb-btn--lg" href="editor.html#start">Open the builder</a>
+        <a class="rb-btn rb-btn--secondary rb-btn--lg" href="about.html">How the app works</a>
+        <a class="rb-btn rb-btn--ghost rb-btn--lg" href="guides/index.html">Writing guides</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="rb-site-footer">
+  <div class="rb-site-footer__inner">
+    <div>
+      <h2>Resumeboard</h2>
+      <p>A resume builder that runs entirely in your browser. No account, no server, no tracking.</p>
+    </div>
+    <nav aria-label="Product">
+      <h2>Product</h2>
+      <a href="editor.html#start">Open the builder</a>
+      <a href="examples/index.html">Resume examples</a>
+      <a href="ats/index.html">ATS parsing reference</a>
+    </nav>
+    <nav aria-label="Project">
+      <h2>Project</h2>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+      <a href="guides/index.html">Guides</a>
+      <a href="404.html">Page not found</a>
+    </nav>
+  </div>
+
+    </footer>
+
+<script>
+/* Theme button. The builder and the guides both store their light/dark choice
+ * under the same key, so the toggle here follows whatever the app decided. The
+ * class is set in the head, and only revealed once this script has run, so the
+ * button never appears with a label that does not match the current theme. */
+(function (win, doc) {
+  'use strict';
+  var KEY = 'rb:theme';
+  var THEMES = ['light', 'dark'];
+  var button = doc.querySelector('[data-theme-toggle]');
+  if (!button) return;
+
+  function current() {
+    var set = doc.documentElement.getAttribute('data-theme');
+    if (THEMES.indexOf(set) !== -1) return set;
+    return win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function label() {
+    button.textContent = current() === 'dark' ? 'Light' : 'Dark';
+    button.setAttribute('aria-label', 'Switch to ' + button.textContent.toLowerCase() + ' theme');
+  }
+
+  button.hidden = false;
+  label();
+
+  button.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    doc.documentElement.setAttribute('data-theme', next);
+    try { win.localStorage.setItem(KEY, next); } catch (e) { /* the choice just will not persist */ }
+    label();
+  });
+
+  if (!win.matchMedia) return;
+  var query = win.matchMedia('(prefers-color-scheme: dark)');
+  var onChange = function () {
+    if (doc.documentElement.getAttribute('data-theme')) return;
+    label();
+  };
+  if (query.addEventListener) query.addEventListener('change', onChange);
+  else if (query.addListener) query.addListener(onChange);
+})(window, document);
+</script>
+
+<script src="assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="assets/js/motion.js?v=d639f64b7f"></script>
+  <div class="rb-contact" role="contentinfo" aria-label="Contact">
+    <span class="rb-contact__label">Built by</span>
+    <strong class="rb-contact__name">Utkarsh</strong>
+    <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>
+    <span class="rb-contact__dot" aria-hidden="true">·</span>
+    <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </div>
+</body>
+</html>

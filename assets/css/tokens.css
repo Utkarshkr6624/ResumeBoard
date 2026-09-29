@@ -1,0 +1,211 @@
+/* Resumeboard — design tokens
+ * The app chrome and the resume document are two separate token universes.
+ * App tokens live in :root. Document tokens (--rb-doc-*) are set on the
+ * resume root by the renderer, because they change per template.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Neutral ramp — cool, slightly desaturated, reads as "tool" not "toy" */
+  --rb-gray-0:  #ffffff;
+  --rb-gray-25: #fcfcfd;
+  --rb-gray-50: #f7f8fa;
+  --rb-gray-100:#eef0f4;
+  --rb-gray-150:#e4e7ec;
+  --rb-gray-200:#d7dbe3;
+  --rb-gray-300:#b9c0cc;
+  --rb-gray-400:#8d97a8;
+  --rb-gray-500:#697386;
+  --rb-gray-600:#4d5666;
+  --rb-gray-700:#363e4c;
+  --rb-gray-800:#232936;
+  --rb-gray-900:#151a23;
+  --rb-gray-950:#0c1017;
+
+  /* Accent — a confident indigo. Deep enough to pass AA on white at 600. */
+  --rb-accent-50:  #eef1ff;
+  --rb-accent-100: #dfe4ff;
+  --rb-accent-200: #c4cdff;
+  --rb-accent-300: #9fadff;
+  --rb-accent-400: #7b86ff;
+  --rb-accent-500: #5c62f5;
+  --rb-accent-600: #4743e0;
+  --rb-accent-700: #3a35bd;
+  --rb-accent-800: #302d99;
+  --rb-accent-900: #2b2a7b;
+
+  /* Feedback */
+  --rb-green-50:#ecfdf3;  --rb-green-200:#a6f4c5; --rb-green-600:#047857; --rb-green-700:#065f46;
+  --rb-amber-50:#fffaeb;  --rb-amber-200:#fedf89; --rb-amber-600:#b54708; --rb-amber-700:#93370d;
+  --rb-red-50:#fef3f2;    --rb-red-200:#fecdca;   --rb-red-500:#d92d20;  --rb-red-700:#912018;
+  --rb-blue-50:#eff8ff;   --rb-blue-200:#b9e6fe;  --rb-blue-600:#026aa2; --rb-blue-700:#0550ae;
+
+  /* Semantic surfaces (light) */
+  --rb-bg:            var(--rb-gray-50);
+  --rb-bg-elevated:   var(--rb-gray-0);
+  --rb-bg-sunken:     var(--rb-gray-100);
+  --rb-bg-inset:      #f3f5f8;
+  --rb-bg-hover:      var(--rb-gray-100);
+  --rb-bg-active:     var(--rb-gray-150);
+  --rb-bg-inverse:    var(--rb-gray-900);
+
+  --rb-text:          var(--rb-gray-900);
+  --rb-text-secondary:var(--rb-gray-600);
+  --rb-text-muted:    var(--rb-gray-500);
+  --rb-text-faint:    var(--rb-gray-400);
+  --rb-text-inverse:  var(--rb-gray-0);
+  --rb-text-accent:   var(--rb-accent-700);
+
+  --rb-border:        var(--rb-gray-200);
+  --rb-border-strong: var(--rb-gray-300);
+  --rb-border-subtle: var(--rb-gray-150);
+
+  --rb-shadow-xs: 0 1px 2px rgba(16,24,40,.05);
+  --rb-shadow-sm: 0 1px 3px rgba(16,24,40,.10), 0 1px 2px rgba(16,24,40,.06);
+  --rb-shadow-md: 0 4px 8px -2px rgba(16,24,40,.10), 0 2px 4px -2px rgba(16,24,40,.06);
+  --rb-shadow-lg: 0 12px 16px -4px rgba(16,24,40,.08), 0 4px 6px -2px rgba(16,24,40,.03);
+  --rb-shadow-xl: 0 20px 24px -4px rgba(16,24,40,.08), 0 8px 8px -4px rgba(16,24,40,.03);
+  --rb-shadow-doc: 0 1px 3px rgba(16,24,40,.10), 0 8px 24px -6px rgba(16,24,40,.12);
+  --rb-focus-ring: 0 0 0 2px var(--rb-bg-elevated), 0 0 0 4px var(--rb-accent-500);
+
+  /* Spacing — 4px base */
+  --rb-space-0: 0;
+  --rb-space-1: 0.25rem;
+  --rb-space-2: 0.5rem;
+  --rb-space-3: 0.75rem;
+  --rb-space-4: 1rem;
+  --rb-space-5: 1.25rem;
+  --rb-space-6: 1.5rem;
+  --rb-space-7: 1.75rem;
+  --rb-space-8: 2rem;
+  --rb-space-10: 2.5rem;
+  --rb-space-12: 3rem;
+  --rb-space-16: 4rem;
+  --rb-space-20: 5rem;
+  --rb-space-24: 6rem;
+
+  /* Radii */
+  --rb-radius-xs: 4px;
+  --rb-radius-sm: 6px;
+  --rb-radius-md: 8px;
+  --rb-radius-lg: 12px;
+  --rb-radius-xl: 16px;
+  --rb-radius-2xl: 20px;
+  --rb-radius-full: 999px;
+
+  /* Type scale */
+  --rb-font-sans: "Inter var", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --rb-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --rb-text-2xs: 0.6875rem;
+  --rb-text-xs:  0.75rem;
+  --rb-text-sm:  0.8125rem;
+  --rb-text-base:0.875rem;
+  --rb-text-md:  0.9375rem;
+  --rb-text-lg:  1.0625rem;
+  --rb-text-xl:  1.25rem;
+  --rb-text-2xl:1.5rem;
+  --rb-text-3xl:1.875rem;
+  --rb-text-4xl:2.25rem;
+  --rb-text-5xl:2.75rem;
+
+  /* Motion */
+  --rb-dur-fast: 110ms;
+  --rb-dur-base: 180ms;
+  --rb-dur-slow: 280ms;
+  --rb-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --rb-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --rb-ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+
+  /* Layout */
+  --rb-topbar-h: 52px;
+  --rb-subbar-h: 44px;
+  --rb-panel-w: 380px;
+  --rb-editor-w: 400px;
+  --rb-rail-w: 232px;
+  --rb-z-header: 40;
+  --rb-z-panel: 30;
+  --rb-z-popover: 60;
+  --rb-z-modal: 80;
+  --rb-z-toast: 90;
+
+  /* Document base — 1rem here means 12pt in the resume, not 16px.
+   * Every measurement inside a resume is in pt so that print and screen
+   * agree exactly. Changing this single number rescales the whole document.
+   * The type scale, the measure and the vertical rhythm that sit on top of
+   * --rb-doc-size live in templates.css, next to the rules that use them. */
+  --rb-doc-pt: 12pt;
+  --rb-doc-font: var(--rb-font-sans);
+  --rb-doc-size: 10.5pt;
+  --rb-doc-leading: 1.32;
+  --rb-doc-accent: #1f2937;
+  --rb-doc-section-gap: 14pt;
+  --rb-doc-entry-gap: 7pt;
+  --rb-doc-margin: 0.6in;
+  /* A length, not a number: the stylesheet adds its own tracking on top of it
+   * for the uppercase section headings. */
+  --rb-doc-tracking: 0em;
+  --rb-doc-bullet: "•";
+  --rb-doc-rule: 0.6pt;
+}
+
+/* Dark theme. Applied by preference or explicit toggle, on <html>. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rb-bg:            #0c1017;
+    --rb-bg-elevated:   #151a23;
+    --rb-bg-sunken:     #080b10;
+    --rb-bg-inset:      #111621;
+    --rb-bg-hover:      #1c2330;
+    --rb-bg-active:     #232b3a;
+    --rb-bg-inverse:    var(--rb-gray-0);
+
+    --rb-text:          #e8ebf0;
+    --rb-text-secondary:#a8b1c0;
+    --rb-text-muted:    #7d8798;
+    --rb-text-faint:    #5b6474;
+    --rb-text-inverse:  var(--rb-gray-900);
+    --rb-text-accent:   var(--rb-accent-300);
+
+    --rb-border:        #262e3c;
+    --rb-border-strong: #38425333;
+    --rb-border-subtle: #1d2430;
+
+    --rb-shadow-xs: 0 1px 2px rgba(0,0,0,.4);
+    --rb-shadow-sm: 0 1px 3px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4);
+    --rb-shadow-md: 0 4px 8px -2px rgba(0,0,0,.55), 0 2px 4px -2px rgba(0,0,0,.4);
+    --rb-shadow-lg: 0 12px 16px -4px rgba(0,0,0,.6), 0 4px 6px -2px rgba(0,0,0,.4);
+    --rb-shadow-xl: 0 20px 24px -4px rgba(0,0,0,.65), 0 8px 8px -4px rgba(0,0,0,.4);
+    --rb-focus-ring: 0 0 0 2px var(--rb-bg), 0 0 0 4px var(--rb-accent-400);
+  }
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --rb-bg:            #0c1017;
+  --rb-bg-elevated:   #151a23;
+  --rb-bg-sunken:     #080b10;
+  --rb-bg-inset:      #111621;
+  --rb-bg-hover:      #1c2330;
+  --rb-bg-active:     #232b3a;
+  --rb-bg-inverse:    var(--rb-gray-0);
+
+  --rb-text:          #e8ebf0;
+  --rb-text-secondary:#a8b1c0;
+  --rb-text-muted:    #7d8798;
+  --rb-text-faint:    #5b6474;
+  --rb-text-inverse:  var(--rb-gray-900);
+  --rb-text-accent:   var(--rb-accent-300);
+
+  --rb-border:        #262e3c;
+  --rb-border-subtle: #1d2430;
+
+  --rb-shadow-xs: 0 1px 2px rgba(0,0,0,.4);
+  --rb-shadow-sm: 0 1px 3px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4);
+  --rb-shadow-md: 0 4px 8px -2px rgba(0,0,0,.55), 0 2px 4px -2px rgba(0,0,0,.4);
+  --rb-shadow-lg: 0 12px 16px -4px rgba(0,0,0,.6), 0 4px 6px -2px rgba(0,0,0,.4);
+  --rb-shadow-xl: 0 20px 24px -4px rgba(0,0,0,.65), 0 8px 8px -4px rgba(0,0,0,.4);
+  --rb-focus-ring: 0 0 0 2px var(--rb-bg), 0 0 0 4px var(--rb-accent-400);
+}
+
+html[data-theme="light"] { color-scheme: light; }

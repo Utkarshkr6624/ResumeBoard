@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Resumeboard — a browser-only resume builder</title>
+<meta name="description" content="Resumeboard is a resume builder with no account, no server and no tracking. Your document is a file on your own device. This page explains how it works and why.">
+<link rel="canonical" href="https://resumeboard.app/about.html">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resumeboard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="About Resumeboard — a browser-only resume builder">
+<meta property="og:description" content="Resumeboard is a resume builder with no account, no server and no tracking. Your document is a file on your own device. This page explains how it works and why.">
+<meta property="og:url" content="https://resumeboard.app/about.html">
+<meta property="og:image" content="https://resumeboard.app/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Resumeboard — a resume builder that runs in your browser">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About Resumeboard — a browser-only resume builder">
+<meta name="twitter:description" content="Resumeboard is a resume builder with no account, no server and no tracking. Your document is a file on your own device. This page explains how it works and why.">
+<meta name="twitter:image" content="https://resumeboard.app/assets/img/og-image.png">
+<link rel="alternate" hreflang="en" href="https://resumeboard.app/about.html">
+<link rel="alternate" hreflang="x-default" href="https://resumeboard.app/about.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About Resumeboard — a browser-only resume builder",
+  "description": "Resumeboard is a resume builder with no account, no server and no tracking. Your document is a file on your own device. This page explains how it works and why.",
+  "url": "https://resumeboard.app/about.html",
+  "inLanguage": "en",
+  "isPartOf": { "@type": "WebSite", "name": "Resumeboard", "url": "https://resumeboard.app/" }
+}
+</script>
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/examples.css">
+<script src="assets/js/reset-guard.js?v=d639f64b7f"></script>
+  <link rel="stylesheet" href="assets/css/motion.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+</head>
+<body class="rb-site">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="rb-site-header">
+  <div class="rb-site-header__inner">
+    <a class="rb-site-brand" href="index.html">
+      <span class="rb-site-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" stroke-linejoin="round"/><path d="M14 2v5h5" stroke-linejoin="round"/><path d="M8 13h8M8 17h5" stroke-linecap="round"/></svg></span>
+      <span>Resumeboard</span>
+    </a>
+    <nav class="rb-site-nav" aria-label="Site">
+      <span class="rb-sz-host" data-site-size></span>
+      <a href="editor.html#start">Open the builder</a>
+      <a href="examples/index.html">Examples</a>
+      <a href="about.html" aria-current="page">About</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="rb-site-main" tabindex="-1">
+
+  <div class="rbx-wrap">
+    <div class="rb-page-head">
+      <span class="eyebrow">About</span>
+      <h1>A resume builder that stops at the edge of your browser.</h1>
+      <p class="lede">
+        Resumeboard is a set of static files. You open it, you type, and the pages
+        you download are yours. There is no account to create, no server that holds
+        your document, and nothing that reports back. That is not a policy promise
+        bolted onto a normal app. It is the only kind of app this codebase can be.
+      </p>
+    </div>
+  </div>
+
+  <section class="rb-section">
+    <div class="rbx-wrap">
+      <h2>What it actually is</h2>
+      <p>
+        Three things: an editor, a set of templates, and an export path to PDF and
+        plain text. You edit directly on the page — the document is the editing
+        surface, so what you see while you type is what prints. There is no form
+        wizard on the side pretending to summarise your life.
+      </p>
+      <ul class="rbx-list">
+        <li data-reveal><strong>Everything is one document.</strong> Sections in the order you want them, entries inside them, nothing hidden in a drawer.</li>
+        <li data-reveal><strong>Every field is a live check.</strong> Empty required fields, broken links, and thin sections are flagged as you type, not after you export.</li>
+        <li data-reveal><strong>Design is a small set of decisions.</strong> Margins, type size, line height, heading treatment, one accent colour. No theme gallery.</li>
+        <li data-reveal><strong>Print is the destination.</strong> The page size, margins, and type scale are measured in points so the screen and the paper agree.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="rb-section">
+    <div class="rbx-wrap">
+      <h2>Where your resume lives</h2>
+      <p>
+        When you type, the app writes your resume to your browser's storage on the
+        same device. It stays there between visits. It is not uploaded, because
+        there is nowhere for it to be uploaded to.
+      </p>
+      <p>
+        That has one real consequence worth stating plainly: <strong>your resume is
+        tied to this browser, on this device, at this address.</strong> Clearing
+        site data, using a different browser, or opening the app from a different
+        folder gives you an empty document. If that matters to you, export a backup
+        file. The <a href="privacy.html#delete">privacy page</a> explains how to
+        delete the stored copy and how to keep a backup you control.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section">
+    <div class="rbx-wrap">
+      <h2>Why it is built this way</h2>
+      <p>
+        A resume is the most sensitive document most people own, and the standard
+        way to build one online is to hand it to a stranger's database. We took the
+        other option seriously enough to accept the trade-offs that come with it:
+      </p>
+      <ul class="rbx-list rbx-list--num">
+        <li data-reveal><strong>No accounts, so no recovery.</strong> If you lose the device you lose the local copy. Backups are the answer, and the app makes exporting one a two-click job.</li>
+        <li data-reveal><strong>No collaboration, so no merge conflicts.</strong> There is no shared document, no comments, no "Alex is editing".</li>
+        <li data-reveal><strong>No server, so no cross-device sync.</strong> If you want the same resume on your phone, you import the exported file.</li>
+        <li data-reveal><strong>No tracking, so no product analytics.</strong> We cannot tell you which button people press most, because we never find out. The trade-off buys a document that never leaves the machine.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="rb-section">
+    <div class="rbx-wrap">
+      <h2>What it deliberately does not do</h2>
+      <ul class="rbx-list rbx-list--no">
+        <li data-reveal>No score out of ten. An ATS is not a grader, and a number that looks authoritative is usually neither.</li>
+        <li data-reveal>No job-board scraping, keyword stuffing, or "beat the filter" advice.</li>
+        <li data-reveal>No auto-formatting that rewrites your sentences into passive voice.</li>
+        <li data-reveal>No login, no cloud sync, no "share with your team".</li>
+      </ul>
+      <p>
+        The one network request the app can make is fetching a PDF parsing library
+        from a CDN, and only after you choose <strong>Import from PDF</strong> and
+        pick a file. Nothing else in the codebase opens a connection. See
+        <a href="privacy.html">the privacy page</a> for the itemised list.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section">
+    <div class="rbx-wrap">
+      <h2>Accessibility and quality</h2>
+      <p>
+        Every control has a label, every icon-only button has a spoken name and a
+        tooltip, and the whole app is operable from the keyboard. Focus is visible
+        at every step, colour contrast is checked against the token palette in
+        both light and dark mode, and nothing animates when your system asks for
+        reduced motion. It is usable at 360 pixels wide, where the section rail
+        becomes a drawer and the editing panel becomes a sheet.
+      </p>
+      <p>
+        Dark mode is a peer of light mode, not an inverted afterthought. The token
+        file defines both palettes side by side, and the document templates inherit
+        the same names.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section">
+    <div class="rbx-wrap">
+      <h2>See a finished resume first</h2>
+      <p>
+        The <a href="examples/index.html">examples</a> are complete, fictional resumes written
+        for six roles — product designer, software engineer, marketing manager,
+        nurse, accountant, and teacher. Each one is annotated with why it works, and
+        each one can be loaded into the editor as a starting point, so you can see
+        the structure you are aiming for before you type a word of your own.
+      </p>
+      <div class="rbx-actions">
+        <a class="rb-btn rb-btn--primary rb-btn--lg" href="editor.html#start">Open the builder</a>
+        <a class="rb-btn rb-btn--secondary rb-btn--lg" href="examples/index.html">Browse the examples</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="rb-site-footer">
+  <div class="rb-site-footer__inner">
+    <div>
+      <h2>Resumeboard</h2>
+      <p>A resume builder that runs entirely in your browser. No account, no server, no tracking.</p>
+    </div>
+    <nav aria-label="Product">
+      <h2>Product</h2>
+      <a href="editor.html#start">Open the builder</a>
+      <a href="examples/index.html">Resume examples</a>
+      <a href="examples/product-designer.html">Product designer example</a>
+    </nav>
+    <nav aria-label="Project">
+      <h2>Project</h2>
+      <a href="about.html">About</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="404.html">Page not found</a>
+    </nav>
+  </div>
+
+    <p class="rb-foot__contact"><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> <span aria-hidden="true">&middot;</span> <a href="contact.html">Contact</a></p>
+</footer>
+
+<script src="assets/js/core/utils.js?v=d639f64b7f"></script>
+<script src="assets/js/motion.js?v=d639f64b7f"></script>
+  <div class="rb-contact" role="contentinfo" aria-label="Contact">
+    <span class="rb-contact__label">Built by</span>
+    <strong class="rb-contact__name">Utkarsh</strong>
+    <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>
+    <span class="rb-contact__dot" aria-hidden="true">·</span>
+    <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </div>
+</body>
+</html>

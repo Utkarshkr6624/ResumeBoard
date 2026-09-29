@@ -1,0 +1,1451 @@
+/* Resumeboard — accessibility fix layer
+ * ============================================================================
+ * A single override sheet, loaded LAST, after tokens / base / app / editor /
+ * templates / site / gallery / examples / home and (on screen) print.css.
+ * Nothing here changes the default look. Every block is inert until one of
+ * three things happens:
+ *
+ *   1. The operating system asks for it        (@media prefers-*)
+ *   2. The user asks for it                    (attribute on <html>)
+ *   3. The browser enters forced colors        (@media forced-colors)
+ *
+ * ---------------------------------------------------------------------------
+ * HOOK CONTRACT — attributes the preferences module sets on <html>
+ * ---------------------------------------------------------------------------
+ * All are optional. `data-a11y-*` values are ADDITIVE over the media queries:
+ * the sheet never turns a preference off, so a user who both enables Windows
+ * high contrast and ticks the in-app contrast toggle gets the stronger of the
+ * two, not a race between stylesheets.
+ *
+ *   data-a11y-contrast   "high"    Increased-contrast text mode. Auto-engaged
+ *                                   by prefers-contrast: more.
+ *   data-a11y-focus      "thick"   3px ring with a wider offset.
+ *                     | "always"   Ring on every :focus, not just
+ *                                   :focus-visible — for switch access, voice
+ *                                   control and anyone who cannot judge hover
+ *                                   state. Also implies "thick".
+ *   data-a11y-spacing    "relaxed" Text-spacing override that beats every
+ *                                   design declaration in the other sheets.
+ *                                   Auto-engaged per-node by
+ *                                   #rb-doc[data-a11y-spacing="relaxed"].
+ *   data-a11y-targets    "large"   44px pointer targets. Fine-tune with
+ *                                   --rb-a11y-target / --rb-a11y-target-sm.
+ *   data-a11y-transparency "off"  Drops blur and translucency. Auto-engaged by
+ *                                   prefers-reduced-transparency: reduce.
+ *   data-a11y-print      "plain"   @media print only. Black on white, every
+ *                                   fill removed, borders instead of tints,
+ *                                   no drop of the user's own colours.
+ *
+ * ESCAPE HATCH for the document: the resume is a printed artifact, so a change
+ * to its tracking is a pagination change rather than an accessibility
+ * affordance. Sections 4 and 5 therefore leave #rb-doc alone unless the
+ * document itself carries the same data-a11y-spacing, which the design panel
+ * can set when it grows a document-level type control.
+ *
+ * ---------------------------------------------------------------------------
+ * WHAT THIS FILE WILL NOT DO
+ * ---------------------------------------------------------------------------
+ * - It does not weaken prefers-reduced-motion. Section 8 re-asserts the
+ *   reduced-motion kills on top of everything above, because a target-size or
+ *   transparency change can otherwise leave a transform running on a control
+ *   that gained a new transition.
+ * - It does not weaken prefers-contrast: more. The increased-contrast block is
+ *   a union with the media query, never an alternative to it.
+ * - It does not recolour #rb-doc outside forced colors. The resume is the
+ *   user's own design and the design panel's output.
+ * - It does not use JS, network, or a build step. It is a stylesheet.
+ *
+ * Specificity note: ui/chrome.js, ui/rail.js and ui/panel.js inject their own
+ * <style> elements at runtime, i.e. after this file. Overrides aimed at those
+ * surfaces are therefore written as `body .x` (0,1,x) and up, never as a bare
+ * `.x` — the same rule app.css documents for its own overrides.
+ * ========================================================================= */
+
+
+/* ===========================================================================
+ * 1. Layer contract
+ * Tokens every later block reads. Declared once, on :root, so a wiring agent
+ * can retune a single number instead of hunting through the sheet.
+ * =========================================================================== */
+
+:root {
+  /* Focus indicator. Kept as three parts because the double ring (colour +
+   * halo) is the only construction that survives an unknown background. */
+  --rb-a11y-focus-width: 2px;
+  --rb-a11y-focus-offset: 2px;
+  --rb-a11y-focus-color: var(--rb-accent-500);
+  --rb-a11y-focus-halo: var(--rb-bg-elevated);
+
+  /* WCAG 2.2 SC 2.5.5 (AAA) asks for 44; SC 2.5.8 (AA) is satisfied at 24.
+   * 44 is the default because the alternative is a first-order target-size
+   * failure in a toolbar built from 26px controls. Controls that live packed
+   * edge to edge (segments, chips) take --rb-a11y-target-sm, which is still
+   * comfortably over the AA floor once the group's gap is counted. */
+  --rb-a11y-target: 44px;
+  --rb-a11y-target-sm: 32px;
+
+  /* WCAG 1.4.12 text-spacing values, expressed against the element's own
+   * font-size so they hold at any zoom level. */
+  --rb-a11y-line: 1.5;
+  --rb-a11y-letter: 0.12em;
+  --rb-a11y-word: 0.16em;
+  --rb-a11y-para: 2em;
+}
+
+html[data-a11y-focus="thick"],
+html[data-a11y-focus="always"] {
+  --rb-a11y-focus-width: 3px;
+  --rb-a11y-focus-offset: 3px;
+  --rb-a11y-focus-halo: var(--rb-bg);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --rb-a11y-focus-width: 3px;
+    --rb-a11y-focus-offset: 3px;
+  }
+}
+
+/* A user who has asked for thicker focus indicators wants the darker end of
+ * the accent ramp; the default 500 step is thin against a tinted surface. */
+html[data-a11y-focus="thick"],
+html[data-a11y-focus="always"] {
+  --rb-a11y-focus-color: var(--rb-accent-700);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]):is([data-a11y-focus="thick"], [data-a11y-focus="always"]) {
+    --rb-a11y-focus-color: var(--rb-accent-300);
+  }
+}
+html[data-theme="dark"]:is([data-a11y-focus="thick"], [data-a11y-focus="always"]) {
+  --rb-a11y-focus-color: var(--rb-accent-300);
+}
+
+
+/* ===========================================================================
+ * 2. Focus indicators
+ * base.css sets `:focus { outline: none }` and then relies on `:focus-visible`.
+ * That is correct in a browser, but it means any control that also declares
+ * `outline: none` of its own loses its indicator entirely, and any control
+ * that a runtime-injected stylesheet restyles can lose it too. The net below
+ * is one rule for every focusable thing, and the explicit rules after it
+ * restore the ring to the primitives that draw their focus with box-shadow.
+ * =========================================================================== */
+
+/* The :is() argument list is what gives this rule its weight: [tabindex] alone
+ * is (0,1,0), and the whole thing lands at (0,3,1) — above every class-based
+ * declaration in the other sheets and above the id-based ones in app.css. */
+body :is(
+  a[href], button, input, select, textarea, summary,
+  [role="button"], [role="tab"], [role="menuitem"], [role="option"], [role="switch"],
+  [contenteditable], [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+  outline-offset: var(--rb-a11y-focus-offset);
+}
+
+/* Engines without :focus-visible cannot tell keyboard from pointer, so the
+ * ring is unconditional there. Costs a ring on click; costs nothing else. */
+@supports not selector(:focus-visible) {
+  body :is(
+    a[href], button, input, select, textarea, summary,
+    [role="button"], [role="tab"], [role="menuitem"], [role="option"], [role="switch"],
+    [contenteditable], [tabindex]:not([tabindex="-1"])
+  ):focus {
+    outline: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+    outline-offset: var(--rb-a11y-focus-offset);
+  }
+}
+
+/* "always": switch access, voice control and voice-control users get the ring
+ * whether or not the heuristic fired. Declared after the two rules above and
+ * with the attribute doubled so it out-specifies both. */
+html[data-a11y-focus="always"] body :is(
+  a[href], button, input, select, textarea, summary,
+  [role="button"], [role="tab"], [role="menuitem"], [role="option"], [role="switch"],
+  [contenteditable], [tabindex]:not([tabindex="-1"])
+):focus {
+  outline: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+  outline-offset: var(--rb-a11y-focus-offset);
+}
+
+/* --- Primitives that draw focus with box-shadow, or suppress the outline --- */
+
+/* base.css drops the outline on focus and paints an 18%-alpha ring instead.
+ * That ring is invisible at high contrast, so the outline comes back and the
+ * shadow is dropped rather than doubled. */
+body .rb-input:focus,
+body .rb-select:focus,
+body .rb-textarea:focus {
+  outline: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+  outline-offset: 1px;
+  box-shadow: none;
+}
+body .rb-input[aria-invalid="true"]:focus,
+body .rb-textarea[aria-invalid="true"]:focus {
+  outline-color: var(--rb-red-700);
+}
+html[data-theme="dark"] .rb-input[aria-invalid="true"]:focus { outline-color: var(--rb-red-200); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-input[aria-invalid="true"]:focus,
+  html:not([data-theme="light"]) .rb-textarea[aria-invalid="true"]:focus { outline-color: var(--rb-red-200); }
+}
+
+/* The switch hides its input at 0x0, so :focus-visible lands on nothing. The
+ * ring has to be drawn on the track, which is the visible control. */
+body .rb-switch input:focus-visible + .rb-switch-track {
+  outline: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Range thumb: the input is 20px tall, so an outline on the input would ring
+ * the whole track rather than the handle. */
+body .rb-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 var(--rb-a11y-focus-offset) var(--rb-a11y-focus-halo);
+  border: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+}
+body .rb-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 var(--rb-a11y-focus-offset) var(--rb-a11y-focus-halo);
+  border: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+}
+
+/* These three declare `outline: none` in editor.css and signal focus with a
+ * two-stop box-shadow. The shadow is colour-only, so the ring returns. */
+body .rb-focus-ring:focus-visible,
+body .rb-optcard:focus-visible,
+body .rb-swatch:focus-visible {
+  outline: var(--rb-a11y-focus-width) solid var(--rb-a11y-focus-color);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* The selected state of a swatch is a box-shadow too. Losing the shadow on
+ * focus would lose the selection, so it is re-stated in forced colors (below)
+ * and kept as-is here. */
+body .rb-swatch[aria-pressed="true"]:focus-visible {
+  outline-offset: 3px;
+}
+
+/* The rail's collapse toggle and any runtime-injected icon button: the net
+ * above covers them, but their own hover fill sits under the ring, so the
+ * halo is pinned to the surface behind the control. */
+body .rb-rail [aria-expanded]:focus-visible,
+body .rb-panel__tabs [role="tab"]:focus-visible,
+body #rb-topbar [aria-pressed]:focus-visible {
+  outline-offset: 2px;
+}
+
+/* Focus must survive a scroll container. Without scroll-margin, tabbing to
+ * the last control in #rb-panel or #rb-stage parks it under the sticky bar. */
+body :is(#rb-panel, #rb-stage, #rb-rail, .rb-panel__body, .rb-scroll, [data-rb-scroll]) :focus-visible {
+  scroll-margin-block: var(--rb-space-8) var(--rb-space-8);
+}
+
+
+/* ===========================================================================
+ * 3. Increased-contrast text mode
+ * Two things are wrong at the default contrast, and only two: --rb-text-faint
+ * sits at roughly 2.9:1 on an elevated surface in light mode and 3.4:1 in
+ * dark, and the hairline borders are drawn from a 14%-alpha tint that
+ * disappears on a projector. Everything else already clears AA, so this block
+ * re-points those two scales and re-asserts the state that was being carried
+ * by a tint alone. It never lightens a colour to match a theme.
+ * =========================================================================== */
+
+/* --- Explicit toggle: light --- */
+html[data-a11y-contrast="high"] {
+  --rb-text-faint: var(--rb-text-secondary);
+  --rb-text-muted: var(--rb-text-secondary);
+
+  /* Light mode: stronger means darker. gray-400 is the first step of the
+   * neutral ramp that reaches 3:1 against paper, which is the floor for a
+   * border that is carrying meaning. */
+  --rb-border-subtle: var(--rb-gray-300);
+  --rb-border: var(--rb-gray-400);
+  --rb-border-strong: var(--rb-gray-500);
+
+  --rb-text-accent: var(--rb-accent-800);
+  --rb-focus-ring: 0 0 0 2px var(--rb-bg-elevated), 0 0 0 6px var(--rb-accent-700);
+
+  /* The same elevations as tokens.css with the alpha raised, plus a hard
+   * 1px rim on the page. A 5%-opacity shadow is the one cue that survives a
+   * bad monitor but not a bright room, and the paper needs a rim or it stops
+   * being a sheet. Only the alpha is changed; the geometry is tokens.css's. */
+  --rb-shadow-xs: 0 1px 2px rgba(16, 24, 40, .18);
+  --rb-shadow-sm: 0 1px 3px rgba(16, 24, 40, .22);
+  --rb-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, .22);
+  --rb-shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, .2);
+  --rb-shadow-xl: 0 20px 24px -4px rgba(16, 24, 40, .2);
+  --rb-shadow-doc: 0 0 0 1px var(--rb-gray-400), 0 8px 24px -6px rgba(16, 24, 40, .18);
+
+  /* editor.css's private palette, re-pointed at the opaque equivalents of
+   * its 8% / 14% tints. Declared on :root so it outranks the sheet-level
+   * block on .rb-panel without needing to know which module mounted. */
+  --_tint: var(--rb-accent-50);
+  --_tint-strong: var(--rb-accent-100);
+  --_ring-soft: var(--rb-accent-200);
+  --_hairline: var(--rb-gray-300);
+  --_ok-tint: var(--rb-green-50);
+  --_warn-tint: var(--rb-amber-50);
+  --_bad-tint: var(--rb-red-50);
+}
+
+/* --- Explicit toggle: dark --- */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"])[data-a11y-contrast="high"] {
+    --rb-text-faint: var(--rb-text-secondary);
+    --rb-text-muted: var(--rb-text-secondary);
+
+    --rb-border-subtle: var(--rb-gray-700);
+    --rb-border: var(--rb-gray-600);
+    --rb-border-strong: var(--rb-gray-500);
+
+    --rb-text-accent: var(--rb-accent-200);
+    --rb-focus-ring: 0 0 0 2px var(--rb-bg), 0 0 0 6px var(--rb-accent-300);
+  }
+}
+html[data-theme="dark"][data-a11y-contrast="high"] {
+  --rb-text-faint: var(--rb-text-secondary);
+  --rb-text-muted: var(--rb-text-secondary);
+
+  --rb-border-subtle: var(--rb-gray-700);
+  --rb-border: var(--rb-gray-600);
+  --rb-border-strong: var(--rb-gray-500);
+
+  --rb-text-accent: var(--rb-accent-200);
+  --rb-focus-ring: 0 0 0 2px var(--rb-bg), 0 0 0 6px var(--rb-accent-300);
+}
+
+/* --- prefers-contrast: more: the same repairs, with no attribute --- */
+@media (prefers-contrast: more) {
+  :root {
+    --rb-text-faint: var(--rb-text-secondary);
+    --rb-text-muted: var(--rb-text-secondary);
+    --rb-border-subtle: var(--rb-gray-300);
+    --rb-border: var(--rb-gray-400);
+    --rb-border-strong: var(--rb-gray-500);
+    --rb-text-accent: var(--rb-accent-800);
+    --_tint: var(--rb-accent-50);
+    --_tint-strong: var(--rb-accent-100);
+    --_ring-soft: var(--rb-accent-200);
+    --_hairline: var(--rb-gray-300);
+  }
+}
+/* Dark, from the OS rather than from the attribute. The pair of blocks below
+ * is the same split tokens.css uses: one for the media query, one for an
+ * explicit html[data-theme="dark"] with no media query, so a user who pinned
+ * dark while the OS is light still gets the dark repairs. */
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rb-text-faint: var(--rb-text-secondary);
+    --rb-text-muted: var(--rb-text-secondary);
+    --rb-border-subtle: var(--rb-gray-700);
+    --rb-border: var(--rb-gray-600);
+    --rb-border-strong: var(--rb-gray-500);
+    --rb-text-accent: var(--rb-accent-200);
+  }
+}
+@media (prefers-contrast: more) {
+  :root:is([data-theme="dark"]) {
+    --rb-text-faint: var(--rb-text-secondary);
+    --rb-text-muted: var(--rb-text-secondary);
+    --rb-border-subtle: var(--rb-gray-700);
+    --rb-border: var(--rb-gray-600);
+    --rb-border-strong: var(--rb-gray-500);
+    --rb-text-accent: var(--rb-accent-200);
+  }
+}
+
+/* --- Repairs that only apply once contrast is raised --- */
+
+/* Placeholders are text. --rb-text-faint is 2.9:1, so a control that reaches
+ * for it instead of the semantic token still fails. Both triggers re-point
+ * it; neither has to be on for the other to work. */
+html[data-a11y-contrast="high"] body :is(.rb-input, .rb-textarea)::placeholder {
+  color: var(--rb-text-secondary);
+  opacity: 1;
+}
+@media (prefers-contrast: more) {
+  body :is(.rb-input, .rb-textarea)::placeholder {
+    color: var(--rb-text-secondary);
+    opacity: 1;
+  }
+}
+
+/* base.css dims disabled controls with opacity, which drags the label under
+ * the 4.5:1 floor as well as the border. An opacity-reduced control is still
+ * a control, so it is re-expressed as a colour and a border instead. */
+html[data-a11y-contrast="high"] body :is(.rb-btn, .rb-btn-group .rb-btn, .rb-zoom__btn, .rb-range):disabled,
+html[data-a11y-contrast="high"] body :is(.rb-btn, .rb-btn-group .rb-btn, .rb-zoom__btn, .rb-range):disabled :is(*, *::before, *::after) {
+  opacity: 1;
+  color: var(--rb-text-muted);
+  border-color: var(--rb-border-strong);
+  background-color: var(--rb-bg-inset);
+}
+@media (prefers-contrast: more) {
+  body :is(.rb-btn, .rb-zoom__btn, .rb-range):disabled,
+  body :is(.rb-btn, .rb-zoom__btn, .rb-range):disabled :is(*, *::before, *::after) {
+    opacity: 1;
+    color: var(--rb-text-muted);
+    border-color: var(--rb-border-strong);
+    background-color: var(--rb-bg-inset);
+  }
+}
+
+/* A card that was identified by its hover fill and a 1px hairline needs the
+ * hairline promoted, or four cards on a page read as one surface. */
+html[data-a11y-contrast="high"] body :is(
+  .rb-card, .rb-l-card, .rb-l-faq__item, .card, .gp-card, .note, .rb-plain-card
+) {
+  border-color: var(--rb-border-strong);
+}
+@media (prefers-contrast: more) {
+  body :is(.rb-card, .rb-l-card, .rb-l-faq__item, .card, .gp-card, .note, .rb-plain-card) {
+    border-color: var(--rb-border-strong);
+  }
+}
+
+/* Design tokens that set `text-decoration: none` stop reading as links the
+ * moment colour is no longer carrying the distinction. Only the ones that are
+ * actually interactive and standalone: underlining a nav item in a horizontal
+ * bar is noise, and a hover-only selector would be a state that cannot be
+ * seen at all on a touch screen. */
+html[data-a11y-contrast="high"] body :is(
+  .rb-l-jump__list a, .rb-card-link, .gp-card--link,
+  .pager__link, .toc__link, .rbx-pager a
+) {
+  text-decoration: underline;
+}
+@media (prefers-contrast: more) {
+  body :is(
+    .rb-l-jump__list a, .rb-card-link, .gp-card--link,
+    .pager__link, .toc__link, .rbx-pager a
+  ) {
+    text-decoration: underline;
+  }
+}
+
+/* Status was tint + text colour. The text colour already survives; the tint
+ * becomes an edge so the badge has a shape on a mono screen. */
+html[data-a11y-contrast="high"] body :is(.rb-badge, .rb-chip, .gp-tag) {
+  border: 1px solid var(--rb-border-strong);
+}
+@media (prefers-contrast: more) {
+  body :is(.rb-badge, .rb-chip, .gp-tag) { border: 1px solid var(--rb-border-strong); }
+}
+
+/* The rail's completion dot is a 9px circle of pure state colour. In forced
+ * colors it survives; at raised contrast it needs a visible rim so a "partial"
+ * ring is not mistaken for an empty circle. */
+@media (prefers-contrast: more) {
+  body #rb-rail .rb-rail__dot { width: 12px; height: 12px; border-width: 2px; }
+  body .rb-save-dot { width: 9px; height: 9px; }
+}
+html[data-a11y-contrast="high"] body #rb-rail .rb-rail__dot {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+html[data-a11y-contrast="high"] body .rb-save-dot { width: 9px; height: 9px; }
+
+/* The sticky header carries its surface as an 86%-alpha fill over the page.
+ * At raised contrast there is nothing behind it to composite with, so it
+ * becomes opaque. */
+html[data-a11y-contrast="high"] :is(.masthead, .rb-site-header) {
+  background: var(--rb-bg);
+}
+@media (prefers-contrast: more) {
+  .masthead,
+  .rb-site-header { background: var(--rb-bg); }
+}
+
+
+/* ===========================================================================
+ * 4. Reduced-transparency fallback
+ * Two surfaces depend on seeing through themselves: the sticky header (86%
+ * fill + a 10px blur) and the modal backdrop (55% ink + a 2px blur). Removing
+ * the blur without replacing the fill leaves text sitting on a busy page, so
+ * both become fully opaque at the same time.
+ * =========================================================================== */
+
+@media (prefers-reduced-transparency: reduce) {
+  .masthead,
+  .rb-site-header,
+  body #rb-topbar {
+    background: var(--rb-bg) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  body .rb-modal-backdrop,
+  body .rb-scrim {
+    background: var(--rb-bg-inverse) !important;
+    opacity: 1;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* The backdrop stops being see-through, so it has to stop being
+   * translucent: an ink wash at 55% over opaque ink is 78% and the dialog
+   * behind it loses its edge. */
+  body .rb-modal {
+    border-width: 2px;
+    border-color: var(--rb-border-strong);
+  }
+
+  /* Every 8%/14%/18%/24%/30% color-mix tint in the other sheets is a
+   * translucency. They are re-pointed, not removed, so the surfaces they
+   * paint keep their identity. */
+  body :is(.rb-edit, .rb-rail, .rb-analysis, .rb-design, .rb-panel) {
+    --_tint: var(--rb-accent-50);
+    --_tint-strong: var(--rb-accent-100);
+    --_ring-soft: var(--rb-accent-100);
+    --_hairline: var(--rb-border);
+  }
+
+  body .rb-input:focus,
+  body .rb-select:focus,
+  body .rb-textarea:focus {
+    box-shadow: none;
+    border-color: var(--rb-accent-600);
+    border-width: 2px;
+  }
+
+  /* site.css dims its underline with a 35%-alpha currentColor mix. */
+  body a { text-decoration-color: currentColor; }
+}
+
+/* The same set keyed on the attribute. The two triggers are independent and
+ * neither implies the other, so this is written out rather than derived: a
+ * CSS file cannot OR two conditions, and a support query for
+ * prefers-reduced-transparency would be a lie in an engine that has the
+ * attribute but not the media feature. */
+html[data-a11y-transparency="off"] .masthead,
+html[data-a11y-transparency="off"] .rb-site-header,
+html[data-a11y-transparency="off"] body #rb-topbar {
+  background: var(--rb-bg) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html[data-a11y-transparency="off"] body .rb-modal-backdrop,
+html[data-a11y-transparency="off"] body .rb-scrim {
+  background: var(--rb-bg-inverse) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html[data-a11y-transparency="off"] body .rb-modal { border-width: 2px; }
+html[data-a11y-transparency="off"] body :is(.rb-edit, .rb-rail, .rb-analysis, .rb-design, .rb-panel) {
+  --_tint: var(--rb-accent-50);
+  --_tint-strong: var(--rb-accent-100);
+  --_ring-soft: var(--rb-accent-100);
+  --_hairline: var(--rb-border);
+}
+html[data-a11y-transparency="off"] body a { text-decoration-color: currentColor; }
+
+
+/* ===========================================================================
+ * 5. Text-spacing override
+ * WCAG 1.4.12 asks for line-height 1.5, letter-spacing 0.12em, word-spacing
+ * 0.16em and 2em of paragraph spacing. The hard part is surviving: this
+ * codebase's display type carries negative tracking (landings are at -0.025em,
+ * site headings at -0.015em, panel titles at -0.01em), and a negative
+ * letter-spacing is arithmetically indistinguishable from a user asking for
+ * *less* tracking. A user who set 0.12em in their browser and then loaded a
+ * page with -0.025em on the h1 has been overridden by the design.
+ *
+ * So the override is !important and is applied to a deliberately broad
+ * selector list — including div and span, because the negative tracking is
+ * inherited onto exactly those. text-wrap: balance and pretty are dropped
+ * for the same reason: both re-flow lines in ways that assume the original
+ * metrics, and both can strand a word outside the measure at 0.12em.
+ * =========================================================================== */
+
+html[data-a11y-spacing="relaxed"] body :is(
+  p, li, dd, dt, h1, h2, h3, h4, h5, h6, a, button, label, legend, caption,
+  td, th, summary, figcaption, blockquote, code, kbd, pre, output, time,
+  strong, em, b, i, small, div, span, details, textarea, input, select
+):not(#rb-doc *) {
+  line-height: var(--rb-a11y-line) !important;
+  letter-spacing: var(--rb-a11y-letter) !important;
+  word-spacing: var(--rb-a11y-word) !important;
+  text-wrap: wrap !important;
+}
+
+html[data-a11y-spacing="relaxed"] body :is(p, li, dd, dt, blockquote, figcaption, td, th):not(#rb-doc *) {
+  margin-block-end: var(--rb-a11y-para) !important;
+}
+
+/* text-spacing-trim lets CJK and Devanagari opt out of the browser's
+ * punctuation compression. It is a draft property, so the declaration is
+ * dropped whole by an engine that has not heard of it — harmless. */
+html[data-a11y-spacing="relaxed"] body :not(#rb-doc) {
+  text-spacing-trim: space-all;
+}
+
+/* The display faces are the ones that break worst: at 0.12em, a 22ch measure
+ * with -0.025em tracking no longer fits, and the display heading is the first
+ * thing to overflow. */
+html[data-a11y-spacing="relaxed"] body :is(
+  h1, h2, .rb-l-display, .rb-l-h2, .hero__title, .pagehead__title, .gp-h1, .rb-page-head
+):not(#rb-doc *) {
+  max-width: none !important;
+  line-height: var(--rb-a11y-line) !important;
+}
+
+/* Anything that clips horizontally destroys the override's whole point. */
+html[data-a11y-spacing="relaxed"] body :is(
+  .rb-truncate, .rb-clamp-2, .rb-clamp-3, .rb-statusbar__item,
+  .rb-toolstrip__title, .rb-marquee, .rb-marquee__item
+):not(#rb-doc *) {
+  overflow: visible !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
+  -webkit-line-clamp: none !important;
+}
+
+/* The document opts in per-node. Same values, no :not(), so a design panel
+ * that sets the attribute gets the override inside the resume too. */
+html[data-a11y-spacing="relaxed"] body #rb-doc[data-a11y-spacing="relaxed"] :is(
+  p, li, dd, dt, h1, h2, h3, h4, h5, h6, a, span, div, strong, em, td, th
+) {
+  line-height: var(--rb-a11y-line) !important;
+  letter-spacing: var(--rb-a11y-letter) !important;
+  word-spacing: var(--rb-a11y-word) !important;
+  text-wrap: wrap !important;
+}
+
+
+/* ===========================================================================
+ * 6. Target-size bump
+ * The default shell is built from 26px and 32px controls, which clears the
+ * 44px of SC 2.5.5 by nothing at all. Two tiers:
+ *
+ *   --rb-a11y-target      44px — anything a user aims at directly
+ *   --rb-a11y-target-sm   32px — controls packed edge to edge in a group,
+ *                                  where 44px each would overlap and the
+ *                                  smaller one would steal the neighbour's
+ *                                  click. 32px plus the group's own gap
+ *                                  still clears SC 2.5.8's 24px floor.
+ *
+ * min-height, not height: every one of these controls declares a fixed
+ * `height`, and min-height clamps it from below, so the box grows without the
+ * declaration having to be overridden.
+ *
+ * #rb-doc is excluded. It is the printed artifact, and inflating a
+ * contenteditable's box reflows the page the user is going to submit.
+ * =========================================================================== */
+
+html[data-a11y-targets="large"] body :is(
+  button,
+  [role="button"],
+  summary,
+  .rb-pop__item,
+  .rb-optcard,
+  .rb-scale-picker__opt,
+  .rb-disclosure__summary,
+  .rb-item__head,
+  .rb-item__toggle,
+  .rb-theme-opt,
+  .rb-tpl-card
+):not(#rb-doc *):not(.rb-btn--sm):not(.rb-seg__btn):not(.rb-chip__x) {
+  min-height: var(--rb-a11y-target);
+}
+
+/* Controls that carry text grow in one axis only. `.rb-btn--sm` is excluded
+ * because it shares an element with `.rb-btn`, and without the exclusion the
+ * small tier below could never apply to a small button. */
+html[data-a11y-targets="large"] body :is(
+  .rb-btn, .rb-pop__item, .rb-tab, .gp-btn, .btn,
+  .nav__link, .toc__link, .pager__link, .rbx-actions a
+):not(#rb-doc *):not(.rb-btn--sm) {
+  min-height: var(--rb-a11y-target);
+}
+
+/* Icon-only and square controls grow in both. Listed rather than inferred:
+ * "looks like a button" is not something CSS can test, and a wrong guess
+ * here is a 44px-wide text button. */
+html[data-a11y-targets="large"] body :is(
+  .rb-btn--icon, .icon-btn, .nav-toggle, .rb-zoom__btn, .rb-swatch,
+  .rb-input-clear, .rb-item__grip, .rb-doc__add, .card__more
+):not(#rb-doc *) {
+  min-width: var(--rb-a11y-target);
+  min-height: var(--rb-a11y-target);
+}
+
+/* Text inputs. A 32px field with a 16px checkbox next to it is a
+ * mis-tap surface on touch and a zoom hazard on iOS, which scales anything
+ * under 16px of computed size. */
+html[data-a11y-targets="large"] body :is(.rb-input, .rb-select, .rb-textarea):not(#rb-doc *) {
+  min-height: var(--rb-a11y-target);
+}
+html[data-a11y-targets="large"] body :is(.rb-input--sm, .rb-select--sm):not(#rb-doc *) {
+  min-height: var(--rb-a11y-target-sm);
+  height: auto;
+}
+
+/* Checkbox and radio hit areas, without growing the drawn box. */
+html[data-a11y-targets="large"] body :is(.rb-checkbox, .rb-radio):not(#rb-doc *) {
+  padding-block: calc((var(--rb-a11y-target) - 20px) / 2);
+}
+html[data-a11y-targets="large"] body :is(.rb-checkbox input, .rb-radio input):not(#rb-doc *) {
+  width: 20px;
+  height: 20px;
+  margin-block-start: 0;
+}
+
+/* The range input is 20px tall with a 4px track; growing the box to 44 and
+ * leaving the track centred is the only way to hit the target without
+ * drawing a 44px rail. */
+html[data-a11y-targets="large"] body .rb-range:not(#rb-doc *) {
+  height: var(--rb-a11y-target);
+}
+html[data-a11y-targets="large"] body .rb-range::-webkit-slider-thumb { margin-top: 15px; }
+
+/* The switch. The track is 34x20 and the input is 0x0, so the label is the
+ * target: give the label a 44px box and the track a 24px one. */
+html[data-a11y-targets="large"] body .rb-switch:not(#rb-doc *) {
+  min-height: var(--rb-a11y-target);
+}
+html[data-a11y-targets="large"] body .rb-switch-track { width: 44px; height: 26px; }
+html[data-a11y-targets="large"] body .rb-switch-track::after { width: 20px; height: 20px; }
+html[data-a11y-targets="large"] body .rb-switch input:checked + .rb-switch-track::after { transform: translateX(18px); }
+
+/* Clear button inside a now-44px field: grow it, and reserve the room so the
+ * value never runs under the glyph. */
+html[data-a11y-targets="large"] body .rb-input-clear:not(#rb-doc *) {
+  width: var(--rb-a11y-target-sm);
+  height: var(--rb-a11y-target-sm);
+  right: 0;
+}
+html[data-a11y-targets="large"] body .rb-input-group .rb-input:not(#rb-doc *) { padding-right: 44px; }
+
+/* Grouped controls take the small tier. */
+html[data-a11y-targets="large"] body :is(.rb-btn--sm, .rb-seg__btn, .rb-chip__x):not(#rb-doc *) {
+  min-height: var(--rb-a11y-target-sm);
+  min-width: var(--rb-a11y-target-sm);
+}
+html[data-a11y-targets="large"] body .rb-seg { padding: 4px; gap: 4px; }
+html[data-a11y-targets="large"] body .rb-chip__x { margin-inline: -6px; }
+
+/* Item rows and disclosure headers are already clickable boxes; they need the
+ * full tier because they are the primary way an entry is opened. */
+html[data-a11y-targets="large"] body :is(.rb-item__head, .rb-disclosure__summary, .rb-tabs--panel .rb-tab):not(#rb-doc *) {
+  min-height: var(--rb-a11y-target);
+}
+html[data-a11y-targets="large"] body .rb-zoom__value { min-width: 72px; }
+html[data-a11y-targets="large"] body .rb-panel__grip { height: var(--rb-a11y-target); }
+
+/* Remaining marketing, guides and gallery surfaces. `.btn--tiny` sits inline
+ * in a sentence, so it takes the small tier; the cards and pager links are
+ * full-size and were missed by the shared rules above only because they are
+ * anchors, not buttons. */
+html[data-a11y-targets="large"] body :is(
+  .crumbs a, .rbx-cta, .rbx-pager a, .gp-nav a, .gp-card--link
+):not(#rb-doc *) {
+  min-height: var(--rb-a11y-target);
+}
+html[data-a11y-targets="large"] body .btn--tiny { min-height: var(--rb-a11y-target-sm); }
+
+
+/* ===========================================================================
+ * 7. Forced colors
+ * Windows High Contrast and the macOS increase-contrast system modes put the
+ * browser in forced-colors mode, which repaints author colours from the
+ * system palette. That does most of the work on its own. What it cannot do is
+ * preserve the handful of places where meaning is carried by a *fill* rather
+ * than by text, because fills and gradients are exactly what the mode strips.
+ *
+ * The rule for this section: adopt the system palette everywhere, and set
+ * forced-color-adjust: none in only three places — a colour the user chose as
+ * data (the design swatches), and two status fills that have a system colour
+ * with the same meaning. Everything else gets a border, because a border
+ * survives and a tint does not.
+ * =========================================================================== */
+
+@media (forced-colors: active) {
+
+  /* --- Baseline: let the palette through, and be explicit about surfaces --- */
+
+  :root {
+    --rb-a11y-focus-color: Highlight;
+    --rb-a11y-focus-halo: Canvas;
+    --rb-a11y-focus-width: 3px;
+    --rb-a11y-focus-offset: 2px;
+    --rb-focus-ring: 0 0 0 2px Canvas, 0 0 0 5px Highlight;
+  }
+
+  body,
+  .rb-card,
+  .rb-modal,
+  .rb-pop,
+  .rb-panel__body,
+  .rb-toast,
+  .gp-card,
+  .note,
+  .card,
+  .rb-plain-card,
+  .rbx-cta {
+    background-color: Canvas;
+    color: CanvasText;
+  }
+
+  body #rb-main,
+  body #rb-stage,
+  body #rb-rail,
+  body #rb-toolstrip,
+  body #rb-statusbar,
+  body #rb-marquee,
+  .rb-modal-foot {
+    background-color: Canvas;
+    color: CanvasText;
+  }
+
+  /* Shadows carry elevation everywhere in this design and nothing else; the
+   * mode already drops them, but the ones we re-introduce under
+   * forced-color-adjust: none have to go explicitly. */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Borders are the only structural cue left, so every edge that was a tint
+   * becomes a real line. */
+  body :is(.rb-input, .rb-select, .rb-textarea, .rb-btn, .rb-card, .rb-pop__item,
+           .rb-optcard, .rb-scale-picker__opt, .rb-chip, .rb-badge, .rb-item,
+           .rb-tpl-card, .rb-disclosure, .rb-meter, .rb-empty, .gp-card,
+           .gp-note, .gp-table th, .gp-table td, .prose th, .prose td,
+           .rbx-table th, .rbx-table td, .note, .card, .rb-plain-card) {
+    border-color: CanvasText;
+  }
+
+  /* --- Focus --- */
+
+  body :is(a[href], button, input, select, textarea, summary, [role="button"],
+           [role="tab"], [contenteditable], [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* The switch's input is 0x0, so the indicator has to live on the track. */
+  body .rb-switch-track {
+    border: 2px solid CanvasText;
+    background-color: Canvas;
+  }
+  body .rb-switch-track::after {
+    background-color: CanvasText;
+    border: 1px solid Canvas;
+  }
+  body .rb-switch input:checked + .rb-switch-track {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+  body .rb-switch input:checked + .rb-switch-track::after {
+    background-color: HighlightText;
+  }
+  body .rb-switch input:focus-visible + .rb-switch-track {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  body .rb-range::-webkit-slider-runnable-track { background-color: CanvasText; }
+  body .rb-range::-moz-range-track { background-color: CanvasText; }
+  body .rb-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: Canvas;
+    border: 2px solid CanvasText;
+  }
+  body .rb-range::-moz-range-thumb {
+    background-color: Canvas;
+    border: 2px solid CanvasText;
+  }
+
+  /* --- Text --- */
+
+  body .rb-input::placeholder,
+  body .rb-textarea::placeholder,
+  body :is(input, textarea)::placeholder {
+    color: GrayText;
+    opacity: 1;
+  }
+
+  /* site.css sets 86% opacity on the underline decoration colour, which the
+   * mode would then dim again. */
+  body a { text-decoration-color: currentColor; }
+
+  body :is(code, kbd, .rb-kbd, .rb-text-mono, pre) {
+    background-color: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+
+  body .rb-tip::after,
+  body [data-tip]::after {
+    background-color: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+
+  /* The select's chevron is a background-image, which the mode removes. That
+   * is correct: the arrow was decoration on top of a control the OS already
+   * draws with its own arrow. */
+  body .rb-select,
+  body .rb-select--sm {
+    background-image: none;
+    padding-right: var(--rb-space-3);
+  }
+
+  body ::selection {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  /* A dashed or 6%-alpha rule disappears. Section rules in the resume are
+   * meaning, not decoration, so they get promoted to solid. */
+  body :is(hr, .rb-divider, .rb-statusbar__sep, .rb-toolstrip__sep, .rb-divider--v) {
+    background-color: CanvasText;
+    border-color: CanvasText;
+  }
+
+  body .rb-item--blank { border-style: solid; }
+  body .rb-item__dropzone { border-style: solid; }
+
+  /* --- Fills that carried meaning and are now gone: give them a system
+   *     colour with the same meaning, or a border --- */
+
+  body .rb-progress__bar,
+  body .reading-progress__bar {
+    -webkit-forced-color-adjust: none;
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+  body .rb-progress { border: 1px solid CanvasText; }
+
+  body .rb-meter__fill {
+    -webkit-forced-color-adjust: none;
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+  body .rb-meter {
+    border: 1px solid CanvasText;
+  }
+  body .rb-meter__fill[data-tone="ok"] { background-color: Highlight; }
+
+  body .rb-save-dot {
+    -webkit-forced-color-adjust: none;
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+  }
+  body .rb-save-dot.is-saved { background-color: Highlight; }
+  body .rb-save-dot.is-saving { background-color: CanvasText; }
+
+  body #rb-rail .rb-rail__dot {
+    -webkit-forced-color-adjust: none;
+    forced-color-adjust: none;
+    border: 2px solid CanvasText;
+  }
+  body #rb-rail .rb-rail__dot[data-state="full"] {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+  body #rb-rail .rb-rail__dot[data-state="partial"] {
+    background-color: Canvas;
+    border-color: CanvasText;
+  }
+
+  /* The score dial is a conic gradient on a background-image, so it renders
+   * as an empty circle. Highlight is the system accent, so re-drawing the
+   * ring in it stays inside the palette; the inner disc then needs a border
+   * for the boundary between "filled" and "not filled" to exist at all. */
+  body .rb-score__dial {
+    -webkit-forced-color-adjust: none;
+    forced-color-adjust: none;
+    background: conic-gradient(Highlight calc(var(--_range-pct, 0) * 1%), Canvas 0);
+  }
+  body .rb-score__dial::after {
+    -webkit-forced-color-adjust: none;
+    forced-color-adjust: none;
+    background-color: Canvas;
+    border: 1px solid CanvasText;
+  }
+
+  body .rb-optcard[aria-pressed="true"],
+  body .rb-optcard[aria-checked="true"],
+  body .rb-swatch[aria-pressed="true"],
+  body .rb-scale-picker__opt[aria-pressed="true"],
+  body .rb-chip--matched {
+    border: 2px solid Highlight;
+    box-shadow: none;
+  }
+  body .rb-seg__btn[aria-selected="true"],
+  body .rb-tab[aria-selected="true"] {
+    border: 1px solid CanvasText;
+  }
+  body .rb-tab[aria-selected="true"] { border-bottom: 3px solid Highlight; }
+
+  body :is(.rb-statusbar__item--ok, .rb-statusbar__item--warn, .rb-statusbar__item--error) {
+    color: CanvasText;
+  }
+  body .rb-statusbar__item--error::before,
+  body .rb-statusbar__item--warn::before {
+    content: "";
+    display: inline-block;
+    width: 0.6em;
+    height: 0.6em;
+    margin-inline-end: 0.4em;
+    border: 1px solid CanvasText;
+  }
+  body .rb-statusbar__item--error::before { background-color: CanvasText; }
+
+  /* --- The resume document ---
+     forced-color-adjust stays `auto` on #rb-doc. A user in this mode has
+     asked the OS to remove colour from the screen; preserving the template's
+     palette over the top of that request is not an accessibility fix. What
+     does need repair is the editing affordances, which were drawn as a faint
+     tint on a white sheet and are now invisible. */
+  body #rb-doc {
+    background-color: Canvas;
+    color: CanvasText;
+  }
+  body #rb-doc :is(h1, h2, h3, h4, h5, h6, strong, b, th) { color: CanvasText; }
+  body #rb-doc a { color: LinkText; }
+  body #rb-doc :is(.rb-doc__meta, [data-role="meta"], time) { color: GrayText; }
+  body #rb-doc :is([contenteditable], [data-bind]):focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 1px;
+  }
+  body #rb-doc [data-section-type] { border-color: CanvasText; }
+  body #rb-doc hr { border-color: CanvasText; }
+
+  /* A photo placeholder and a portrait are images, not text. They survive
+     the mode on their own, so nothing to do — but the ring that is drawn
+     around an empty slot has to come back as a border. */
+  body #rb-doc .rb-doc__photo--placeholder {
+    border: 1px dashed CanvasText;
+  }
+
+  /* --- Colour the user chose as data ---
+     A swatch is a sample of a value. Rendering it in the system palette
+     would make every swatch identical and the design panel useless, so this
+     is one of the three legitimate forced-color-adjust: none cases. The
+     border is what keeps it legible when the value is close to Canvas. */
+  body .rb-swatch,
+  body .rbx-doc--blue,
+  body .rbx-doc--green,
+  body .rbx-doc--plum,
+  body .rbx-doc--sienna,
+  body .rbx-doc--slate {
+    -webkit-forced-color-adjust: none;
+    forced-color-adjust: none;
+  }
+  body .rb-swatch {
+    border: 2px solid CanvasText;
+    box-shadow: none;
+  }
+  body .rb-swatch[aria-pressed="true"] {
+    outline: 3px solid Highlight;
+    outline-offset: 3px;
+  }
+  body .rb-color-field__native { border: 1px solid CanvasText; }
+
+  /* --- Backdrop surfaces ---
+     A backdrop-filter is a no-op here, so the scrim and the modal backdrop
+     must carry their separation some other way. */
+  body .rb-modal-backdrop,
+  body .rb-scrim {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-color: Canvas;
+  }
+  body .rb-scrim { border: 2px solid CanvasText; }
+  body .rb-modal { border: 2px solid CanvasText; }
+
+  /* --- Sticky headers --- */
+  .masthead,
+  .rb-site-header,
+  body #rb-topbar {
+    background-color: Canvas;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-bottom: 1px solid CanvasText;
+  }
+  .reading-progress { background-color: Canvas; }
+
+  /* --- Reduced-motion isn't ours to give back ---
+     forced-colors and prefers-reduced-motion are independent settings, and a
+     user can have both. Nothing above adds a transition, but the reduced
+     motion kills from base.css are re-asserted inside this block so a
+     stylesheet loaded after this one cannot reintroduce motion for a user
+     who is already in forced colors. */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto !important; }
+  body .rb-btn:active:not(:disabled) { transform: none; }
+}
+
+
+/* ===========================================================================
+ * 8. Reduced motion — do not fight it
+ * The one place this layer could plausibly regress: a target-size or
+ * transparency change adds no transition of its own, but base.css only
+ * zeroes *duration*. A transform declared on :active still fires, and
+ * site.css sets `scroll-behavior: smooth` on html at a specificity that ties
+ * with base.css and wins on order — so on every guides/ page the reduced
+ * motion override has been losing to the site sheet. This block is last and
+ * out-specifies both.
+ * =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  /* Transforms, not durations: these are the residual moves. `.rb-swatch`
+   * is handled on its own below, because its transform is the only thing
+   * carrying its selected state. */
+  body .rb-btn:active:not(:disabled),
+  body .rb-item__chev,
+  body .rb-l-faq__q::after,
+  body .faq__q::after {
+    transform: none !important;
+  }
+
+  /* The chevron's rotation tells an open item from a closed one, so under
+   * reduced motion it is exchanged for a marker rather than dropped. */
+  body .rb-l-faq__item[open] .rb-l-faq__q::after,
+  body .faq__item[open] .faq__q::after {
+    transform: none !important;
+    border-right: 0;
+    border-bottom: 0;
+    border-top: 1.5px solid currentColor;
+    border-left: 1.5px solid currentColor;
+    color: var(--rb-text-muted);
+  }
+
+  /* The swatch's scale is its selected ring, so the ring is redrawn as a
+   * box-shadow the same shape the sheet already uses. */
+  body .rb-swatch:hover { transform: none !important; }
+  body .rb-swatch[aria-pressed="true"] {
+    transform: none !important;
+    box-shadow: 0 0 0 2px var(--rb-bg), 0 0 0 4px var(--rb-accent-500), inset 0 0 0 1px var(--rb-gray-950);
+  }
+
+  body .rb-switch-track::after { transition: none; }
+  body :is(.rb-modal-backdrop, .rb-modal, .rb-pop, .rb-toast, .rb-progress__bar) {
+    animation: none !important;
+  }
+}
+
+
+/* ===========================================================================
+ * 9. Shared repairs
+ * Small, unconditional, and only safe *because* they are non-visual or
+ * strictly additive. Nothing here changes the default appearance.
+ * =========================================================================== */
+
+/* A focus ring on a scrolled-to element can land under a sticky header, and
+ * the app's own focus rule in section 2 only covers the panes that scroll.
+ * This covers the anchored headings on the guides, gallery and examples
+ * pages, which is where a `#fragment` link actually lands. */
+body :is([id], :target) {
+  scroll-margin-block-start: calc(var(--rb-topbar-h, 52px) + var(--rb-space-4));
+}
+
+/* Note on zoom. 400% zoom (WCAG 1.4.10) reduces the CSS viewport, so the
+ * app's own 760px / 1100px breakpoints fire and the rail becomes a drawer
+ * and the panel a sheet. Nothing extra is needed here, and a grid override
+ * would fight app.css's 900-1100 panel-narrowing design, so none is added.
+ *
+ * Note on ::selection. The UA default is left alone. Re-tinting it would be a
+ * design decision, and in forced colors it is the system's job — section 7
+ * hands it Highlight / HighlightText. */
+
+
+/* ===========================================================================
+ * 9b. Unconditional contrast repair (WCAG 1.4.3, measured in-browser)
+ * ---------------------------------------------------------------------------
+ * Everything above in this sheet is inert until a preference is set. This block
+ * is not: the two de-emphasis text tiers fail 1.4.3 at the DEFAULT settings,
+ * in both themes, on every page that renders the neutral ramp as text.
+ *
+ * Measured with axe-core 4.10.2 in Chromium, at the worst background each tier
+ * is actually painted on:
+ *
+ *                       light (worst: --rb-gray-150 #e4e7ec)   dark (worst: --rb-bg-active #232b3a)
+ *   --rb-text-faint     #8d97a8  2.58:1  FAIL                 #5b6474  2.44:1  FAIL
+ *   --rb-text-muted     #697386  3.85:1  FAIL                 #7d8798  3.92:1  FAIL
+ *
+ * The grey ramp is calibrated for hairlines and de-emphasis, and 1.4.3 has no
+ * exemption for small text: an 11px uppercase eyebrow is held to 4.5:1, not to
+ * the 3:1 that large text gets. Both tiers are therefore re-pointed at the next
+ * usable steps of the SAME ramp, which keeps the three-step hierarchy the design
+ * is built on (faint < muted < secondary) instead of collapsing it:
+ *
+ *   light   faint  #586273  4.97:1  |  muted  #5c6678  4.67:1  |  secondary #4d5666  5.97:1
+ *   dark    faint  #959faf  5.32:1  |  muted  #9ca5b5  5.73:1  |  secondary #a8b1c0  6.57:1
+ *
+ * Written as color-mix between two EXISTING tokens rather than as hex, per the
+ * house rule. Neither declaration references the property it defines — a
+ * custom property that appears in its own value is a cycle and drops to
+ * guaranteed-invalid at computed-value time — so the mixes are anchored on
+ * --rb-gray-500/--rb-gray-600 in light and on --rb-gray-400 /
+ * --rb-text-secondary in dark, neither of which is redefined here.
+ *
+ * This is the one place in this file that changes the default look: the
+ * de-emphasis tier moves about two steps darker in light mode and two lighter
+ * in dark. It has to — 2.58:1 is not a near-miss.
+ * =========================================================================== */
+
+:root {
+  --rb-text-muted: color-mix(in srgb, var(--rb-gray-500) 45%, var(--rb-gray-600));
+  --rb-text-faint: color-mix(in srgb, var(--rb-gray-500) 60%, var(--rb-gray-600));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rb-text-muted: color-mix(in srgb, var(--rb-gray-400) 55%, var(--rb-text-secondary));
+    --rb-text-faint: color-mix(in srgb, var(--rb-gray-400) 30%, var(--rb-text-secondary));
+  }
+}
+html[data-theme="dark"] {
+  --rb-text-muted: color-mix(in srgb, var(--rb-gray-400) 55%, var(--rb-text-secondary));
+  --rb-text-faint: color-mix(in srgb, var(--rb-gray-400) 30%, var(--rb-text-secondary));
+}
+
+/* Section 3 collapses both tiers onto --rb-text-secondary for the
+ * `prefers-contrast: more` path, but it does it on a bare `:root`, which this
+ * block out-orders. Re-asserted here so raising the OS contrast still gets the
+ * stronger of the two, which is the additive rule the header of this file
+ * promises. The [data-a11y-contrast="high"] variants in section 3 are already
+ * (0,2,0) and were never at risk. */
+@media (prefers-contrast: more) {
+  :root {
+    --rb-text-muted: var(--rb-text-secondary);
+    --rb-text-faint: var(--rb-text-secondary);
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rb-text-muted: var(--rb-text-secondary);
+    --rb-text-faint: var(--rb-text-secondary);
+  }
+}
+@media (prefers-contrast: more) {
+  :root:is([data-theme="dark"]) {
+    --rb-text-muted: var(--rb-text-secondary);
+    --rb-text-faint: var(--rb-text-secondary);
+  }
+}
+
+/* base.css gives the selected tab an accent-700 label, and corrects it to
+ * accent-300 under `html[data-theme="dark"]` only. In the DEFAULT "system"
+ * theme <html> carries no data-theme, so OS-dark took the accent-700 path and
+ * the Check panel's selected tab measured 2.01:1. The media-query twin is what
+ * tokens.css already does for the palette; this adds the one for this control. */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .rb-tab[aria-selected="true"] {
+    color: var(--rb-accent-300);
+  }
+}
+
+/* The same missing twin, in gallery.css: the ATS verdict headings take
+ * green-700 and red-700, which are light-mode text steps, and nothing re-points
+ * them for OS-dark. Measured 2.27:1 and 2.01:1 on --rb-bg-elevated. Both
+ * replacements are existing tokens, and both are already the light steps the
+ * rest of the sheet uses for the same "this passed / this failed" meaning. */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .gp-verdict--good .gp-verdict__title {
+    color: var(--rb-green-200);
+  }
+  html:not([data-theme="light"]) .gp-verdict--bad .gp-verdict__title {
+    color: var(--rb-red-200);
+  }
+}
+html[data-theme="dark"] .gp-verdict--good .gp-verdict__title { color: var(--rb-green-200); }
+html[data-theme="dark"] .gp-verdict--bad .gp-verdict__title { color: var(--rb-red-200); }
+
+
+/* ===========================================================================
+ * 9c. Minimum pointer target (WCAG 2.5.8, measured in-browser)
+ * ---------------------------------------------------------------------------
+ * SC 2.5.8 asks for 24x24 CSS px, and section 6 above only reaches that when the
+ * user ticks the in-app "large targets" preference. At the default setting
+ * every small icon button in the shell measured between 16.9px and 23.8px wide:
+ *
+ *   .rb-btn--icon.rb-btn--sm      16.9–23.8 x 26   topbar Export/More at
+ *                                                    360px, and the per-entry
+ *                                                    Move / Hide / Duplicate /
+ *                                                    Delete row in the panel
+ *   .rb-pane__grab                360 x 18           the bottom sheet's handle
+ *                                                    at 360px
+ *
+ * The widths differ per button because each holds a different glyph, so the
+ * floor is applied to the class rather than to the four offenders individually.
+ * min-* rather than width/height, so a chip stays a chip.
+ *
+ * Two groups are deliberately NOT touched:
+ *
+ *   - The inline prose links in the marketing, guides, gallery and examples
+ *     pages measure 19–20px tall. SC 2.5.8 exempts "a target in a sentence or
+ *     whose size is otherwise constrained by the line-height of non-target
+ *     text", which is exactly what they are.
+ *   - The contenteditable lines inside #rb-doc, which section 6 already
+ *     excludes for the stronger reason that they are the printed artifact.
+ * =========================================================================== */
+
+body :is(.rb-btn--icon, .rb-btn--sm.rb-btn--icon) {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+body .rb-rail__grip {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+body .rb-chip__x,
+body .rbf-chip .rb-btn--icon.rb-btn--sm {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+body .rb-pane__grab {
+  min-height: 24px;
+}
+
+/* The onboarding dialog's dismiss link is 178.9 x 21. It is the only control
+ * in that dialog, so it is also the only way out for a keyboard user who does
+ * not want a starting point — 21px tall is under the floor. */
+body .rb-onb__skip {
+  min-height: 24px;
+}
+
+
+/* ===========================================================================
+ * 10. Print safety
+ * print.css already handles the normal case: chrome off, greyscale tokens,
+ * entries kept whole. This block is only for the user who has told us their
+ * print is hostile — a mono laser, a low-vision reader, or an employer that
+ * discards backgrounds — and it is opt-in via data-a11y-print.
+ *
+ * The defining choice: "plain" wins over #rb-doc[data-print-safe]. That
+ * attribute is the user accepting a template's own colours for a normal
+ * print job; data-a11y-print="plain" is the user saying the print output
+ * itself is the problem. The two are contradictory and this one is later.
+ * =========================================================================== */
+
+@media print {
+  html[data-a11y-print="plain"] {
+    color-scheme: light;
+  }
+
+  /* --- The resume: black on white, no fills, every edge a real rule --- */
+  html[data-a11y-print="plain"] #rb-doc,
+  html[data-a11y-print="plain"] #rb-doc :is(
+    *, *::before, *::after
+  ) {
+    color: var(--rb-print-ink, #000) !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Every border in the document is a rule or a divider. In plain mode none
+   * of them are allowed to be a tint that a mono printer drops. */
+  html[data-a11y-print="plain"] #rb-doc :is(*, *::before, *::after) {
+    border-color: var(--rb-print-ink, #000) !important;
+    border-style: solid !important;
+  }
+  html[data-a11y-print="plain"] #rb-doc :is(hr, [data-rule]) {
+    border-top-width: 0.75pt !important;
+  }
+
+  /* Type. The document is set in pt, and 10.5pt is already near the floor
+   * for a mono laser; plain mode takes it to 11pt and holds the leading
+   * wide enough that a dropped line does not collide with the one above. */
+  html[data-a11y-print="plain"] #rb-doc {
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+  html[data-a11y-print="plain"] #rb-doc :is(
+    .rb-doc__meta, [data-role="meta"], time, small, .rb-entry__when
+  ) {
+    font-size: 10pt !important;
+    color: var(--rb-print-ink, #000) !important;
+  }
+  html[data-a11y-print="plain"] #rb-doc :is(h1, h2, h3, h4, h5, h6) {
+    font-size: 1.25em;
+    letter-spacing: 0 !important;
+  }
+
+  /* Links. print.css already removes the ::after URL column for a normal job,
+   * and the resume's link text is already the address (email, handle, site),
+   * so all plain mode adds is the underline — which is the only thing left
+   * distinguishing a link from body text once every fill is gone. */
+  html[data-a11y-print="plain"] #rb-doc :is(a, a:visited) {
+    color: var(--rb-print-ink, #000) !important;
+    text-decoration: underline !important;
+    overflow-wrap: anywhere;
+  }
+  html[data-a11y-print="plain"] #rb-doc a[href]::after,
+  html[data-a11y-print="plain"] #rb-doc a[href]:visited::after,
+  html[data-a11y-print="plain"] #rb-doc :is([title], abbr[title])::after {
+    content: none !important;
+  }
+
+  /* A remote photo is a broken-image box on a mono device, and the site
+   * makes no network requests, so a src^="http" image in a resume is one the
+   * user pasted by URL. Dropping it beats printing the placeholder glyph. */
+  html[data-a11y-print="plain"] #rb-doc img[src^="http"] {
+    display: none !important;
+  }
+
+  /* --- Marketing, guides and gallery pages ---
+     The chrome comes off and every outbound link prints its target, because
+     a page printed from a browser dialog loses its address bar. Scoped to
+     the prose surfaces so the resume rule above is never reached. */
+  html[data-a11y-print="plain"] :is(
+    .masthead, .footer, .rb-site-header, .rb-site-footer,
+    .gp-top, .gp-foot, .toc, .reading-progress, .pager, .crumbs, .nav
+  ) {
+    display: none !important;
+  }
+
+  html[data-a11y-print="plain"] :is(.prose, .article, .rbx-prose, .gp-prose) a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-family: var(--rb-font-mono);
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  html[data-a11y-print="plain"] :is(.prose, .article, .rbx-prose, .gp-prose) {
+    max-width: none;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: var(--rb-print-ink, #000);
+  }
+
+  /* Tinted callouts lose their fill, so they need their edge back. */
+  html[data-a11y-print="plain"] :is(.note, .gp-note, .rb-l-callout, .rb-l-limits, .card, .rbx-cta) {
+    background: transparent !important;
+    border: 1pt solid var(--rb-print-ink, #000) !important;
+    break-inside: avoid;
+  }
+
+  /* A table that only separates its cells with tints prints as one block. */
+  html[data-a11y-print="plain"] :is(th, td) {
+    border: 0.5pt solid var(--rb-print-ink, #000) !important;
+  }
+  html[data-a11y-print="plain"] th {
+    background: transparent !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
