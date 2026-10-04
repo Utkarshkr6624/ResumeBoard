@@ -636,7 +636,8 @@
       { label: 'Examples', href: 'examples/index.html' },
       { label: 'Guides', href: 'guides/index.html' },
       { label: 'ATS', href: 'ats/index.html' },
-      { label: 'Contact', href: 'contact.html' }
+      { label: 'Contact', href: 'contact.html' },
+      { label: 'Terms', href: 'terms.html' }
     ].forEach(function (item) {
       nav.appendChild(el('a', { class: 'rb-topbar__navlink', href: item.href, text: item.label }));
     });

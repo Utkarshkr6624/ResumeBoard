@@ -797,3 +797,74 @@ html[data-theme="dark"] .rbx-status[data-state="ready"] { color: #6ee7b7; }
   .rbx-doc__h { break-after: avoid; }
   @page { margin: 0.6in; }
 }
+
+/* ---------- contact.html ----------
+ * contact.html is the one site page that marks its own head instead of using
+ * .rb-page-head, and those class names were never written down, so its crumbs,
+ * title, lede and section headings were rendering with no styling at all. The
+ * values below are the ones .rb-page-head already uses, so the page reads like
+ * the rest of the site rather than like its own thing. */
+.rbx-crumbs {
+  padding-top: var(--rb-space-8);
+  margin-bottom: var(--rb-space-8);
+  font-size: var(--rb-text-sm);
+  color: var(--rb-text-muted);
+}
+.rbx-crumbs a { color: var(--rbx-label); text-decoration: none; }
+.rbx-crumbs a:hover { color: var(--rb-text); text-decoration: underline; }
+.rbx-crumbs [aria-current="page"] { color: var(--rb-text-secondary); }
+
+.rbx-eyebrow {
+  display: block;
+  font-size: var(--rb-text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--rbx-label);
+  margin-bottom: var(--rb-space-3);
+}
+.rbx-title {
+  font-size: var(--rbx-h1);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 680;
+  margin-bottom: var(--rb-space-4);
+}
+.rbx-lede {
+  font-size: var(--rb-text-lg);
+  line-height: 1.55;
+  color: var(--rb-text-secondary);
+  max-width: var(--rbx-measure);
+  margin-bottom: var(--rb-space-4);
+}
+.rbx-h2 {
+  font-size: var(--rb-text-2xl);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 660;
+  margin-bottom: var(--rb-space-4);
+}
+
+/* Section rhythm inside the wrap. Body copy is capped to the prose measure the
+ * same way .rb-section does it; tables and notes keep the full column.
+ *
+ * Scoped to #main.rbx-wrap rather than .rbx-wrap: eleven pages under examples/
+ * also put <section> directly inside a .rbx-wrap div, and the unscoped selector
+ * put a 1px rule above every section of all of them. contact.html is the only
+ * page in the site whose wrap is a <main id="main"> element. */
+#main.rbx-wrap > section { margin-top: var(--rb-space-12); }
+#main.rbx-wrap > section + section {
+  margin-top: var(--rb-space-16);
+  padding-top: var(--rb-space-12);
+  border-top: 1px solid var(--rb-border);
+}
+#main.rbx-wrap > section p,
+#main.rbx-wrap > section ul,
+#main.rbx-wrap > section ol { max-width: var(--rbx-measure); }
+
+/* The routing table is two columns. Stretched to the full page width it reads
+ * as a form, so it is held to the same measure as the copy beside it. */
+.rbx-matrix { max-width: var(--rbx-measure); }
+/* .rbx-code wins on specificity over the base anchor colour, which would make
+ * the subject prefixes read as plain text inside a link. */
+.rbx-matrix a .rbx-code { color: inherit; }

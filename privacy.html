@@ -43,6 +43,7 @@
       "url": "https://resumeboard.app/privacy.html",
       "name": "Privacy: what Resumeboard stores and why",
       "description": "What Resumeboard writes to your browser, the one CDN request PDF import makes, and how to export a backup or delete everything.",
+      "dateModified": "2026-10-04",
       "inLanguage": "en-US",
       "isPartOf": { "@id": "https://resumeboard.app/#website" }
     },
@@ -52,12 +53,12 @@
       "url": "https://resumeboard.app/",
       "name": "Resumeboard",
       "inLanguage": "en-US",
-      "publisher": { "@id": "https://resumeboard.app/#org" }
+      "publisher": { "@id": "https://resumeboard.app/#operator" }
     },
     {
-      "@type": "Organization",
-      "@id": "https://resumeboard.app/#org",
-      "name": "Resumeboard",
+      "@type": "Person",
+      "@id": "https://resumeboard.app/#operator",
+      "name": "Utkarsh",
       "url": "https://resumeboard.app/"
     },
     {
@@ -87,14 +88,14 @@
         {
           "@type": "Question",
           "name": "Where do I send a privacy question?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Nowhere, because there is no server to receive it. This page is a plain file served from the same directory as the app, and every claim on it names the source file it comes from, so the fastest answer to a question is usually to read the line it points at." }
+          "acceptedAnswer": { "@type": "Answer", "text": "To Utkarsh6624@gmail.com, with [Privacy] as the subject prefix. It is one real mailbox and it reaches Utkarsh, the operator of this site, directly: no ticketing system, no support desk, no queue. Every claim on this page names the source file it comes from, so reading the line it points at often answers the question first. If it does not, the mailbox gets a real reply, normally within seven days." }
         }
       ]
     }
   ]
 }
 </script>
-<script src="assets/js/reset-guard.js?v=d639f64b7f"></script>
+<script src="assets/js/reset-guard.js?v=5e611bd7a4"></script>
   <link rel="stylesheet" href="assets/css/motion.css">
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -116,6 +117,7 @@
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
       <a href="privacy.html" aria-current="page">Privacy</a>
+      <a href="terms.html">Terms</a>
     </nav>
     <button type="button" class="rb-btn rb-btn--ghost rb-btn--sm" data-theme-toggle hidden>Dark</button>
   </div>
@@ -135,6 +137,52 @@
       </p>
     </div>
   </div>
+
+  <section class="rb-section" id="who">
+    <div class="rbx-wrap">
+      <h2>Who runs this site</h2>
+      <p>
+        Last updated 4 October 2026. Resumeboard is a one-person operation, and
+        none of the facts below belongs to a company.
+      </p>
+      <div class="rbx-table-wrap">
+        <table class="rbx-table">
+          <thead>
+            <tr><th scope="col">Fact</th><th scope="col">Detail</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Service</td><td>Resumeboard, a resume builder that runs in your browser.</td></tr>
+            <tr><td>Site address</td><td><a href="https://resumeboard.app">https://resumeboard.app</a></td></tr>
+            <tr><td>Operator</td><td>Utkarsh, an individual. There is no company behind the site: no registration, no company number, no office, no staff, and no co-founder.</td></tr>
+            <tr><td>Contact mailbox</td><td><a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>, and it is the only address that exists. There are no role addresses, so put a prefix in the subject line: <span class="rbx-code">[Privacy]</span>, <span class="rbx-code">[Legal]</span>, <span class="rbx-code">[Security]</span>, <span class="rbx-code">[Abuse]</span>, <span class="rbx-code">[Press]</span>, or <span class="rbx-code">[Bug]</span>.</td></tr>
+            <tr><td>LinkedIn</td><td><a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">/in/utkarsh-choudhary-116a9736a</a></td></tr>
+            <tr><td>Governing law</td><td>The laws of India. A dispute goes to the courts competent where the operator resides.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Every word on this page that says we or the operator means one named
+        person. Where a page has to describe an organisation it uses the service
+        name, Resumeboard, and that name labels this site rather than naming a
+        legal person.
+      </p>
+      <p>
+        One thing about the host is worth pulling out, because it is the only
+        place on this site where a record of a visit can exist at all. The files
+        are served over HTTPS from a static host, and any host has to handle the
+        network request that fetches a page: an IP address, a user agent, a
+        timestamp, and the address you asked for. Utkarsh does not operate that
+        host, does not read its logs, and cannot see them. None of it is joined
+        to your resume, because your resume is never part of a request.
+      </p>
+      <p>
+        The rules for using the builder, and the promises this site makes about
+        it, are in the <a href="terms.html">Terms of Service</a>. This page
+        describes what is stored and what leaves your machine. That one describes
+        what you may do with the tool, and what we ask in return.
+      </p>
+    </div>
+  </section>
 
   <section class="rb-section" id="short">
     <div class="rbx-wrap">
@@ -189,7 +237,7 @@
         saved yet and nothing is being stored.
       </p>
 
-      <h3 class="rbx-mt-6">localStorage: the fallback, and four small preferences</h3>
+      <h3 class="rbx-mt-6">localStorage: the fallback, and a handful of preferences</h3>
       <p>
         Some browsers refuse IndexedDB in private windows, in locked-down
         configurations, or when a profile is out of room. When that happens the app
@@ -215,19 +263,45 @@
           <tbody>
             <tr><td><span class="rbx-code">rb:resume:current</span></td><td>Your resume, but only in the localStorage fallback. In the normal case this key does not exist.</td></tr>
             <tr><td><span class="rbx-code">rb:resume:undo</span></td><td>The same undo history, in the fallback only.</td></tr>
-            <tr><td><span class="rbx-code">rb:theme</span></td><td>Whether you chose light or dark, as the word <span class="rbx-code">light</span> or <span class="rbx-code">dark</span>. The guides and the button at the top of this page use it too.</td></tr>
-            <tr><td><span class="rbx-code">resumeboard:theme</span></td><td>The same light or dark choice, written by the topbar switch inside the builder.</td></tr>
+            <tr><td><span class="rbx-code">rb:theme</span></td><td>Whether you chose light or dark, as the word <span class="rbx-code">light</span> or <span class="rbx-code">dark</span>. The button at the top of this page, the guides, and the theme command in the builder all write it.</td></tr>
+            <tr><td><span class="rbx-code">resumeboard:theme</span></td><td>The same light or dark choice, written by the theme switch in the builder's topbar and by the one on the home page.</td></tr>
             <tr><td><span class="rbx-code">rb:onboarding.v1</span></td><td>A single <span class="rbx-code">1</span>, set once you have dismissed the first-run dialog. Delete it and the dialog comes back.</td></tr>
             <tr><td><span class="rbx-code">rb:commands:recents</span></td><td>The few commands you have run recently, so the command bar can suggest them. Command text only; it is never sent anywhere.</td></tr>
+            <tr><td><span class="rbx-code">rb.typescale</span></td><td>The type scale you chose with the control in the builder's toolstrip, stored as a ratio.</td></tr>
+            <tr><td><span class="rbx-code">rb.typescale.base</span></td><td>The base point size that ratio is measured against, kept separately so a reset cannot lose it.</td></tr>
+            <tr><td><span class="rbx-code">rb.typescale.applied</span></td><td>The size actually in force on the document after that ratio is applied.</td></tr>
+            <tr><td><span class="rbx-code">rb.doczoom</span></td><td>The zoom on the page preview. Layout only; it changes what you see, not what prints.</td></tr>
             <tr><td><span class="rbx-code">resumeboard.rail.collapsed</span></td><td>Whether the section rail is collapsed.</td></tr>
           </tbody>
         </table>
       </div>
       <p>
+        One more key is read but never written: <span class="rbx-code">rb:site-scale</span>,
+        the text size set by the control in this page's header. It is kept in
+        <span class="rbx-code">sessionStorage</span>, with localStorage checked only
+        as a fallback, so on a fresh profile the key is absent.
+      </p>
+      <p>
         None of these is a cookie. <span class="rbx-code">localStorage</span> is
         readable only by scripts on this origin, is never attached to a request, and
-        is not sent to a server under any circumstance. The app uses no
-        <span class="rbx-code">sessionStorage</span> at all.
+        is not sent to a server under any circumstance.
+      </p>
+
+      <h3 class="rbx-mt-6">sessionStorage, and why none of it lasts</h3>
+      <p>
+        There is some, and here is all of it.
+        <span class="rbx-code">rb:seen-session</span> in
+        <a href="assets/js/reset-guard.js"><span class="rbx-code">reset-guard.js</span></a>
+        and <span class="rbx-code">rb:on-visit</span> in
+        <a href="assets/js/boot.js"><span class="rbx-code">boot.js</span></a>
+        exist for one job: telling a reload apart from an ordinary visit, so that a
+        reload wipes the document instead of landing you back on it. Neither holds
+        anything about you, and the third key,
+        <span class="rbx-code">rb:site-scale</span> in
+        <a href="assets/js/motion.js"><span class="rbx-code">assets/js/motion.js</span></a>,
+        is the text size described above. The reload guard and the builder's own
+        reset both end with <span class="rbx-code">sessionStorage.clear()</span>, and
+        closing the tab discards the lot. None of it is ever attached to a request.
       </p>
 
       <h3 class="rbx-mt-6">What is inside the stored resume</h3>
@@ -359,7 +433,7 @@
         <span class="rbx-code">#start</span>. The list lives at the top of
         <a href="sw.js"><span class="rbx-code">sw.js</span></a> and holds both
         documents, every stylesheet and script either one loads, the manifest, and
-        the install icons: 58 paths. With no network at all the editor still opens
+        the install icons: 67 paths. With no network at all the editor still opens
         and still edits, which is the point of the list being that long.
       </p>
       <p>
@@ -539,21 +613,232 @@
     </div>
   </section>
 
-  <section class="rb-section" id="children">
+  <section class="rb-section" id="cdnjs">
     <div class="rbx-wrap">
-      <h2>Children, and changes to this page</h2>
+      <h2>The one transfer, and who receives it</h2>
       <p>
-        The builder is not directed at children, and it collects nothing from
-        anyone, so there is no personal information held about a child. If you are
-        under 16, ask a parent before putting personal details into a resume you
-        plan to share.
+        Exactly one outbound dependency in this entire application reaches a server
+        belonging to somebody else, and that is the pinned pdf.js download
+        described in <a href="#network">the network</a>. Nothing you type reaches
+        it. The two addresses are requested by your browser, for two public
+        JavaScript files, with the version pinned so the bytes you receive are the
+        bytes everyone receives.
       </p>
       <p>
-        This page is a plain file in the same tree as the application, which is also
-        why it can be checked. Every claim above names the source file it comes
-        from, and the app is plain HTML, CSS, and JavaScript that you can read in
-        full. If a claim here and a line of code ever disagree, the code is the
-        truth and the claim is the bug.
+        What the other end sees is what any web server sees when a browser asks
+        for a file: the network address the connection came from, a user agent
+        string, a timestamp, and the file that was requested. The IP address is
+        not something the app sends. It is a property of your connection, and
+        there is no way to fetch a script without it. The app adds
+        <span class="rbx-code">crossorigin="anonymous"</span> and
+        <span class="rbx-code">referrerpolicy="no-referrer"</span> to the script
+        tag, so no cookie and no referring page travel with it, and no
+        identifier of yours is attached. Your resume, your name, the file you
+        picked, its size and its contents are all absent, because none of them is
+        ever in a request.
+      </p>
+      <p>
+        cdnjs is a free CDN run by Cloudflare, and cdnjs publishes no privacy
+        policy of its own: the address it links to from its own footer is
+        <a href="https://www.cloudflare.com/privacypolicy" target="_blank" rel="noopener noreferrer">Cloudflare's privacy policy</a>.
+        That is the document to read if you want to know what the receiving end
+        does with a request. <a href="https://cdnjs.com/about" target="_blank" rel="noopener noreferrer">The cdnjs about page</a>
+        names Cloudflare as the party providing the network. We do not know how
+        long Cloudflare keeps network records, and we have no way to ask it to
+        delete one on your behalf, because we are not the account holder of the
+        request.
+      </p>
+      <p>
+        Not using it is a complete answer. The other three import routes &mdash; a
+        <span class="rbx-code">.docx</span> file, a
+        <span class="rbx-code">.json</span> file, and pasted text &mdash; make no
+        request at all, and so does everything else in the app.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="rights">
+    <div class="rbx-wrap">
+      <h2>Your rights</h2>
+      <p>
+        Most of what a privacy notice offers is something you can already do here
+        by yourself in about a minute, because your resume is in your browser and
+        nowhere else. That is worth stating plainly rather than hiding behind a
+        process that does not exist. Each right below says what it means here and
+        how you actually exercise it.
+      </p>
+
+      <h3 class="rbx-mt-6">Access</h3>
+      <p>
+        Use the export button in the builder and choose JSON. It writes the exact
+        object the app stores, unredacted, with nothing held back, as described in
+        <a href="#export">how to export a backup</a>. If you would rather read it
+        where it lives, open developer tools, go to
+        <strong>Application</strong> in Chrome and Edge or <strong>Storage</strong>
+        in Firefox and Safari, and open <span class="rbx-code">resume:current</span>
+        in the <span class="rbx-code">kv</span> store of the
+        <span class="rbx-code">resumeboard</span> database.
+      </p>
+
+      <h3 class="rbx-mt-6">Correction</h3>
+      <p>
+        Edit it in the app. The document is the editing surface, so every field is
+        changed where you see it. If you want a written record of a correction
+        rather than a silent fix, email the mailbox with <span class="rbx-code">[Privacy]</span>
+        in the subject and say what should read differently; Utkarsh will confirm
+        the change in writing. The honest limit is that a record cannot be
+        corrected where none exists: if you have already deleted the stored copy,
+        the correction applies to the file you exported, in your hands, on your
+        device.
+      </p>
+
+      <h3 class="rbx-mt-6">Erasure</h3>
+      <p>
+        Delete the storage yourself, using <a href="#delete">how to delete
+        everything</a>. It takes effect the moment you do it, because there is no
+        copy on a server that would need clearing afterwards, and no queue to
+        wait in. Two things cannot be reached from here. A file you exported to
+        your own drive or your own inbox is yours, and a share link you sent to
+        someone else is a document you handed over. Neither is erased by anything
+        this site does or does not do.
+      </p>
+
+      <h3 class="rbx-mt-6">Portability</h3>
+      <p>
+        The JSON export is the portable format. It is plain text, readable in any
+        editor, and it loads back into the builder on any device with
+        <strong>Import</strong>, carrying your content and your design settings
+        with it. It is a plain JSON file, not a proprietary container, and nothing
+        about it is tied to this site or to an account. The PDF and plain-text
+        exports are for reading and printing; if the goal is to move the data, use
+        the JSON.
+      </p>
+
+      <h3 class="rbx-mt-6">Objection</h3>
+      <p>
+        There is nothing to opt out of, because there is no processing to opt out
+        of. The app does its work with the network switched off, and it keeps
+        working that way. The single thing you can decline is the pdf.js download
+        described in <a href="#cdnjs">the one transfer</a>, and declining it costs
+        you exactly one feature: PDF import. If you want that refusal written
+        down, say so in an email with <span class="rbx-code">[Privacy]</span> in
+        the subject and it will be acknowledged.
+      </p>
+
+      <p class="rbx-note">
+        Three limits that follow from the architecture, stated so they are not
+        discovered later. We hold no register of visitors, so there is no file to
+        amend, no account to close and nothing to deactivate. With no account
+        there is also no way to verify who you are before acting on a request, so
+        please do not send anything sensitive expecting it to be checked against a
+        record. And with no server there is nothing to retrieve, restore or
+        confirm, because nothing was ever received. Where a request needs a
+        record we do not hold, you will be told so plainly and given the
+        instruction to do it yourself instead.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="complaints">
+    <div class="rbx-wrap">
+      <h2>Complaints, grievances, and how they get answered</h2>
+      <p>
+        Send it to <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>,
+        with <span class="rbx-code">[Privacy]</span> in the subject for anything
+        on this page and <span class="rbx-code">[Legal]</span> for anything about
+        the terms. That mailbox reaches Utkarsh, the operator, directly. There is
+        no ticket system in front of it, no shared inbox, and no queue: one
+        person reads what arrives.
+      </p>
+      <p>
+        Utkarsh replies within seven days, usually sooner. Seven days is what one
+        person can commit to without it quietly becoming untrue. If it passes, a
+        nudge in the same thread is fair, and it will be picked up.
+      </p>
+      <p>What is worth putting in the message:</p>
+      <ul class="rbx-list">
+        <li data-reveal>What you expected to happen, and what happened instead.</li>
+        <li data-reveal>The page and the section, quoted rather than described.</li>
+        <li data-reveal>Your browser and roughly when it happened.</li>
+        <li data-reveal>What you want to happen now. A correction, an explanation, or a deletion of something on this site.</li>
+      </ul>
+      <p>
+        What comes back depends on what is actually true. A page that states
+        something the code contradicts gets corrected, and the last-updated date
+        at the top of this page changes. A claim you disagree with gets argued
+        with, not quietly removed. A request about data you think is held here
+        cannot be fulfilled, because none is, and the answer will say so instead
+        of pretending otherwise. A critical review of this site is not a
+        grievance and will not be taken down to settle one.
+      </p>
+      <p>
+        If a reply does not resolve it, reply to that thread and say what is still
+        open. Beyond that, escalation is available to you: under the laws of India
+        a dispute goes to the courts competent where the operator resides. It is
+        worth being straight about the shape of that, though. Resumeboard holds no
+        resume and processes no personal data, so there is no processing here for
+        a data-protection oversight body to adjudicate. What remains is a
+        disagreement about a page on this site or about something you sent in, and
+        the honest description of that route is the courts, not a regulator. Both this
+        site and the operator's <a href="https://www.linkedin.com/in/utkarsh-choudhary-116a9736a/" target="_blank" rel="noopener noreferrer">professional profile</a>
+        are public, and saying something in public is also a route.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="children">
+    <div class="rbx-wrap">
+      <h2>Children</h2>
+      <p>
+        The builder is not directed at anyone under 16, and it collects nothing
+        about anyone: not a child, not a parent, not an adult. There is no
+        account, no form, no analytics and no server, so there is no collection
+        for a parent to consent to and no record for anyone to hold. A consent
+        mechanism would be theatre: there is nothing behind it to consent to.
+      </p>
+      <p>
+        What does exist is the arrangement described in
+        <a href="#shared">if you are on a shared computer</a>: a resume typed into
+        the app sits in that browser profile until it is deleted. That is a
+        property of local storage on a shared machine, not a disclosure to us, and
+        the same four precautions apply to a child as to anybody else. Export the
+        backup, use a private window, do not leave a share link in the address
+        bar, and delete the database when you are done.
+      </p>
+      <p>
+        If you are under 16, ask a parent or a guardian before putting personal
+        details into a resume you plan to send to anyone.
+      </p>
+      <p>
+        If you are a parent or a guardian with a question about a child using
+        this site, write to
+        <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a> with
+        <span class="rbx-code">[Privacy]</span> in the subject, say who you are
+        and what you are asking about, and the answer will usually be that we hold
+        nothing about your child, because we hold nothing about anyone. No
+        identification will be asked for, because there are no records to search
+        and no account to match against.
+      </p>
+    </div>
+  </section>
+
+  <section class="rb-section" id="changes">
+    <div class="rbx-wrap">
+      <h2>Changes to this page</h2>
+      <p>
+        This page is a plain file in the same tree as the application, which is
+        also why it can be checked. Every claim above names the source file it
+        comes from, and the app is plain HTML, CSS, and JavaScript that you can
+        read in full. If a claim here and a line of code ever disagree, the code
+        is the truth and the claim is the bug.
+      </p>
+      <p>
+        The date at the top of this page changes when the page does. A revision
+        that corrects a factual claim will say so in the section it corrects, and
+        a revision that changes how data is handled will also change the
+        <a href="terms.html">Terms of Service</a>, because the two pages describe
+        the same arrangement from opposite ends. There is no changelog file
+        because there is no need for one: the file's own history is the record.
       </p>
     </div>
   </section>
@@ -606,18 +891,27 @@
 
       <h3 class="rbx-mt-6">Where do I send a privacy question?</h3>
       <p>
-        Nowhere, because there is no server to receive it. This page is a plain file
-        served from the same directory as the app, and every claim on it names the
-        source file it comes from, so the fastest answer to a question is usually to
-        read the line it points at. If you would rather read about the design
-        decisions behind all of this, <a href="about.html">the about page</a> covers
-        the trade-offs, and the <a href="guides/index.html">guides</a> cover the writing.
+        To <a href="mailto:Utkarsh6624@gmail.com">Utkarsh6624@gmail.com</a>, with
+        <span class="rbx-code">[Privacy]</span> in the subject line. It is one
+        real mailbox and it reaches Utkarsh, the operator of this site, directly.
+        There is no ticketing system in front of it and no support desk: one
+        person reads what arrives, and replies, normally within seven days.
+      </p>
+      <p>
+        Having no server is a fact about the architecture, not about who to ask.
+        Every claim above names the source file it comes from, so reading the line
+        it points at often answers the question first. If it does not, the mailbox
+        gets a real reply. If you would rather read about the design decisions
+        behind all of this, <a href="about.html">the about page</a> covers the
+        trade-offs, and the <a href="guides/index.html">guides</a> cover the
+        writing.
       </p>
 
       <div class="rbx-actions" style="margin-top:var(--rb-space-8)">
         <a class="rb-btn rb-btn--primary rb-btn--lg" href="editor.html#start">Open the builder</a>
         <a class="rb-btn rb-btn--secondary rb-btn--lg" href="about.html">How the app works</a>
         <a class="rb-btn rb-btn--ghost rb-btn--lg" href="guides/index.html">Writing guides</a>
+        <a class="rb-btn rb-btn--ghost rb-btn--lg" href="terms.html">Terms of Service</a>
       </div>
     </div>
   </section>
@@ -641,7 +935,7 @@
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
       <a href="privacy.html">Privacy</a>
-      <a href="contact.html">Contact</a>
+      <a href="terms.html">Terms</a>
       <a href="guides/index.html">Guides</a>
       <a href="404.html">Page not found</a>
     </nav>
@@ -693,8 +987,8 @@
 })(window, document);
 </script>
 
-<script src="assets/js/core/utils.js?v=d639f64b7f"></script>
-<script src="assets/js/motion.js?v=d639f64b7f"></script>
+<script src="assets/js/core/utils.js?v=5e611bd7a4"></script>
+<script src="assets/js/motion.js?v=5e611bd7a4"></script>
   <div class="rb-contact" role="contentinfo" aria-label="Contact">
     <span class="rb-contact__label">Built by</span>
     <strong class="rb-contact__name">Utkarsh</strong>
