@@ -142,7 +142,7 @@
     '',
     'The landing page and the editor both work without a network once they',
     'have been opened once while you were online. Reconnect and reload to',
-    'get this page, or go to the editor at /app.html.'
+    'get this page, or go to the editor at /editor.html.'
   ].join('\n');
 
   var cacheName = null;
