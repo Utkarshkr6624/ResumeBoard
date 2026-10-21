@@ -1,4 +1,4 @@
-# Resumeboard — https://resumeboard.app
+# Resumeboard — https://resumeboard.vercel.app
 #
 # Every URL on this host is public and every page is meant to be indexed, so
 # nothing is blocked. Pages that should stay out of search results carry a
@@ -10,4 +10,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://resumeboard.app/sitemap.xml
+Sitemap: https://resumeboard.vercel.app/sitemap.xml

@@ -22,445 +22,445 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://resumeboard.app/</loc>
+    <loc>https://resumeboard.vercel.app/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/ats/</loc>
+    <loc>https://resumeboard.vercel.app/ats/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/examples/</loc>
+    <loc>https://resumeboard.vercel.app/examples/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/guides/</loc>
+    <loc>https://resumeboard.vercel.app/guides/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/templates/</loc>
+    <loc>https://resumeboard.vercel.app/templates/</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/classic.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/classic.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/modern.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/modern.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/compact.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/compact.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/executive.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/executive.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/academic.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/academic.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/minimal.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/minimal.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/two-column.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/two-column.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/print-safe.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/print-safe.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/technical.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/technical.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/rail.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/rail.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/triptych.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/triptych.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/timeline.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/timeline.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/cards.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/cards.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/ledger.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/ledger.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/gallery.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/gallery.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/maximalist.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/maximalist.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/regent.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/regent.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/accentbar.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/accentbar.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/boxed.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/boxed.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/numbered.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/numbered.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/hairline.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/hairline.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/centred.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/centred.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/flush.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/flush.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/inverted.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/inverted.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/portrait.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/portrait.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/thirds.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/thirds.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/keel.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/keel.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/marginalia.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/marginalia.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/terminal.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/terminal.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/banner.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/banner.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/letterpress.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/letterpress.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/folio.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/folio.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/stamped.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/stamped.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/clinical.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/clinical.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/legal.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/legal.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/hospitality.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/hospitality.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/trade.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/trade.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/civic.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/civic.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/agency.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/agency.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/finance.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/finance.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/nonprofit.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/nonprofit.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/research.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/research.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/teaching.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/teaching.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/retail.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/retail.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/logistics.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/logistics.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/entry.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/entry.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/career-change.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/career-change.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/euro-cv.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/euro-cv.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/swiss.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/swiss.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/oneline.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/oneline.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/block.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/block.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/monochrome.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/monochrome.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/dense.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/dense.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/wide.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/wide.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/narrow.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/narrow.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/archive.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/archive.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/counsel.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/counsel.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/monospace.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/monospace.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/templates/compliance.html</loc>
+    <loc>https://resumeboard.vercel.app/templates/compliance.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -468,154 +468,154 @@
 
 
   <url>
-    <loc>https://resumeboard.app/ats/greenhouse.html</loc>
+    <loc>https://resumeboard.vercel.app/ats/greenhouse.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/ats/workday.html</loc>
+    <loc>https://resumeboard.vercel.app/ats/workday.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/ats/taleo.html</loc>
+    <loc>https://resumeboard.vercel.app/ats/taleo.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/ats/lever.html</loc>
+    <loc>https://resumeboard.vercel.app/ats/lever.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/ats/icims.html</loc>
+    <loc>https://resumeboard.vercel.app/ats/icims.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/ats/lever-and-greenhouse-comparison.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://resumeboard.app/examples/product-designer.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/software-engineer.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/marketing-manager.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/nurse.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/accountant.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/teacher.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/entry-level-resume.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/resume-for-college-student.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/technical-resume.html</loc>
-    <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://resumeboard.app/examples/career-change-resume.html</loc>
+    <loc>https://resumeboard.vercel.app/ats/lever-and-greenhouse-comparison.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/guides/resume-basics.html</loc>
+    <loc>https://resumeboard.vercel.app/examples/product-designer.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/guides/action-verbs.html</loc>
+    <loc>https://resumeboard.vercel.app/examples/software-engineer.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/guides/quantifying-impact.html</loc>
+    <loc>https://resumeboard.vercel.app/examples/marketing-manager.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/guides/ats-formatting.html</loc>
+    <loc>https://resumeboard.vercel.app/examples/nurse.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/guides/when-to-use-two-columns.html</loc>
+    <loc>https://resumeboard.vercel.app/examples/accountant.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/examples/teacher.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/examples/entry-level-resume.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/examples/resume-for-college-student.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/examples/technical-resume.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/examples/career-change-resume.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/about.html</loc>
+    <loc>https://resumeboard.vercel.app/guides/resume-basics.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/guides/action-verbs.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/guides/quantifying-impact.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/guides/ats-formatting.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://resumeboard.vercel.app/guides/when-to-use-two-columns.html</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://resumeboard.vercel.app/about.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/privacy.html</loc>
+    <loc>https://resumeboard.vercel.app/privacy.html</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <url>
-    <loc>https://resumeboard.app/contact.html</loc>
+    <loc>https://resumeboard.vercel.app/contact.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://resumeboard.app/terms.html</loc>
+    <loc>https://resumeboard.vercel.app/terms.html</loc>
     <lastmod>2026-10-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
